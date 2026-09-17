@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Garden Journal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Kalam:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- =========================================================
+         TOP APP HEADER
+         Hidden by default; shown when a journal or archive view is open.
+         ========================================================= -->
+    <nav class="app-bar is-hidden" id="appBar">
+        <div class="app-branding" onclick="showLandingPage()" title="Return to Journal Front Cover">
+            <span class="app-main-title">My Garden Journal ⌂</span>
+            <span class="app-subtitle">little things worth remembering</span>
+        </div>
+
+        <div class="app-actions">
+            <button class="btn-new-entry" onclick="createNewEntryFromCover()">+ New Entry</button>
+
+            <div class="app-search-control">
+                <select id="archiveMonthSelect" class="app-search-select">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09" selected>September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select id="archiveYearSelect" class="app-search-select">
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
+                <button class="btn-search-go" onclick="triggerArchiveSearch()" title="Open Month Archive">Search</button>
+            </div>
+
+            <div class="menu-wrapper">
+                <button class="three-dot-trigger" id="menuTrigger" onclick="toggleDropdown(event)">⋮</button>
+                <div class="app-dropdown" id="appDropdown">
+                    <button class="dropdown-item" onclick="handleMenuAction('edit')">Edit Entry</button>
+                    <button class="dropdown-item" onclick="handleMenuAction('photos')">Add Photos</button>
+                    <button class="dropdown-item" onclick="handleMenuAction('export-pdf')">Export as PDF</button>
+                    <button class="dropdown-item" onclick="handleMenuAction('export-png')">Export as PNG</button>
+                    <button class="dropdown-item danger-action" onclick="handleMenuAction('delete')">Delete Entry</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App system notification banner -->
+    <div class="app-notification-box" id="appNotification">Action performed successfully</div>
+
+
+    <!-- =========================================================
+         VIEW: LANDING PAGE (front cover)
+         ========================================================= -->
+    <div id="landingViewContainer" class="view-panel active">
+        <main class="landing-page-cover paper-sheet">
+
+            <div class="cover-graphics-container">
+                <svg class="cover-graphic cover-graphic--top-right" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="35" fill="var(--coral-red)" />
+                    <circle cx="35" cy="35" r="8" fill="var(--citrus-yellow)" />
+                    <path d="M 50 15 Q 60 5, 80 12" stroke="var(--deep-green)" stroke-width="3" fill="none"/>
+                </svg>
+                <svg class="cover-graphic cover-graphic--bottom-left" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="var(--citrus-yellow)" />
+                    <path d="M 50 10 C 35 25, 20 50, 50 90" stroke="var(--leaf-green)" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+
+            <div class="cover-header">
+                <h1 class="cover-main-title">My<br>Garden<br>Journal</h1>
+                <p class="cover-tagline">little things worth remembering</p>
+            </div>
+
+            <div class="cover-content-grid">
+
+                <!-- A: New Entry -->
+                <div class="cover-action-card primary-action" onclick="createNewEntryFromCover()">
+                    <div>
+                        <span class="action-card-label">Begin Recording</span>
+                        <h2 class="action-card-title">+ New Entry</h2>
+                    </div>
+                    <p class="action-card-desc">Open a completely blank, structured editorial sheet frame to capture today's growth notes, micro-climate factors, and snapshots.</p>
+                </div>
+
+                <div class="cover-side-column">
+
+                    <!-- B: Archive -->
+                    <div class="cover-action-card archive-action">
+                        <div>
+                            <span class="action-card-label">Archival Chronicles</span>
+                            <h2 class="action-card-title">The Index</h2>
+                        </div>
+                        <div class="cover-archive-controls">
+                            <select id="coverMonthSelect" class="cover-select">
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09" selected>September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select id="coverYearSelect" class="cover-select">
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                                <option value="2027">2027</option>
+                            </select>
+                            <button class="btn-cover-search" onclick="triggerArchiveSearchFromCover()">Open Log View →</button>
+                        </div>
+                    </div>
+
+                    <!-- C: Surprise Me -->
+                    <div class="cover-action-card surprise-action" onclick="triggerSurpriseMe()">
+                        <div>
+                            <span class="action-card-label">Random Retrieval</span>
+                            <h2 class="action-card-title">Surprise Me ✦</h2>
+                        </div>
+                        <p class="action-card-desc">Reopen a random past garden log signature instantaneously.</p>
+                    </div>
+
+                </div>
+
+                <!-- D: Utilities -->
+                <div class="cover-action-card utility-action">
+                    <div>
+                        <span class="action-card-label">System Tools</span>
+                        <h2 class="action-card-title">Utilities</h2>
+                    </div>
+                    <div class="cover-archive-controls">
+                        <button class="btn-cover-search" onclick="showNotification('Database backup sequence complete.')">Backup Journal</button>
+                        <button class="btn-cover-search" onclick="showNotification('Local archive records verified.')">Restore System</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="cover-footer">
+                <span class="cover-footer-meta">VOL. 01 // INDEPENDENT PRINT FORMAT</span>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!-- =========================================================
+         VIEW: JOURNAL PAGE
+         ========================================================= -->
+    <div id="journalViewContainer" class="view-panel">
+        <main class="journal-page paper-sheet" id="journalPage">
+
+            <div class="entry-meta-stamp">
+                <div>
+                    <label>Journal Sheet Logs</label>
+                    <span id="autoSaveIndicator" class="auto-save-indicator">Saved ✓</span>
+                </div>
+                <div>
+                    <span class="entry-date-label">Entry Date: </span>
+                    <input type="date" id="entryInlineDate" class="entry-inline-datepicker" onchange="handleInlineDateChange(this.value)">
+                </div>
+            </div>
+
+            <div class="entry-weather-box">
+                <span class="weather-prompt">How does it feel today?</span>
+                <div class="weather-stats-input" id="weatherStatsInput" contenteditable="true" placeholder="e.g., 82°F · Sunny"></div>
+                <div class="weather-feel-input" id="weatherFeelInput" contenteditable="true" placeholder="Hot and humid, but there was a lovely breeze this morning..."></div>
+            </div>
+
+            <svg class="botanical-bg-decor decor-top-left" width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <path d="M10,90 Q30,60 80,20" stroke="#1B511F" stroke-width="1"/>
+                <path d="M30,65 Q20,50 35,45 Q45,55 30,65 Z" fill="#578859"/>
+            </svg>
+
+            <svg class="botanical-bg-decor decor-bottom-right" width="110" height="110" viewBox="0 0 100 100" fill="none">
+                <path d="M90,90 Q60,70 20,20" stroke="#1B511F" stroke-width="1"/>
+                <circle cx="45" cy="45" r="8" fill="var(--citrus-yellow)" opacity="0.75"/>
+            </svg>
+
+            <div class="journal-sections-container" id="sectionsContainer">
+
+                <!-- Composition 1: photo right / text left -->
+                <section class="journal-section arr-1" id="section1">
+                    <div class="text-wrapper">
+                        <span class="section-note-label">Morning Observations</span>
+                        <div class="text-area-input" id="textInput1" contenteditable="true" placeholder="Click here to write notes..."></div>
+                    </div>
+                    <div class="photo-wrapper">
+                        <div class="photo-container" onclick="triggerPhotoUpload(1)">
+                            <div class="photo-frame" id="photoFrame1"></div>
+                        </div>
+                        <input type="file" id="fileInput1" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 1)">
+                    </div>
+                </section>
+
+                <div class="divider-container" id="divider1">
+                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
+                        <path d="M 10 12 Q 150 5, 310 14 T 620 7 T 790 11" />
+                    </svg>
+                </div>
+
+                <!-- Composition 2: wide photo on top / text underneath -->
+                <section class="journal-section arr-2" id="section2">
+                    <div class="photo-wrapper">
+                        <div class="photo-container" onclick="triggerPhotoUpload(2)">
+                            <div class="photo-frame" id="photoFrame2"></div>
+                        </div>
+                        <input type="file" id="fileInput2" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 2)">
+                    </div>
+                    <div class="text-wrapper">
+                        <span class="section-note-label">Midday Harvest Notes</span>
+                        <div class="text-area-input" id="textInput2" contenteditable="true" placeholder="Type wide horizontally layout notes directly..."></div>
+                    </div>
+                </section>
+
+                <div class="divider-container" id="divider2">
+                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
+                        <path d="M 15 8 Q 210 15, 400 6 T 785 13" />
+                    </svg>
+                </div>
+
+                <!-- Composition 3: photo left / text right -->
+                <section class="journal-section arr-3" id="section3">
+                    <div class="photo-wrapper">
+                        <div class="photo-container" onclick="triggerPhotoUpload(3)">
+                            <div class="photo-frame" id="photoFrame3"></div>
+                        </div>
+                        <input type="file" id="fileInput3" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 3)">
+                    </div>
+                    <div class="text-wrapper">
+                        <span class="section-note-label">Pruning Reflections</span>
+                        <div class="text-area-input" id="textInput3" contenteditable="true" placeholder="Click here to record structural notes..."></div>
+                    </div>
+                </section>
+
+                <div class="divider-container" id="divider3">
+                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
+                        <path d="M 8 10 Q 190 6, 450 14 T 792 9" />
+                    </svg>
+                </div>
+
+                <!-- Composition 4: photo right / text left -->
+                <section class="journal-section arr-4" id="section4">
+                    <div class="text-wrapper">
+                        <span class="section-note-label">Dusk Sanctuary Details</span>
+                        <div class="text-area-input" id="textInput4" contenteditable="true" placeholder="Capture quiet twilight garden items..."></div>
+                    </div>
+                    <div class="photo-wrapper">
+                        <div class="photo-container" onclick="triggerPhotoUpload(4)">
+                            <div class="photo-frame" id="photoFrame4"></div>
+                        </div>
+                        <input type="file" id="fileInput4" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 4)">
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <footer class="bottom-nav">
+            <button class="btn-nav" id="btnPrev" onclick="navigatePage(-1)">← Previous</button>
+            <span class="nav-page-indicator" id="pageIndicator">Page 1 of 1</span>
+            <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button>
+        </footer>
+    </div>
+
+
+    <!-- =========================================================
+         VIEW: MONTH ARCHIVE
+         ========================================================= -->
+    <div id="archiveViewContainer" class="view-panel">
+        <main class="archive-page paper-sheet">
+            <a class="archive-back-link" onclick="exitArchiveView()">← Back to Journal</a>
+
+            <div class="archive-title-block">
+                <h1 class="archive-main-title" id="archiveDisplayHeader">September 2026</h1>
+                <div class="archive-title-divider"></div>
+
+                <div class="archive-inline-browser">
+                    <span class="archive-browser-label">Browse another:</span>
+                    <select id="innerArchiveMonth" class="archive-inline-select" onchange="syncInnerArchive()">
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09" selected>September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                    <select id="innerArchiveYear" class="archive-inline-select" onchange="syncInnerArchive()">
+                        <option value="2025">2025</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="archive-list" id="archiveEntriesList"></div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
