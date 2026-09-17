@@ -1,0 +1,630 @@
+/* =========================================================
+   GARDEN JOURNAL — STYLES
+   Palette, typography, and layout preserved from the original.
+   ========================================================= */
+
+:root {
+    --bg-outer: #F4F3E2;
+    --bg-paper: #FBFAE9;
+    --color-text: #1B511F;
+    --deep-green: #1B511F;
+    --coral-red: #DC4F49;
+    --leaf-green: #578859;
+    --muted-purple: #776899;
+    --mustard: #E5A93C;
+    --citrus-yellow: #F2C94C;
+    --shadow-paper: rgba(27, 81, 31, 0.05);
+    --header-dark: #1B511F;
+
+    /* Shared layout constants */
+    --sheet-width: 906px;
+    --sheet-content-x: 55px;
+
+    /* Shared font stacks */
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Newsreader', serif;
+    --font-hand: 'Kalam', cursive;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-outer);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding: 0 0 50px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   SHARED PAPER SHEET
+   Used by the landing cover, journal page, and archive page.
+   ========================================================= */
+.paper-sheet {
+    width: var(--sheet-width);
+    background-color: var(--bg-paper);
+    box-shadow: 0 4px 30px var(--shadow-paper);
+    border: 1px solid rgba(27, 81, 31, 0.08);
+    border-radius: 0;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   TOP APP HEADER
+   ========================================================= */
+.app-bar {
+    width: var(--sheet-width);
+    max-width: 100%;
+    background-color: var(--bg-paper);
+    border-bottom: 2px solid var(--deep-green);
+    color: var(--color-text);
+    padding: 20px var(--sheet-content-x);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(27, 81, 31, 0.02);
+    margin: 40px auto 15px auto;
+}
+
+.app-bar.is-hidden { display: none; }
+
+.app-branding {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.app-main-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--deep-green);
+    text-transform: none;
+}
+
+.app-subtitle {
+    font-family: var(--font-hand);
+    font-size: 0.9rem;
+    color: var(--leaf-green);
+    letter-spacing: 0;
+    margin-top: 2px;
+}
+
+.app-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-new-entry {
+    background-color: transparent;
+    color: var(--deep-green);
+    border: 2px solid var(--deep-green);
+    padding: 6px 14px;
+    border-radius: 0;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-new-entry:hover {
+    background-color: var(--deep-green);
+    color: var(--bg-paper);
+    border-color: var(--deep-green);
+}
+
+/* Header archive search control */
+.app-search-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border-bottom: 2px solid var(--deep-green);
+    padding: 2px 4px;
+}
+
+.app-search-control:focus-within {
+    border-bottom-color: var(--citrus-yellow);
+}
+
+.app-search-select {
+    background: transparent;
+    border: none;
+    color: var(--deep-green);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    padding-right: 4px;
+}
+
+.app-search-select option {
+    background-color: var(--bg-paper);
+    color: var(--deep-green);
+}
+
+.btn-search-go {
+    background: transparent;
+    border: none;
+    color: var(--coral-red);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.15s ease;
+}
+
+.btn-search-go:hover { color: var(--citrus-yellow); }
+
+/* Three-dot menu */
+.menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.three-dot-trigger {
+    background: none;
+    border: none;
+    color: var(--deep-green);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+    font-weight: 700;
+}
+
+.three-dot-trigger:hover { color: var(--citrus-yellow); }
+
+.app-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background-color: var(--bg-paper);
+    border: 2px solid var(--deep-green);
+    border-radius: 0;
+    min-width: 180px;
+    box-shadow: 0 4px 15px rgba(27, 81, 31, 0.08);
+    display: none;
+    flex-direction: column;
+    z-index: 110;
+}
+
+.app-dropdown.show { display: flex; }
+
+.dropdown-item {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 10px 16px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--deep-green);
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s ease;
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(27, 81, 31, 0.05);
+    color: var(--coral-red);
+    padding-left: 20px;
+}
+
+.dropdown-item.danger-action {
+    color: var(--coral-red);
+    border-top: 1px dashed var(--deep-green);
+}
+
+.dropdown-item.danger-action:hover {
+    background-color: rgba(220, 79, 73, 0.05);
+}
+
+/* Notification banner */
+.app-notification-box {
+    position: fixed;
+    top: 75px;
+    right: 20px;
+    background-color: var(--deep-green);
+    color: var(--bg-paper);
+    padding: 10px 20px;
+    border-radius: 0;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-10px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.215, 0.610, 0.355, 1);
+    z-index: 200;
+    pointer-events: none;
+    border: 1px solid rgba(251, 250, 233, 0.15);
+}
+
+.app-notification-box.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* =========================================================
+   VIEW PANELS
+   ========================================================= */
+.view-panel { display: none; width: auto; }
+.view-panel.active { display: block; }
+
+/* =========================================================
+   LANDING PAGE — FRONT COVER
+   ========================================================= */
+.landing-page-cover {
+    min-height: 1090px;
+    height: auto;
+    padding: 70px 80px 50px 80px;
+    justify-content: space-between;
+    overflow: hidden;
+    margin: 40px auto;
+}
+
+.cover-graphics-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.cover-graphic { position: absolute; }
+
+.cover-graphic--top-right {
+    right: -20px;
+    top: 60px;
+    opacity: 0.85;
+    width: 160px;
+    height: 160px;
+}
+
+.cover-graphic--bottom-left {
+    left: -40px;
+    bottom: 180px;
+    opacity: 0.65;
+    transform: rotate(45deg);
+    width: 200px;
+    height: 200px;
+}
+
+.cover-header {
+    position: relative;
+    z-index: 10;
+    text-align: left;
+    border-bottom: 3px double var(--deep-green);
+    padding-bottom: 30px;
+}
+
+.cover-main-title {
+    font-family: var(--font-display);
+    font-size: 4.8rem;
+    font-weight: 800;
+    line-height: 0.95;
+    color: var(--deep-green);
+    letter-spacing: -2px;
+    text-transform: uppercase;
+}
+
+.cover-tagline {
+    font-family: var(--font-hand);
+    font-size: 1.4rem;
+    color: var(--coral-red);
+    font-weight: 700;
+    margin-top: 14px;
+    letter-spacing: -0.5px;
+}
+
+.cover-content-grid {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin: 40px auto;
+    max-width: 720px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+/* Lets the side-column's children flow into the 2x2 grid directly */
+.cover-side-column { display: contents; }
+
+.cover-action-card {
+    padding: 30px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 2px solid var(--deep-green);
+    background-color: var(--bg-paper);
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    transition: transform 0.25s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.cover-action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(27, 81, 31, 0.1);
+}
+
+/* --- Card variants --- */
+.cover-action-card.primary-action {
+    background-color: var(--coral-red);
+    border-color: var(--deep-green);
+    color: var(--bg-paper);
+}
+
+.primary-action .action-card-label { color: var(--citrus-yellow); }
+
+.cover-action-card.archive-action {
+    background-color: var(--muted-purple);
+    color: var(--bg-paper);
+    cursor: default;
+}
+
+.archive-action .action-card-label { color: var(--citrus-yellow); }
+
+.cover-action-card.surprise-action {
+    background-color: var(--citrus-yellow);
+    color: var(--deep-green);
+    border-color: var(--deep-green);
+}
+
+.surprise-action .action-card-label { color: var(--coral-red); }
+
+.surprise-action .action-card-desc {
+    border-top: 1px dashed rgba(27, 81, 31, 0.2);
+    padding-top: 12px;
+    margin-top: auto;
+}
+
+.cover-action-card.utility-action {
+    background-color: var(--leaf-green);
+    color: var(--bg-paper);
+    border-color: var(--deep-green);
+    cursor: default;
+}
+
+.utility-action .action-card-label { color: var(--citrus-yellow); }
+
+.utility-action .cover-archive-controls {
+    border-top-color: rgba(251, 250, 233, 0.3);
+    gap: 6px;
+}
+
+/* --- Card inner typography --- */
+.action-card-label {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.8;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.action-card-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 15px;
+}
+
+.action-card-desc {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    line-height: 1.5;
+    opacity: 0.9;
+}
+
+.primary-action .action-card-desc {
+    border-top: 1px dashed rgba(251, 250, 233, 0.4);
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+/* --- Archive/utility controls inside cards --- */
+.cover-archive-controls {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px dashed rgba(251, 250, 233, 0.3);
+    padding-top: 12px;
+    width: 100%;
+}
+
+.cover-select {
+    background-color: rgba(251, 250, 233, 0.15);
+    border: 2px solid var(--bg-paper);
+    padding: 6px 12px;
+    color: var(--bg-paper);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.cover-select option {
+    background-color: var(--muted-purple);
+    color: var(--bg-paper);
+}
+
+.btn-cover-search {
+    background-color: #FBFAE9;
+    color: var(--deep-green);
+    border: 2px solid var(--deep-green);
+    padding: 7px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all 0.15s ease;
+    width: 100%;
+}
+
+.btn-cover-search:hover {
+    background-color: var(--deep-green);
+    color: var(--bg-paper);
+    border-color: var(--deep-green);
+}
+
+.cover-footer {
+    position: relative;
+    z-index: 10;
+    border-top: 2px dashed rgba(27, 81, 31, 0.3);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cover-footer-meta {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--leaf-green);
+}
+
+/* =========================================================
+   JOURNAL PAGE
+   ========================================================= */
+.journal-page {
+    min-height: 1090px;
+    height: auto;
+    padding: 30px var(--sheet-content-x);
+}
+
+.journal-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 1px;
+    background: rgba(27, 81, 31, 0.03);
+}
+
+.entry-meta-stamp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--deep-green);
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+}
+
+.entry-meta-stamp label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--deep-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.auto-save-indicator {
+    font-family: var(--font-hand);
+    color: var(--leaf-green);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-left: 12px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: inline-block;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.entry-date-label {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--deep-green);
+    font-weight: 500;
+}
+
+.entry-inline-datepicker {
+    border: none;
+    background: transparent;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    color: var(--coral-red);
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+}
+
+.entry-inline-datepicker:hover { color: var(--citrus-yellow); }
+
+.entry-weather-box {
+    margin-bottom: 20px;
+    padding: 4px 0 12px 0;
+    border-bottom: 1px dashed rgba(27, 81, 31, 0.2);
+    text-align: left;
+}
+
+.weather-prompt {
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    color: var(--muted-purple);
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.weather-stats-input {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--deep-green);
+    border: none;
+    background: transparent;
+    outline: none;
+    margin-bottom: 4px;
+}
+
+.weather-stats
