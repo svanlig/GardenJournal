@@ -90,6 +90,7 @@ const SECTION_COUNT = 4;
 window.onload = function () {
     renderEntry(currentEntryIndex);
     setupWeatherListeners();
+    lockJournalEditing();
     document.querySelector('.app-bar').style.display = 'none';
 };
 
