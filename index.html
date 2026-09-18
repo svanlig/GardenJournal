@@ -169,10 +169,19 @@
             </div>
 
             <div class="entry-weather-box">
-                <span class="weather-prompt">How does it feel today?</span>
-                <div class="weather-stats-input" id="weatherStatsInput" contenteditable="true" placeholder="e.g., 82°F · Sunny"></div>
-                <div class="weather-feel-input" id="weatherFeelInput" contenteditable="true" placeholder="Hot and humid, but there was a lovely breeze this morning..."></div>
-            </div>
+                <div class="weather-location-row">
+                    <span id="gardenLocationDisplay">Tallahassee, FL</span>
+                    <button type="button" id="changeLocationButton" onclick="changeGardenLocation()">Change location</button>
+                </div>
+
+                <div class="weather-stats-display" id="weatherStatsDisplay">
+                    Weather loading...
+                </div>
+
+                <div class="weather-feel-label">How does it feel today?</div>
+                <div class="weather-feel-input" id="weatherFeelInput" contenteditable="false"
+                placeholder="Hot and humid, but there was a lovely breeze this morning..."></div>
+           </div>
 
             <svg class="botanical-bg-decor decor-top-left" width="100" height="100" viewBox="0 0 100 100" fill="none">
                 <path d="M10,90 Q30,60 80,20" stroke="#1B511F" stroke-width="1"/>
