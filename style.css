@@ -572,55 +572,53 @@ body {
 .entry-inline-datepicker:hover { color: var(--citrus-yellow); }
 
 .entry-weather-box {
-    margin-bottom: 20px;
-    padding: 4px 0 12px 0;
-    border-bottom: 1px dashed rgba(27, 81, 31, 0.2);
-    text-align: left;
+    width: 100%;
+    margin: 4px 0 10px;
+}
+
+.weather-location-row,
+.weather-feel-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.weather-location-row {
+    justify-content: center;
+}
+
+.weather-feel-row {
+    justify-content: center;
+    margin-top: 3px;
+}
+
+.weather-stats-display {
+    display: inline;
 }
 
 .weather-prompt {
-    font-family: 'Betania Patmos', cursive;
-    font-size: 1.2rem;
+    display: inline;
+    margin: 0;
+    font-family: var(--font-hand);
+    font-size: 1rem;
     color: var(--muted-purple);
-    display: block;
-    margin-bottom: 2px;
     font-weight: 700;
-}
-
-.weather-stats-input {
-    display: inline-block;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--deep-green);
-    border: none;
-    background: transparent;
-    outline: none;
-    margin-bottom: 4px;
-}
-
-.weather-stats-input:empty::before {
-    content: attr(placeholder);
-    color: rgba(27, 81, 31, 0.4);
 }
 
 .weather-feel-input {
-    width: 100%;
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--deep-green);
-    border: none;
-    background: transparent;
+    display: inline;
+    min-width: 120px;
     outline: none;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: pre-wrap;
 }
 
 .weather-feel-input:empty::before {
     content: attr(placeholder);
-    color: rgba(27, 81, 31, 0.4);
+    opacity: 0.45;
+    font-style: italic;
 }
 
 /* =========================================================
