@@ -258,6 +258,21 @@ document.querySelectorAll('.text-area-input').forEach((input, idx) => {
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
+const journalTitle = document.getElementById('journalTitleInput');
+
+if (journalTitle) {
+    journalTitle.addEventListener('input', () => {
+        if (!isEditMode) return;
+
+        journalDatabase[currentEntryIndex].displayTitle =
+            journalTitle.innerText;
+
+        clearTimeout(typingDebounceTimeout);
+        typingDebounceTimeout = setTimeout(() => {
+            triggerAutoSaveFeedback();
+        }, 600);
+    });
+}
 });
 
 /* ---------------------------------------------------------
