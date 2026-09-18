@@ -1091,7 +1091,7 @@ body {
         display: flex;
         flex-direction: column;
         height: auto;
-        gap: 20px;
+        gap: 8px;
     }
 
     .journal-section.arr-2 {
