@@ -3,7 +3,7 @@
    Function names are unchanged so existing inline handlers
    in index.html continue to resolve.
    ========================================================= */
-
+let isEditMode = false;
 /* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
