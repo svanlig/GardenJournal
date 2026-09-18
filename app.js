@@ -177,10 +177,22 @@ function renderEntry(index) {
         }
     }
 
-    document.getElementById('pageIndicator').innerText =
+    const pageIndicator = document.getElementById('pageIndicator');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+
+if (pageIndicator) {
+    pageIndicator.innerText =
         `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
-    document.getElementById('btnPrev').disabled = (currentEntryIndex === 0);
-    document.getElementById('btnNext').disabled = (currentEntryIndex === journalDatabase.length - 1);
+}
+
+if (btnPrev) {
+    btnPrev.disabled = (currentEntryIndex === 0);
+}
+
+if (btnNext) {
+    btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
+}
 }
 
 function renderPlaceholder(id) {
