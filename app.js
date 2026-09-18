@@ -255,11 +255,6 @@ document.querySelectorAll('.text-area-input').forEach((input, idx) => {
     input.addEventListener('input', () => {
         journalDatabase[currentEntryIndex].sections[idx].text = input.innerText;
 
-        if (idx === 0 && input.innerText.trim().length > 0) {
-            const cleanWords = input.innerText.trim().split(" ").slice(0, 3).join(" ");
-            journalDatabase[currentEntryIndex].displayTitle = cleanWords + "...";
-        }
-
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
