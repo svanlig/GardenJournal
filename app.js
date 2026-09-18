@@ -359,9 +359,9 @@ function navigatePage(direction) {
 /* ---------------------------------------------------------
    THREE-DOT MENU
    --------------------------------------------------------- */
-function toggleDropdown(event) {
+function Dropdown(event) {
     event.stopPropagation();
-    document.getElementById('appDropdown').classList.toggle('show');
+    document.getElementById('appDropdown').classList.('show');
 }
 
 window.addEventListener('click', function () {
@@ -453,17 +453,51 @@ function showNotification(msg) {
 function toggleEditMode() {
     isEditMode = !isEditMode;
 
+    // Lock/unlock text areas
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
         .forEach(el => {
             el.contentEditable = isEditMode ? 'true' : 'false';
         });
 
-    document.getElementById('entryInlineDate').disabled = !isEditMode;
+    // Lock/unlock date
+    const dateInput = document.getElementById('entryInlineDate');
+    if (dateInput) {
+        dateInput.disabled = !isEditMode;
+    }
 
+    // Give photo areas a visual state
     document.querySelectorAll('.photo-container').forEach(photo => {
         photo.classList.toggle('photo-editable', isEditMode);
     });
 
-    document.getElementById('editModeButton').textContent =
-        isEditMode ? 'Done' : 'Edit';
+    // Change button
+    const button = document.getElementById('editModeButton');
+    if (button) {
+        button.textContent = isEditMode ? 'Done' : 'Edit';
+    }
+
+    if (isEditMode) {
+        showNotification('Edit mode on — you can now change this entry.');
+    } else {
+        triggerAutoSaveFeedback();
+        showNotification('Changes saved.');
+    }
+}
+function lockJournalEditing() {
+    document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
+        .forEach(el => {
+            el.contentEditable = 'false';
+        });
+
+    const dateInput = document.getElementById('entryInlineDate');
+    if (dateInput) {
+        dateInput.disabled = true;
+    }
+
+    isEditMode = false;
+
+    const button = document.getElementById('editModeButton');
+    if (button) {
+        button.textContent = 'Edit';
+    }
 }
