@@ -529,9 +529,13 @@ async function changeGardenLocation() {
         weatherDisplay.innerText = "Weather loading...";
     }
 
-    await updateEntryWeather();
+    try {
+        await updateEntryWeather();
+    } catch (error) {
+        console.error("Location weather update failed:", error);
+    }
 
-    showNotification(`Garden location updated to ${newLocation.trim()}.`);
+    triggerAutoSaveFeedback();
 }
 async function geocodeGardenLocation(locationName) {
     const url =
