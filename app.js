@@ -585,3 +585,44 @@ function weatherCodeToText(code) {
 
     return "Unknown";
 }
+async function updateEntryWeather() {
+    const entry = journalDatabase[currentEntryIndex];
+
+    if (!entry || !entry.location || !entry.date) return;
+
+    try {
+        const location = await geocodeGardenLocation(entry.location);
+
+        entry.latitude = location.latitude;
+        entry.longitude = location.longitude;
+        entry.timezone = location.timezone;
+
+        const weather = await getGardenWeather(
+            location.latitude,
+            location.longitude,
+            entry.date
+        );
+
+        const temperatureF = Math.round((weather.temperature * 9 / 5) + 32);
+        const condition = weatherCodeToText(weather.weatherCode);
+
+        entry.weatherStats = `${temperatureF}°F · ${condition}`;
+
+        const weatherDisplay = document.getElementById('weatherStatsDisplay');
+
+        if (weatherDisplay) {
+            weatherDisplay.innerText = entry.weatherStats;
+        }
+
+        triggerAutoSaveFeedback();
+
+    } catch (error) {
+        console.error("Weather lookup failed:", error);
+
+        const weatherDisplay = document.getElementById('weatherStatsDisplay');
+
+        if (weatherDisplay) {
+            weatherDisplay.innerText = "Weather unavailable";
+        }
+    }
+}
