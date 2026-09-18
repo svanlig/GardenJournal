@@ -658,3 +658,41 @@ function backupJournal() {
 
     showNotification('Garden Journal backup downloaded successfully.');
 }
+function restoreJournal() {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json,application/json';
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            try {
+                const restoredData = JSON.parse(e.target.result);
+
+                if (!Array.isArray(restoredData)) {
+                    throw new Error('Invalid backup format.');
+                }
+
+                journalDatabase = restoredData;
+                currentEntryIndex = 0;
+
+                renderEntry(currentEntryIndex);
+
+                showNotification('Garden Journal restored successfully.');
+
+            } catch (error) {
+                console.error('Restore failed:', error);
+                showNotification('Restore failed. The backup file is invalid.');
+            }
+        };
+
+        reader.readAsText(file);
+    });
+
+    fileInput.click();
+}
