@@ -528,6 +528,12 @@ function toggleEditMode() {
         triggerAutoSaveFeedback();
         showNotification('Changes saved.');
     }
+
+   const journalTitle = document.getElementById('journalTitleInput');
+   if (journalTitle) {
+    journalTitle.contentEditable = isEditMode ? 'true' : 'false';
+}
+   
 }
 function lockJournalEditing() {
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
