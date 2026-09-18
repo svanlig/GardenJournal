@@ -668,8 +668,14 @@ function restoreJournal() {
 
         if (!file) return;
 
-        const reader = new FileReader();
+         const confirmed = confirm(
+          'Restore this backup? Your current journal entries will be replaced.'
+         );
 
+       if (!confirmed) return;
+
+       const reader = new FileReader();
+       
         reader.onload = function(e) {
             try {
                 const restoredData = JSON.parse(e.target.result);
