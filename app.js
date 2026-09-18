@@ -353,6 +353,7 @@ function createNewEntry() {
     };
     journalDatabase.push(newBlankPage);
     renderEntry(journalDatabase.length - 1);
+    updateEntryWeather();
     showNotification('New blank journal page composition initialized.');
 }
 
