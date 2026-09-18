@@ -267,9 +267,25 @@ document.querySelectorAll('.text-area-input').forEach((input, idx) => {
 /* ---------------------------------------------------------
    DATE EDITING
    --------------------------------------------------------- */
-function handleInlineDateChange(dateValue) {
+/* ---------------------------------------------------------
+   DATE EDITING
+   --------------------------------------------------------- */
+async function handleInlineDateChange(dateValue) {
     if (!dateValue) return;
+
     journalDatabase[currentEntryIndex].date = dateValue;
+
+    const weatherDisplay = document.getElementById('weatherStatsDisplay');
+    if (weatherDisplay) {
+        weatherDisplay.innerText = "Weather loading...";
+    }
+
+    try {
+        await updateEntryWeather();
+    } catch (error) {
+        console.error("Date weather update failed:", error);
+    }
+
     triggerAutoSaveFeedback();
     showNotification(`Active sheet entry date set to: ${dateValue}`);
 }
