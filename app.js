@@ -417,8 +417,14 @@ function handleMenuAction(action) {
    PHOTOS
    --------------------------------------------------------- */
 function triggerPhotoUpload(id) {
-    document.getElementById('fileInput' + id).click();
+    if (!isEditMode) return;
+
+    const fileInput = document.getElementById('fileInput' + id);
+    if (fileInput) {
+        fileInput.click();
+    }
 }
+
 
 function handlePhotoSelect(event, id) {
     const file = event.target.files[0];
