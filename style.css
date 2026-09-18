@@ -839,23 +839,17 @@ body {
     to   { border-color: var(--coral-red); }
 }
 
-/* --- Wobbly divider between sections --- */
+/* --- Wobbly divider between sections (no more wobbly line!!) --- */
 .divider-container {
-    height: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
+    height: 1px;
+    width: 100%;
+    background-color: var(--deep-green);
     margin: 4px 0;
+    pointer-events: none;
 }
 
 .wobbly-line {
-    width: 100%;
-    height: 100%;
-    stroke: var(--mustard);
-    stroke-width: 3;
-    fill: none;
-    opacity: 0.75;
+    display: none;
 }
 
 /* --- Botanical background decorations --- */
