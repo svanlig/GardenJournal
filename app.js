@@ -367,7 +367,7 @@ function navigatePage(direction) {
 /* ---------------------------------------------------------
    THREE-DOT MENU
    --------------------------------------------------------- */
-function Dropdown(event) {
+function toggleDropdown(event) {
     event.stopPropagation();
     document.getElementById('appDropdown').classList.add('show');
 }
