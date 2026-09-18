@@ -387,6 +387,8 @@ function handleMenuAction(action) {
     } else if (action === 'export-pdf') {
         window.print();
     } else if (action === 'delete') {
+        const confirmed = confirm('Confirm Delete?');
+        if (!confirmed) return;
         if (journalDatabase.length > 1) {
             journalDatabase.splice(currentEntryIndex, 1);
             const targetIndex = Math.max(0, currentEntryIndex - 1);
