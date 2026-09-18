@@ -793,14 +793,9 @@ body {
     transition: transform 0.25s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
-.arr-1 .photo-container { transform: rotate(0.8deg); }
-.arr-3 .photo-container { transform: rotate(-0.6deg); }
-.arr-4 .photo-container { transform: rotate(0.5deg); }
-
-.photo-container:hover {
-    transform: scale(1.01) rotate(0deg) !important;
-    box-shadow: 0 6px 18px rgba(27, 81, 31, 0.12);
-    z-index: 5;
+.arr-1 .photo-container { transform: none; }
+.arr-3 .photo-container { transform: none; }
+.arr-4 .photo-container { transform: none; }
 }
 
 .photo-frame {
