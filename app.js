@@ -637,3 +637,24 @@ async function updateEntryWeather() {
         }
     }
 }
+function backupJournal() {
+    const backupData = JSON.stringify(journalDatabase, null, 2);
+
+    const blob = new Blob([backupData], {
+        type: 'application/json'
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `garden-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+
+    showNotification('Garden Journal backup downloaded successfully.');
+}
