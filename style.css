@@ -580,7 +580,7 @@ body {
 .weather-feel-row {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 4px;
     flex-wrap: wrap;
     font-family: var(--font-body);
     font-size: 0.95rem;
@@ -594,6 +594,7 @@ body {
 .weather-feel-row {
     justify-content: center;
     margin-top: 3px;
+    gap: 4px
 }
 
 .weather-stats-display {
