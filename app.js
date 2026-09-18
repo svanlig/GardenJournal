@@ -157,6 +157,10 @@ function renderEntry(index) {
     const entry = journalDatabase[currentEntryIndex];
 
     document.getElementById('entryInlineDate').value = entry.date;
+    const locationDisplay = document.getElementById('gardenLocationDisplay');
+    if (locationDisplay) {
+       locationDisplay.innerText = entry.location || 'Tallahassee, FL';
+    }
     const weatherDisplay = document.getElementById('weatherStatsDisplay');
     if (weatherDisplay) {
     weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
