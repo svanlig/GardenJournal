@@ -508,3 +508,21 @@ function lockJournalEditing() {
         button.textContent = 'Edit';
     }
 }
+function changeGardenLocation() {
+    const newLocation = prompt(
+        "Enter your garden location:",
+        journalDatabase[currentEntryIndex].location || ""
+    );
+
+    if (!newLocation || !newLocation.trim()) return;
+
+    journalDatabase[currentEntryIndex].location = newLocation.trim();
+
+    const locationDisplay = document.getElementById('gardenLocationDisplay');
+    if (locationDisplay) {
+        locationDisplay.innerText = newLocation.trim();
+    }
+
+    triggerAutoSaveFeedback();
+    showNotification(`Garden location updated to ${newLocation.trim()}.`);
+}
