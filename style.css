@@ -338,6 +338,7 @@ body {
     color: var(--deep-green);
     letter-spacing: -2px;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .cover-tagline {
