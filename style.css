@@ -579,7 +579,7 @@ body {
 }
 
 .weather-prompt {
-    font-family: var(--font-hand);
+    font-family: 'Betania Patmos', cursive;
     font-size: 1.2rem;
     color: var(--muted-purple);
     display: block;
@@ -628,7 +628,6 @@ body {
    ========================================================= */
 .journal-sections-container {
     display: grid;
-    grid-template-rows: repeat(4, minmax(190px, auto));
     flex-grow: 1;
     gap: 4px;
 }
