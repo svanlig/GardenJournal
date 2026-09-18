@@ -1018,7 +1018,8 @@ body {
    BOTTOM NAVIGATION
    ========================================================= */
 .bottom-nav {
-    margin-top: 35px;
+    margin-top: 10px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
