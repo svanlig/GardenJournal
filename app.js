@@ -157,7 +157,10 @@ function renderEntry(index) {
     const entry = journalDatabase[currentEntryIndex];
 
     document.getElementById('entryInlineDate').value = entry.date;
-    document.getElementById('weatherStatsDisplay').innerText = entry.weatherStats || '';
+    const weatherDisplay = document.getElementById('weatherStatsDisplay');
+    if (weatherDisplay) {
+    weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
+    }
     document.getElementById('weatherFeelInput').innerText = entry.weatherFeel || '';
 
     for (let i = 0; i < SECTION_COUNT; i++) {
