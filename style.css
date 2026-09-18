@@ -696,7 +696,7 @@ body {
 .arr-1 .text-wrapper {
     background-color: var(--coral-red);
     color: var(--bg-paper);
-    transform: rotate(-0.5deg);
+    transform: none;
 }
 .arr-1 .text-wrapper .section-note-label { color: var(--bg-paper); border-bottom-color: rgba(251, 250, 233, 0.3); }
 .arr-1 .text-wrapper .text-area-input    { color: var(--bg-paper); }
@@ -711,7 +711,7 @@ body {
 .arr-3 .text-wrapper {
     background-color: var(--muted-purple);
     color: var(--bg-paper);
-    transform: rotate(0.4deg);
+    transform: none;
 }
 .arr-3 .text-wrapper .section-note-label { color: var(--bg-paper); border-bottom-color: rgba(251, 250, 233, 0.3); }
 .arr-3 .text-wrapper .text-area-input    { color: var(--bg-paper); }
@@ -719,7 +719,7 @@ body {
 .arr-4 .text-wrapper {
     background-color: var(--mustard);
     color: var(--deep-green);
-    transform: rotate(-0.3deg);
+    transform: none;
 }
 .arr-4 .text-wrapper .section-note-label { color: var(--deep-green); border-bottom-color: rgba(27, 81, 31, 0.2); }
 .arr-4 .text-wrapper .text-area-input    { color: var(--deep-green); }
