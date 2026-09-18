@@ -489,6 +489,12 @@ function toggleEditMode() {
         dateInput.disabled = !isEditMode;
     }
 
+   // Show/hide location editing
+   const changeLocationButton = document.getElementById('changeLocationButton');
+   if (changeLocationButton) {
+    changeLocationButton.style.display = isEditMode ? 'inline-block' : 'none';
+   }
+
     // Give photo areas a visual state
     document.querySelectorAll('.photo-container').forEach(photo => {
         photo.classList.toggle('photo-editable', isEditMode);
