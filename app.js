@@ -214,19 +214,21 @@ function triggerAutoSaveFeedback() {
    EDITABLE FIELDS — WEATHER
    --------------------------------------------------------- */
 function setupWeatherListeners() {
-    document.getElementById('weatherStatsInput').addEventListener('input', (e) => {
-        journalDatabase[currentEntryIndex].weatherStats = e.target.innerText;
-        clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
+    const weatherFeelInput = document.getElementById('weatherFeelInput');
 
-    document.getElementById('weatherFeelInput').addEventListener('input', (e) => {
+    if (!weatherFeelInput) return;
+
+    weatherFeelInput.addEventListener('input', (e) => {
+        if (!isEditMode) return;
+
         journalDatabase[currentEntryIndex].weatherFeel = e.target.innerText;
+
         clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+        typingDebounceTimeout = setTimeout(() => {
+            triggerAutoSaveFeedback();
+        }, 600);
     });
 }
-
 /* ---------------------------------------------------------
    EDITABLE FIELDS — TEXT SECTIONS
    Listeners are attached once at parse time to the four
