@@ -293,35 +293,6 @@ body {
     margin: 40px auto;
 }
 
-.cover-graphics-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.cover-graphic { position: absolute; }
-
-.cover-graphic--top-right {
-    right: -20px;
-    top: 60px;
-    opacity: 0.85;
-    width: 160px;
-    height: 160px;
-}
-
-.cover-graphic--bottom-left {
-    left: -40px;
-    bottom: 180px;
-    opacity: 0.65;
-    transform: rotate(45deg);
-    width: 200px;
-    height: 200px;
-}
-
 .cover-header {
     position: relative;
     z-index: 10;
@@ -337,12 +308,12 @@ body {
     line-height: 0.95;
     color: var(--deep-green);
     letter-spacing: -2px;
-    text-transform: uppercase;
+    text-transform: none;
     white-space: nowrap;
 }
 
 .cover-tagline {
-    font-family: var(--font-hand);
+    font-family: 'Betania Patmos', cursive;
     font-size: 1.4rem;
     color: var(--coral-red);
     font-weight: 700;
