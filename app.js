@@ -362,7 +362,7 @@ function navigatePage(direction) {
    --------------------------------------------------------- */
 function Dropdown(event) {
     event.stopPropagation();
-    document.getElementById('appDropdown').classList.('show');
+    document.getElementById('appDropdown').classList.add('show');
 }
 
 window.addEventListener('click', function () {
