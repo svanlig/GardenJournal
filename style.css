@@ -630,7 +630,7 @@ body {
     display: grid;
     grid-template-rows: repeat(4, minmax(190px, auto));
     flex-grow: 1;
-    gap: 10px;
+    gap: 4px;
 }
 
 .journal-section {
