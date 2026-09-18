@@ -21,9 +21,9 @@
     --sheet-content-x: 55px;
 
     /* Shared font stacks */
-    --font-display: 'Fraunces', serif;
-    --font-body: 'Newsreader', serif;
-    --font-hand: 'Kalam', cursive;
+    --font-display: 'Betania Patmos', serif;
+    --font-body: 'Betania Patmos', serif;
+    --font-hand: 'Newsreader', serif;
 }
 
 * {
