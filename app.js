@@ -155,6 +155,7 @@ function renderEntry(index) {
     currentEntryIndex = index;
 
     const entry = journalDatabase[currentEntryIndex];
+    document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
 
     document.getElementById('entryInlineDate').value = entry.date;
     const locationDisplay = document.getElementById('gardenLocationDisplay');
