@@ -341,7 +341,8 @@ function createNewEntry() {
     const newBlankPage = {
         date: todayStr,
         displayTitle: "New Organic Entry",
-        weatherStats: "78°F · Mild",
+        location: "Tallahassee, FL",
+        weatherStats: "",
         weatherFeel: "",
         sections: [
             { text: "", image: "" },
