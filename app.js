@@ -444,3 +444,20 @@ function showNotification(msg) {
     box.classList.add('visible');
     setTimeout(() => { box.classList.remove('visible'); }, 3000);
 }
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+
+    document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
+        .forEach(el => {
+            el.contentEditable = isEditMode ? 'true' : 'false';
+        });
+
+    document.getElementById('entryInlineDate').disabled = !isEditMode;
+
+    document.querySelectorAll('.photo-container').forEach(photo => {
+        photo.classList.toggle('photo-editable', isEditMode);
+    });
+
+    document.getElementById('editModeButton').textContent =
+        isEditMode ? 'Done' : 'Edit';
+}
