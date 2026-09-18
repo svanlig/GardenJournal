@@ -543,3 +543,30 @@ async function geocodeGardenLocation(locationName) {
         timezone: data.results[0].timezone
     };
 }
+async function getGardenWeather(latitude, longitude, date) {
+    const url =
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+        `&hourly=temperature_2m,weather_code` +
+        `&start_date=${date}&end_date=${date}` +
+        `&timezone=auto`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.hourly) {
+        throw new Error('Weather data not found.');
+    }
+
+    const noonIndex = data.hourly.time.findIndex(time =>
+        time.includes('T12:00')
+    );
+
+    if (noonIndex === -1) {
+        throw new Error('Noon weather data not found.');
+    }
+
+    return {
+        temperature: data.hourly.temperature_2m[noonIndex],
+        weatherCode: data.hourly.weather_code[noonIndex]
+    };
+}
