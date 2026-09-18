@@ -509,7 +509,7 @@ function lockJournalEditing() {
         button.textContent = 'Edit';
     }
 }
-function changeGardenLocation() {
+async function changeGardenLocation() {
     const newLocation = prompt(
         "Enter your garden location:",
         journalDatabase[currentEntryIndex].location || ""
@@ -524,7 +524,13 @@ function changeGardenLocation() {
         locationDisplay.innerText = newLocation.trim();
     }
 
-    triggerAutoSaveFeedback();
+    const weatherDisplay = document.getElementById('weatherStatsDisplay');
+    if (weatherDisplay) {
+        weatherDisplay.innerText = "Weather loading...";
+    }
+
+    await updateEntryWeather();
+
     showNotification(`Garden location updated to ${newLocation.trim()}.`);
 }
 async function geocodeGardenLocation(locationName) {
