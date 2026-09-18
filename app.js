@@ -526,3 +526,20 @@ function changeGardenLocation() {
     triggerAutoSaveFeedback();
     showNotification(`Garden location updated to ${newLocation.trim()}.`);
 }
+async function geocodeGardenLocation(locationName) {
+    const url =
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationName)}&count=1&language=en&format=json`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+        throw new Error('Location not found.');
+    }
+
+    return {
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+        timezone: data.results[0].timezone
+    };
+}
