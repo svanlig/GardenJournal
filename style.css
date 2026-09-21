@@ -645,6 +645,53 @@ body {
 .journal-section.arr-1 .photo-wrapper { order: 2; justify-content: flex-end; }
 .journal-section.arr-1 .text-wrapper  { order: 1; }
 
+/* =========================================================
+   Layout 1 — photo column matches text column height
+   ========================================================= */
+
+/* 1. Let the photo-wrapper stretch to the full row height.
+   By default grid items stretch, but the flex display below
+   would otherwise shrink it to its content. */
+.journal-section.arr-1 .photo-wrapper {
+    height: 100%;
+    align-self: stretch;
+    align-items: stretch;      /* was: center — lets the child fill vertically */
+}
+
+/* 2. The photo-container fills the wrapper's height.
+   It keeps its white mat + padding + shadow. */
+.journal-section.arr-1 .photo-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 3. The photo-frame drops its fixed 4:3 aspect ratio for Layout 1
+   only, and instead flexes to fill the container. The image inside
+   uses object-fit: cover so it fills without distortion. */
+.journal-section.arr-1 .photo-frame {
+    aspect-ratio: auto;        /* override the shared 4 / 3 */
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+/* 4. Make sure the img actually fills the frame (the shared rule
+   already does this, but we re-state it here so Layout 1 is
+   self-contained and doesn't depend on cascade order). */
+.journal-section.arr-1 .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 5. When no photo is chosen, the placeholder graphic should be
+   centered in the tall frame, not stuck at the top. */
+.journal-section.arr-1 .photo-placeholder-graphic {
+    height: 100%;
+    justify-content: center;
+}
+
 /* --- Composition 2: wide photo on top / text underneath --- */
 .journal-section.arr-2 {
     display: flex;
