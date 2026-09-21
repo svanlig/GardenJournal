@@ -582,31 +582,42 @@ function handleMenuAction(action) {
 /* ---------------------------------------------------------
    PHOTOS
    --------------------------------------------------------- */
-function triggerPhotoUpload(id) {
+function triggerPhotoUpload(index) {
     if (!isEditMode) return;
 
-    const fileInput = document.getElementById('fileInput' + id);
-    if (fileInput) {
-        fileInput.click();
-    }
+    const container = document.getElementById('sectionsContainer');
+    const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+    if (!section) return;
+
+    const fileInput = section.querySelector('input[type="file"]');
+    if (fileInput) fileInput.click();
 }
 
-
-function handlePhotoSelect(event, id) {
+function handlePhotoSelect(event, index) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const frame = document.getElementById('photoFrame' + id);
-            frame.innerHTML = `<img src="${e.target.result}" alt="Uploaded Garden View Element">`;
-            journalDatabase[currentEntryIndex].sections[id - 1].image = e.target.result;
-            triggerAutoSaveFeedback();
-            showNotification(`Photo mapped successfully to Section ${id}.`);
-        };
-        reader.readAsDataURL(file);
-    }
-}
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const container = document.getElementById('sectionsContainer');
+        const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+        if (!section) return;
+
+        const photoFrame = section.querySelector('.photo-frame');
+        if (photoFrame) {
+            photoFrame.innerHTML = `<img src="${e.target.result}" alt="Uploaded Garden View Element">`;
+        }
+
+        const current = journalDatabase[currentEntryIndex];
+        if (current && current.sections[index]) {
+            current.sections[index].image = e.target.result;
+        }
+
+        triggerAutoSaveFeedback();
+        showNotification(`Photo added.`);
+    };
+    reader.readAsDataURL(file);
+}
 /* ---------------------------------------------------------
    NOTIFICATIONS
    --------------------------------------------------------- */
