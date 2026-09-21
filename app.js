@@ -340,18 +340,6 @@ function renderEntry(index) {
     if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
 }
 
-function renderPlaceholder(id) {
-    const frame = document.getElementById('photoFrame' + id);
-    frame.innerHTML = `
-        <div class="photo-placeholder-graphic">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="0" />
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <path d="M21 15l-5-5L5 21" />
-            </svg>
-            <span>Select Photo</span>
-        </div>`;
-}
 
 /* ---------------------------------------------------------
    AUTO-SAVE FEEDBACK
