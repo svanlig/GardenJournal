@@ -662,10 +662,12 @@ body {
    and let it fill the remaining space to the left of the float. */
 .journal-section.arr-1 .text-wrapper {
     display: block;
-    overflow: hidden;  /* establishes a BFC so the box hugs the float */
+    overflow: visible;      /* was: hidden — must be visible so text can wrap under the float */
     width: auto;
     min-width: 0;
-    /* keep the existing background, color, padding, rotation reset */
+    background: transparent; /* the colored panel moves to the label + text area below */
+    color: inherit;
+    padding: 0;
 }
 
 /* The editable area inside stays full width of whatever box it's in.
