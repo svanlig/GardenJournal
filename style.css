@@ -715,7 +715,7 @@ body {
     padding: 8px;
 }
 .journal-section.arr-2 .photo-frame {
-    aspect-ratio: 11 / 4;
+    aspect-ratio: 5 / 2;
     width: 100%;
 }
 .journal-section.arr-2 .text-wrapper { order: 2; width: 100%; }
