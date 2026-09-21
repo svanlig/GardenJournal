@@ -116,6 +116,7 @@ function migrateJournalDatabase(db) {
    BOOTSTRAP
    --------------------------------------------------------- */
 window.onload = function () {
+    migrateJournalDatabase(journalDatabase);
     renderEntry(currentEntryIndex);
     setupWeatherListeners();
     lockJournalEditing();
