@@ -542,11 +542,11 @@ window.addEventListener('click', function () {
 
 function handleMenuAction(action) {
     if (action === 'edit') {
-        const firstInput = document.getElementById('textInput1');
+        const firstInput = document.querySelector('.journal-section .text-area-input');
         if (firstInput) {
             firstInput.classList.add('editing-focus');
             firstInput.focus();
-            showNotification('Direct edit focus triggered on Section 1.');
+            showNotification('Direct edit focus triggered on first section.');
             setTimeout(() => firstInput.classList.remove('editing-focus'), 1800);
         }
     } else if (action === 'photos') {
@@ -571,12 +571,7 @@ function handleMenuAction(action) {
                 displayTitle: "Single Wiped Sheet",
                 weatherStats: "75°F · Clear",
                 weatherFeel: "",
-                sections: [
-                    { text: "", image: "" },
-                    { text: "", image: "" },
-                    { text: "", image: "" },
-                    { text: "", image: "" }
-                ]
+                sections: []
             };
             renderEntry(0);
             showNotification('Single entry wiped cleanly.');
