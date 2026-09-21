@@ -640,24 +640,10 @@ body {
     min-width: 0;
 }
 
-/* --- Composition 1: photo right / text left --- */
-.journal-section.arr-1 { 
-    display: block;
-}
-
-.journal-section.arr-1 .photo-wrapper {
-    float: right;
-    width: 48%;
-    margin-left: 40px;
-    margin-bottom: 15px;
-    display: block;
-}
-
-.journal-section.arr-1 .text-wrapper {
-    display: block;
-    width: auto;
-    padding: 20px;
-}
+/* --- Composition 1: photo on the right, text left --- */
+.journal-section.arr-1 { grid-template-columns: 1fr 1fr; gap: 40px; }
+.journal-section.arr-1 .photo-wrapper { order: 2; justify-content: flex-end; }
+.journal-section.arr-1 .text-wrapper  { order: 1; }
 
 /* --- Composition 2: wide photo on top / text underneath --- */
 .journal-section.arr-2 {
@@ -676,7 +662,7 @@ body {
     padding: 8px;
 }
 .journal-section.arr-2 .photo-frame {
-    aspect-ratio: 21 / 7;
+    aspect-ratio: 3 / 2;
     width: 100%;
 }
 .journal-section.arr-2 .text-wrapper { order: 2; width: 100%; }
