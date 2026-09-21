@@ -723,13 +723,23 @@ body {
 }
 
 /* --- Text-wrapper color variants per composition --- */
-.arr-1 .text-wrapper {
+/* The colored panel now lives on the label + text area, not the wrapper,
+   so it can stay tight around the text while the wrapper spans full width. */
+.arr-1 .section-note-label {
     background-color: var(--coral-red);
     color: var(--bg-paper);
-    transform: none;
+    border-bottom-color: rgba(251, 250, 233, 0.3);
+    padding: 20px 20px 4px 20px;
+    margin-bottom: 0;
 }
-.arr-1 .text-wrapper .section-note-label { color: var(--bg-paper); border-bottom-color: rgba(251, 250, 233, 0.3); }
-.arr-1 .text-wrapper .text-area-input    { color: var(--bg-paper); }
+
+.arr-1 .text-area-input {
+    background-color: var(--coral-red);
+    color: var(--bg-paper);
+    padding: 0 20px 20px 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
 
 .arr-2 .text-wrapper {
     background-color: var(--leaf-green);
