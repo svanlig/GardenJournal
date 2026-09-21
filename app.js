@@ -301,49 +301,43 @@ function renderEntry(index) {
     currentEntryIndex = index;
 
     const entry = journalDatabase[currentEntryIndex];
-    document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
 
+    document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
     document.getElementById('entryInlineDate').value = entry.date;
+
     const locationDisplay = document.getElementById('gardenLocationDisplay');
     if (locationDisplay) {
-       locationDisplay.innerText = entry.location || 'Tallahassee, FL';
+        locationDisplay.innerText = entry.location || 'Tallahassee, FL';
     }
+
     const weatherDisplay = document.getElementById('weatherStatsDisplay');
     if (weatherDisplay) {
-    weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
+        weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
     }
+
     document.getElementById('weatherFeelInput').innerText = entry.weatherFeel || '';
 
-    for (let i = 0; i < SECTION_COUNT; i++) {
-        const textInput = document.getElementById('textInput' + (i + 1));
-        const photoFrame = document.getElementById('photoFrame' + (i + 1));
-        const secData = entry.sections[i];
+    const container = document.getElementById('sectionsContainer');
+    container.innerHTML = '';
 
-        textInput.innerText = secData.text || '';
-
-        if (secData.image) {
-            photoFrame.innerHTML = `<img src="${secData.image}" alt="Garden View Slot">`;
-        } else {
-            renderPlaceholder(i + 1);
+    entry.sections.forEach((sectionData, i) => {
+        container.appendChild(buildSectionElement(sectionData, i));
+        if (i < entry.sections.length - 1) {
+            container.appendChild(buildDividerElement());
         }
-    }
+    });
 
     const pageIndicator = document.getElementById('pageIndicator');
-const btnPrev = document.getElementById('btnPrev');
-const btnNext = document.getElementById('btnNext');
+    if (pageIndicator) {
+        pageIndicator.innerText =
+            `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
+    }
 
-if (pageIndicator) {
-    pageIndicator.innerText =
-        `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
-}
+    const btnPrev = document.getElementById('btnPrev');
+    if (btnPrev) btnPrev.disabled = (currentEntryIndex === 0);
 
-if (btnPrev) {
-    btnPrev.disabled = (currentEntryIndex === 0);
-}
-
-if (btnNext) {
-    btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
-}
+    const btnNext = document.getElementById('btnNext');
+    if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
 }
 
 function renderPlaceholder(id) {
