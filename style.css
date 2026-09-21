@@ -641,7 +641,7 @@ body {
 }
 
 /* --- Composition 1: photo right / text left --- */
-.journal-section.arr-1 { grid-template-columns: 1fr 1fr; gap: 40px; }
+.journal-section.arr-1 { grid-template-columns: 1.4fr 1fr; gap: 20px; }
 .journal-section.arr-1 .photo-wrapper { order: 2; justify-content: flex-end; }
 .journal-section.arr-1 .text-wrapper  { order: 1; }
 
