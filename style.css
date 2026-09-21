@@ -640,36 +640,59 @@ body {
     min-width: 0;
 }
 
-/* --- Composition 1: photo floats right, text wraps underneath --- */
+/* --- Composition 1: photo floats right, coral panel wraps underneath --- */
+
+/* Section is a plain block; the float does the work. */
 .journal-section.arr-1 {
-    display: block;                 /* was: grid */
+    display: block;
     padding: 4px 0;
 }
 
-/* Photo floats right at a fixed width. The fixed width is what makes
-   the text column a stable target for wrapping. */
+/* Photo floats to the right at a fixed footprint. */
 .journal-section.arr-1 .photo-wrapper {
     float: right;
-    width: 45%;                     /* fixed footprint; adjust to taste */
+    width: 45%;
     max-width: 45%;
-    margin: 0 0 16px 32px;          /* bottom + left breathing room */
+    margin: 0 0 16px 32px;   /* bottom gap + left gutter between panel and photo */
     display: block;
     height: auto;
 }
 
-/* Text becomes a block that sits next to the float. The wrapper stays
-   as-is (background, padding, color), but we remove the grid ordering
-   and let it fill the remaining space to the left of the float. */
+/* Wrapper is a plain full-width block. Do NOT use overflow:hidden,
+   or the coral panel inside will be forced into a BFC and stop
+   wrapping under the float. */
 .journal-section.arr-1 .text-wrapper {
     display: block;
-    overflow: visible;      /* was: hidden — must be visible so text can wrap under the float */
+    overflow: visible;
     width: auto;
     min-width: 0;
-    background: transparent; /* the colored panel moves to the label + text area below */
+    background: transparent;
     color: inherit;
     padding: 0;
 }
 
+/* The coral panel is the visible text box. inline-block lets it
+   shrink-wrap beside the photo when the text is short, and its
+   background box will span the full wrapper width when the text
+   is long enough to clear the float's bottom edge. */
+.journal-section.arr-1 .arr-1-panel {
+    display: inline-block;
+    width: auto;
+    min-width: 45%;              /* keeps the panel from getting tiny when text is short */
+    background-color: var(--coral-red);
+    color: var(--bg-paper);
+    padding: 20px;
+}
+
+.journal-section.arr-1 .section-note-label {
+    color: var(--bg-paper);
+    border-bottom-color: rgba(251, 250, 233, 0.3);
+}
+
+.journal-section.arr-1 .text-area-input {
+    color: var(--bg-paper);
+    width: 100%;
+}
 
 /* --- Composition 2: wide photo on top / text underneath --- */
 .journal-section.arr-2 {
