@@ -375,17 +375,10 @@ function setupWeatherListeners() {
     });
 }
 /* ---------------------------------------------------------
-   EDITABLE FIELDS — TEXT SECTIONS
-   Listeners are attached once at parse time to the four
-   persistent .text-area-input nodes.
+   EDITABLE FIELD — JOURNAL TITLE
+   Attached once to the (static) title element. Only writes
+   back to the data model while in Edit mode.
    --------------------------------------------------------- */
-document.querySelectorAll('.text-area-input').forEach((input, idx) => {
-    input.addEventListener('input', () => {
-        journalDatabase[currentEntryIndex].sections[idx].text = input.innerText;
-
-        clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
 const journalTitle = document.getElementById('journalTitleInput');
 
 if (journalTitle) {
@@ -401,7 +394,6 @@ if (journalTitle) {
         }, 600);
     });
 }
-});
 
 /* ---------------------------------------------------------
    DATE EDITING
