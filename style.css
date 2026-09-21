@@ -670,12 +670,6 @@ body {
     padding: 0;
 }
 
-/* The editable area inside stays full width of whatever box it's in.
-   The text naturally continues under the photo once it clears the
-   float's bottom edge. */
-.journal-section.arr-1 .text-area-input {
-    width: 100%;
-}
 
 /* --- Composition 2: wide photo on top / text underneath --- */
 .journal-section.arr-2 {
@@ -726,6 +720,8 @@ body {
 /* The colored panel now lives on the label + text area, not the wrapper,
    so it can stay tight around the text while the wrapper spans full width. */
 .arr-1 .section-note-label {
+    display: inline-block;
+    width: auto;
     background-color: var(--coral-red);
     color: var(--bg-paper);
     border-bottom-color: rgba(251, 250, 233, 0.3);
