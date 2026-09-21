@@ -179,6 +179,123 @@ function triggerSurpriseMe() {
 /* ---------------------------------------------------------
    JOURNAL RENDERING
    --------------------------------------------------------- */
+/* ---------------------------------------------------------
+   SECTION BUILDER
+   Creates the DOM for one journal section from its data.
+   The inner structure is identical for all four layouts;
+   the composition class on the outer <section> is what
+   arranges text vs. photo visually via CSS.
+   --------------------------------------------------------- */
+function buildSectionElement(sectionData, index) {
+    const section = document.createElement('section');
+    section.className = 'journal-section ' + (sectionData.layout || 'arr-1');
+    section.dataset.index = String(index);
+
+    // ---- text wrapper ----
+    const textWrapper = document.createElement('div');
+    textWrapper.className = 'text-wrapper';
+
+    const label = document.createElement('span');
+    label.className = 'section-note-label';
+    label.textContent = getDefaultLabelForLayout(sectionData.layout);
+
+    const textInput = document.createElement('div');
+    textInput.className = 'text-area-input';
+    textInput.contentEditable = 'true';
+    textInput.setAttribute('placeholder', 'Click here to write notes...');
+    textInput.innerText = sectionData.text || '';
+
+    textInput.addEventListener('input', () => {
+        const current = journalDatabase[currentEntryIndex];
+        if (!current || !current.sections[index]) return;
+        current.sections[index].text = textInput.innerText;
+
+        // Derive the entry title from the FIRST section that has text,
+        // regardless of its position. Matches the decision made for
+        // the flexible layout system.
+        if (index === 0) {
+            const t = textInput.innerText.trim();
+            if (t.length > 0) {
+                current.displayTitle = t.split(' ').slice(0, 3).join(' ') + '...';
+            }
+        }
+
+        clearTimeout(typingDebounceTimeout);
+        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+    });
+
+    textWrapper.appendChild(label);
+    textWrapper.appendChild(textInput);
+
+    // ---- photo wrapper ----
+    const photoWrapper = document.createElement('div');
+    photoWrapper.className = 'photo-wrapper';
+
+    const photoContainer = document.createElement('div');
+    photoContainer.className = 'photo-container';
+
+    const photoFrame = document.createElement('div');
+    photoFrame.className = 'photo-frame';
+
+    if (sectionData.image) {
+        const img = document.createElement('img');
+        img.src = sectionData.image;
+        img.alt = 'Garden View Slot';
+        photoFrame.appendChild(img);
+    } else {
+        photoFrame.innerHTML = placeholderMarkup();
+    }
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.className = 'hidden-file-input';
+    fileInput.accept = 'image/*';
+    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+
+    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+
+    photoContainer.appendChild(photoFrame);
+    photoWrapper.appendChild(photoContainer);
+    photoWrapper.appendChild(fileInput);
+
+    section.appendChild(textWrapper);
+    section.appendChild(photoWrapper);
+    return section;
+}
+
+function getDefaultLabelForLayout(layoutId) {
+    switch (layoutId) {
+        case 'arr-1': return 'Morning Observations';
+        case 'arr-2': return 'Midday Harvest Notes';
+        case 'arr-3': return 'Pruning Reflections';
+        case 'arr-4': return 'Dusk Sanctuary Details';
+        default:      return 'Notes';
+    }
+}
+
+function placeholderMarkup() {
+    return `
+        <div class="photo-placeholder-graphic">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="0" />
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <path d="M21 15l-5-5L5 21" />
+            </svg>
+            <span>Select Photo</span>
+        </div>`;
+}
+
+function buildDividerElement() {
+    const divider = document.createElement('div');
+    divider.className = 'divider-container';
+    divider.innerHTML = `
+        <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
+            <path d="M 10 12 Q 150 5, 310 14 T 620 7 T 790 11" />
+        </svg>`;
+    return divider;
+}
+
+
 function renderEntry(index) {
     if (index < 0 || index >= journalDatabase.length) return;
     currentEntryIndex = index;
