@@ -693,7 +693,7 @@ body {
 }
 
 .journal-section.arr-1 .text-area-input {
-    max-height: 260px;   /* tune this number to taste */
+    max-height: 600px;   /* tune this number to taste */
     overflow-y: auto;
 }
 
