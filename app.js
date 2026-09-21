@@ -82,7 +82,35 @@ const MONTH_NAMES = [
     "July", "August", "September", "October", "November", "December"
 ];
 
-const SECTION_COUNT = 4;
+/* ---------------------------------------------------------
+   LAYOUT REGISTRY
+   Single source of truth for the compositions that can appear
+   in a journal entry. Order here is the order shown in the
+   future layout chooser.
+   --------------------------------------------------------- */
+const LAYOUTS = [
+    { id: "arr-1", name: "Photo right / Text left" },
+    { id: "arr-2", name: "Wide photo / Text below" },
+    { id: "arr-3", name: "Photo left / Text right" },
+    { id: "arr-4", name: "Photo right / Text left" }
+];
+
+/* ---------------------------------------------------------
+   MIGRATION
+   Fills in a `layout` field on every section that lacks one,
+   based on its index. Existing entries get arr-1..arr-4 in
+   their original order, so rendering is visually unchanged.
+   --------------------------------------------------------- */
+function migrateJournalDatabase(db) {
+    db.forEach(entry => {
+        if (!Array.isArray(entry.sections)) entry.sections = [];
+        entry.sections.forEach((section, index) => {
+            if (!section.layout) {
+                section.layout = LAYOUTS[index] ? LAYOUTS[index].id : LAYOUTS[0].id;
+            }
+        });
+    });
+}
 
 /* ---------------------------------------------------------
    BOOTSTRAP
