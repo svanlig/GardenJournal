@@ -692,6 +692,12 @@ body {
     justify-content: center;
 }
 
+.journal-section.arr-1 .text-area-input {
+    max-height: 260px;   /* tune this number to taste */
+    overflow-y: auto;
+}
+
+
 /* --- Composition 2: wide photo on top / text underneath --- */
 .journal-section.arr-2 {
     display: flex;
@@ -709,7 +715,7 @@ body {
     padding: 8px;
 }
 .journal-section.arr-2 .photo-frame {
-    aspect-ratio: 21 / 7;
+    aspect-ratio: 3 / 2;
     width: 100%;
 }
 .journal-section.arr-2 .text-wrapper { order: 2; width: 100%; }
