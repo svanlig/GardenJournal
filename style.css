@@ -721,12 +721,12 @@ body {
 .journal-section.arr-2 .text-wrapper { order: 2; width: 100%; }
 
 /* --- Composition 3: photo left / text right --- */
-.journal-section.arr-3 { grid-template-columns: 1fr 1fr; gap: 40px; }
+.journal-section.arr-3 { grid-template-columns: 1.2fr 1fr; gap: 15px; }
 .journal-section.arr-3 .photo-wrapper { order: 1; justify-content: flex-start; }
 .journal-section.arr-3 .text-wrapper  { order: 2; }
 
 /* --- Composition 4: photo right / text left --- */
-.journal-section.arr-4 { grid-template-columns: 1fr 1fr; gap: 40px; }
+.journal-section.arr-4 { grid-template-columns: 1fr 1fr; gap: 15px; }
 .journal-section.arr-4 .photo-wrapper { order: 2; justify-content: flex-end; }
 .journal-section.arr-4 .text-wrapper  { order: 1; }
 
