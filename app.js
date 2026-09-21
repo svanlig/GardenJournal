@@ -507,12 +507,7 @@ function createNewEntry() {
         location: "Tallahassee, FL",
         weatherStats: "",
         weatherFeel: "",
-        sections: [
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" }
-        ]
+        sections: []
     };
     journalDatabase.push(newBlankPage);
     renderEntry(journalDatabase.length - 1);
