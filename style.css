@@ -662,7 +662,7 @@ body {
    and let it fill the remaining space to the left of the float. */
 .journal-section.arr-1 .text-wrapper {
     display: block;
-    overflow: hidden;               /* establishes a BFC so the box hugs the float */
+    /* overflow: hidden; deleted this block -->establishes a BFC so the box hugs the float */
     width: auto;
     min-width: 0;
     /* keep the existing background, color, padding, rotation reset */
