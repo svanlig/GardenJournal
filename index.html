@@ -211,26 +211,19 @@
 
             <div class="journal-sections-container" id="sectionsContainer">
 
-                <!-- Composition 1: photo right / text left -->
-                <section class="journal-section arr-1" id="section1">
-                    <div class="text-wrapper">
-                        <span class="section-note-label">Morning Observations</span>
-                        <div class="text-area-input" id="textInput1" contenteditable="true" placeholder="Click here to write notes..."></div>
-                    </div>
-                    <div class="photo-wrapper">
-                        <div class="photo-container" onclick="triggerPhotoUpload(1)">
-                            <div class="photo-frame" id="photoFrame1"></div>
-                        </div>
-                        <input type="file" id="fileInput1" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 1)">
-                    </div>
-                </section>
-
-                <div class="divider-container" id="divider1">
-                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
-                        <path d="M 10 12 Q 150 5, 310 14 T 620 7 T 790 11" />
-                    </svg>
-                </div>
-
+                <!-- Composition 1: photo right / text left (photo first in source for float wrap) -->
+<section class="journal-section arr-1" id="section1">
+    <div class="photo-wrapper">
+        <div class="photo-container" onclick="triggerPhotoUpload(1)">
+            <div class="photo-frame" id="photoFrame1"></div>
+        </div>
+        <input type="file" id="fileInput1" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 1)">
+    </div>
+    <div class="text-wrapper">
+        <span class="section-note-label">Morning Observations</span>
+        <div class="text-area-input" id="textInput1" contenteditable="true" placeholder="Click here to write notes..."></div>
+    </div>
+</section>
                 <!-- Composition 2: wide photo on top / text underneath -->
                 <section class="journal-section arr-2" id="section2">
                     <div class="photo-wrapper">
