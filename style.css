@@ -1487,3 +1487,53 @@ body {
     background: transparent;
     color: var(--coral-red);
 }
+/* =========================================================
+   PHOTO SOURCE MENU
+   Small popup that appears when the user taps a photo
+   container in Edit mode. Offers Camera or Gallery.
+   ========================================================= */
+
+.photo-source-menu {
+    position: absolute;
+    background: var(--bg-paper);
+    border: 2px solid var(--deep-green);
+    box-shadow: 0 6px 18px rgba(27, 81, 31, 0.18);
+    z-index: 250;
+    min-width: 180px;
+    display: none;
+    flex-direction: column;
+}
+
+.photo-source-menu.visible {
+    display: flex;
+}
+
+.photo-source-menu button {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 12px 16px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--deep-green);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.photo-source-menu button:hover {
+    background: rgba(27, 81, 31, 0.06);
+    color: var(--coral-red);
+    padding-left: 20px;
+}
+
+.photo-source-menu button + button {
+    border-top: 1px solid rgba(27, 81, 31, 0.12);
+}
+
+.photo-source-menu .source-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
