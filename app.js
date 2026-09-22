@@ -268,7 +268,7 @@ function buildSectionElement(sectionData, index) {
     cameraInput.setAttribute('capture', 'environment');   // rear camera
     cameraInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
-    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+    photoContainer.addEventListener('click', (event) => triggerPhotoUpload(event, index));
 
     photoContainer.appendChild(photoFrame);
     photoWrapper.appendChild(photoContainer);
@@ -729,8 +729,16 @@ function handleMenuAction(action) {
 /* ---------------------------------------------------------
    PHOTOS
    --------------------------------------------------------- */
-function triggerPhotoUpload(index) {
+
+function triggerPhotoUpload(event, index) {
     if (!isEditMode) return;
+
+    // Prevent this click from bubbling to document, where the global
+    // outside-click handler would immediately close the menu we're
+    // about to open.
+    if (event && event.stopPropagation) {
+        event.stopPropagation();
+    }
 
     const container = document.getElementById('sectionsContainer');
     const section = container.querySelector(`.journal-section[data-index="${index}"]`);
