@@ -445,6 +445,9 @@ function renderEntry(index) {
     const container = document.getElementById('sectionsContainer');
     container.innerHTML = '';
 
+    // NEW: Undo banner sits at the top of the sections flow.
+    container.appendChild(buildUndoBanner());
+   
     entry.sections.forEach((sectionData, i) => {
         container.appendChild(buildSectionElement(sectionData, i));
         if (i < entry.sections.length - 1) {
