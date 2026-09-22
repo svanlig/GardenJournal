@@ -627,7 +627,7 @@ body {
    ========================================================= */
 .journal-sections-container {
     display: grid;
-    grid-auto-rows: minmax(190px, auto);
+    grid-auto-rows: auto;
     flex-grow: 1;
     gap: 4px;
 }
