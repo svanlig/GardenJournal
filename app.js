@@ -315,6 +315,104 @@ function buildAddLayoutControl() {
     return wrapper;
 }
 
+/* ---------------------------------------------------------
+   LAYOUT CHOOSER
+   Populates the overlay with one tile per entry in LAYOUTS,
+   shows the overlay, and wires click handlers.
+   --------------------------------------------------------- */
+function openLayoutChooser() {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    const grid = document.getElementById('layoutChooserGrid');
+    if (!overlay || !grid) return;
+
+    grid.innerHTML = '';
+
+    LAYOUTS.forEach(layout => {
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.className = 'layout-choice-tile';
+        tile.dataset.layoutId = layout.id;
+
+        const preview = document.createElement('div');
+        preview.className = 'layout-choice-preview';
+
+        // Mini rendering of the composition using the same class names
+        // as the real section, so the diagram matches what gets added.
+        preview.innerHTML = `
+            <div class="preview-section ${layout.id}">
+                <div class="preview-photo"></div>
+                <div class="preview-text"></div>
+            </div>`;
+
+        const label = document.createElement('span');
+        label.className = 'layout-choice-label';
+        label.textContent = layout.name;
+
+        tile.appendChild(preview);
+        tile.appendChild(label);
+
+        tile.addEventListener('click', () => {
+            chooseLayout(layout.id);
+        });
+
+        grid.appendChild(tile);
+    });
+
+    overlay.classList.add('visible');
+}
+
+function closeLayoutChooser() {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    if (overlay) overlay.classList.remove('visible');
+}
+
+/* ---------------------------------------------------------
+   CHOOSE A LAYOUT
+   Appends a new, empty section with the chosen composition
+   to the current entry, closes the chooser, re-renders.
+   --------------------------------------------------------- */
+function chooseLayout(layoutId) {
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+
+    entry.sections.push({
+        layout: layoutId,
+        text: '',
+        image: ''
+    });
+
+    closeLayoutChooser();
+
+    // Re-render to pick up the new section. renderEntry re-attaches
+    // all listeners and rebuilds the container including the + control.
+    renderEntry(currentEntryIndex);
+
+    triggerAutoSaveFeedback();
+
+    const layoutName = (LAYOUTS.find(l => l.id === layoutId) || {}).name || 'Layout';
+    showNotification(`${layoutName} added.`);
+}
+
+/* ---------------------------------------------------------
+   CLOSE CHOOSER ON OUTSIDE CLICK / ESCAPE
+   --------------------------------------------------------- */
+document.addEventListener('click', (e) => {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    if (!overlay || !overlay.classList.contains('visible')) return;
+
+    // If the click is directly on the overlay backdrop (not inside
+    // the chooser panel), close it.
+    if (e.target === overlay) {
+        closeLayoutChooser();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLayoutChooser();
+    }
+});
+
 function renderEntry(index) {
     if (index < 0 || index >= journalDatabase.length) return;
     currentEntryIndex = index;
