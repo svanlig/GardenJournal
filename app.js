@@ -295,6 +295,123 @@ function buildDividerElement() {
     return divider;
 }
 
+/* ---------------------------------------------------------
+   ADD LAYOUT CONTROL
+   Renders the + button below the last section. Lives inside
+   #sectionsContainer so it flows with the sections. Hidden
+   by CSS unless #journalPage has the is-editing class.
+   --------------------------------------------------------- */
+function buildAddLayoutControl() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'add-layout-control';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'add-layout-btn';
+    button.innerHTML = '<span class="add-layout-plus">+</span><span>Add layout</span>';
+    button.addEventListener('click', openLayoutChooser);
+
+    wrapper.appendChild(button);
+    return wrapper;
+}
+
+/* ---------------------------------------------------------
+   LAYOUT CHOOSER
+   Populates the overlay with one tile per entry in LAYOUTS,
+   shows the overlay, and wires click handlers.
+   --------------------------------------------------------- */
+function openLayoutChooser() {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    const grid = document.getElementById('layoutChooserGrid');
+    if (!overlay || !grid) return;
+
+    grid.innerHTML = '';
+
+    LAYOUTS.forEach(layout => {
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.className = 'layout-choice-tile';
+        tile.dataset.layoutId = layout.id;
+
+        const preview = document.createElement('div');
+        preview.className = 'layout-choice-preview';
+
+        // Mini rendering of the composition using the same class names
+        // as the real section, so the diagram matches what gets added.
+        preview.innerHTML = `
+            <div class="preview-section ${layout.id}">
+                <div class="preview-photo"></div>
+                <div class="preview-text"></div>
+            </div>`;
+
+        const label = document.createElement('span');
+        label.className = 'layout-choice-label';
+        label.textContent = layout.name;
+
+        tile.appendChild(preview);
+        tile.appendChild(label);
+
+        tile.addEventListener('click', () => {
+            chooseLayout(layout.id);
+        });
+
+        grid.appendChild(tile);
+    });
+
+    overlay.classList.add('visible');
+}
+
+function closeLayoutChooser() {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    if (overlay) overlay.classList.remove('visible');
+}
+
+/* ---------------------------------------------------------
+   CHOOSE A LAYOUT
+   Appends a new, empty section with the chosen composition
+   to the current entry, closes the chooser, re-renders.
+   --------------------------------------------------------- */
+function chooseLayout(layoutId) {
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+
+    entry.sections.push({
+        layout: layoutId,
+        text: '',
+        image: ''
+    });
+
+    closeLayoutChooser();
+
+    // Re-render to pick up the new section. renderEntry re-attaches
+    // all listeners and rebuilds the container including the + control.
+    renderEntry(currentEntryIndex);
+
+    triggerAutoSaveFeedback();
+
+    const layoutName = (LAYOUTS.find(l => l.id === layoutId) || {}).name || 'Layout';
+    showNotification(`${layoutName} added.`);
+}
+
+/* ---------------------------------------------------------
+   CLOSE CHOOSER ON OUTSIDE CLICK / ESCAPE
+   --------------------------------------------------------- */
+document.addEventListener('click', (e) => {
+    const overlay = document.getElementById('layoutChooserOverlay');
+    if (!overlay || !overlay.classList.contains('visible')) return;
+
+    // If the click is directly on the overlay backdrop (not inside
+    // the chooser panel), close it.
+    if (e.target === overlay) {
+        closeLayoutChooser();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLayoutChooser();
+    }
+});
 
 function renderEntry(index) {
     if (index < 0 || index >= journalDatabase.length) return;
@@ -327,6 +444,9 @@ function renderEntry(index) {
         }
     });
 
+    // NEW: + button at the end of the sections flow.
+    container.appendChild(buildAddLayoutControl());
+
     const pageIndicator = document.getElementById('pageIndicator');
     if (pageIndicator) {
         pageIndicator.innerText =
@@ -339,7 +459,6 @@ function renderEntry(index) {
     const btnNext = document.getElementById('btnNext');
     if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
 }
-
 
 /* ---------------------------------------------------------
    AUTO-SAVE FEEDBACK
@@ -622,33 +741,29 @@ function showNotification(msg) {
     box.classList.add('visible');
     setTimeout(() => { box.classList.remove('visible'); }, 3000);
 }
+
 function toggleEditMode() {
     isEditMode = !isEditMode;
 
-    // Lock/unlock text areas
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
         .forEach(el => {
             el.contentEditable = isEditMode ? 'true' : 'false';
         });
 
-    // Lock/unlock date
     const dateInput = document.getElementById('entryInlineDate');
     if (dateInput) {
         dateInput.disabled = !isEditMode;
     }
 
-   // Show/hide location editing
-   const changeLocationButton = document.getElementById('changeLocationButton');
-   if (changeLocationButton) {
-    changeLocationButton.style.display = isEditMode ? 'inline-block' : 'none';
-   }
+    const changeLocationButton = document.getElementById('changeLocationButton');
+    if (changeLocationButton) {
+        changeLocationButton.style.display = isEditMode ? 'inline-block' : 'none';
+    }
 
-    // Give photo areas a visual state
     document.querySelectorAll('.photo-container').forEach(photo => {
         photo.classList.toggle('photo-editable', isEditMode);
     });
 
-    // Change button
     const button = document.getElementById('editModeButton');
     if (button) {
         button.textContent = isEditMode ? 'Done' : 'Edit';
@@ -661,12 +776,19 @@ function toggleEditMode() {
         showNotification('Changes saved.');
     }
 
-   const journalTitle = document.getElementById('journalTitleInput');
-   if (journalTitle) {
-    journalTitle.contentEditable = isEditMode ? 'true' : 'false';
+    const journalTitle = document.getElementById('journalTitleInput');
+    if (journalTitle) {
+        journalTitle.contentEditable = isEditMode ? 'true' : 'false';
+    }
+
+    // NEW: toggle the is-editing class on the journal page so that
+    // Edit-mode-only controls (e.g. the + button) appear/hide.
+    const journalPage = document.getElementById('journalPage');
+    if (journalPage) {
+        journalPage.classList.toggle('is-editing', isEditMode);
+    }
 }
-   
-}
+
 function lockJournalEditing() {
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
         .forEach(el => {
@@ -684,7 +806,15 @@ function lockJournalEditing() {
     if (button) {
         button.textContent = 'Edit';
     }
+
+    // NEW: hide Edit-mode-only controls (e.g. the + button) by
+    // removing the is-editing class from the journal page.
+    const journalPage = document.getElementById('journalPage');
+    if (journalPage) {
+        journalPage.classList.remove('is-editing');
+    }
 }
+
 async function changeGardenLocation() {
     const newLocation = prompt(
         "Enter your garden location:",
@@ -713,6 +843,7 @@ async function changeGardenLocation() {
 
     triggerAutoSaveFeedback();
 }
+
 async function geocodeGardenLocation(locationName) {
     const url =
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationName)}&count=1&language=en&format=json`;

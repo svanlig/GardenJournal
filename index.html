@@ -216,6 +216,22 @@
              journalDatabase[currentEntryIndex].sections. -->
         <div class="journal-sections-container" id="sectionsContainer"></div>
 
+        <!-- =========================================================
+     LAYOUT CHOOSER OVERLAY
+     Shown when the + button is clicked. Hidden by default.
+     ========================================================= -->
+<div class="layout-chooser-overlay" id="layoutChooserOverlay">
+    <div class="layout-chooser" role="dialog" aria-modal="true" aria-labelledby="layoutChooserTitle">
+        <div class="layout-chooser-header">
+            <h2 class="layout-chooser-title" id="layoutChooserTitle">Choose a layout</h2>
+            <button type="button" class="layout-chooser-close" onclick="closeLayoutChooser()" aria-label="Close">×</button>
+        </div>
+        <div class="layout-chooser-grid" id="layoutChooserGrid">
+            <!-- Tiles are inserted by JS on open, from LAYOUTS -->
+        </div>
+    </div>
+</div>
+
     </main>
 </div>
     <!-- =========================================================
