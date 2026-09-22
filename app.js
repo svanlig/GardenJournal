@@ -741,33 +741,29 @@ function showNotification(msg) {
     box.classList.add('visible');
     setTimeout(() => { box.classList.remove('visible'); }, 3000);
 }
+
 function toggleEditMode() {
     isEditMode = !isEditMode;
 
-    // Lock/unlock text areas
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
         .forEach(el => {
             el.contentEditable = isEditMode ? 'true' : 'false';
         });
 
-    // Lock/unlock date
     const dateInput = document.getElementById('entryInlineDate');
     if (dateInput) {
         dateInput.disabled = !isEditMode;
     }
 
-   // Show/hide location editing
-   const changeLocationButton = document.getElementById('changeLocationButton');
-   if (changeLocationButton) {
-    changeLocationButton.style.display = isEditMode ? 'inline-block' : 'none';
-   }
+    const changeLocationButton = document.getElementById('changeLocationButton');
+    if (changeLocationButton) {
+        changeLocationButton.style.display = isEditMode ? 'inline-block' : 'none';
+    }
 
-    // Give photo areas a visual state
     document.querySelectorAll('.photo-container').forEach(photo => {
         photo.classList.toggle('photo-editable', isEditMode);
     });
 
-    // Change button
     const button = document.getElementById('editModeButton');
     if (button) {
         button.textContent = isEditMode ? 'Done' : 'Edit';
@@ -780,14 +776,19 @@ function toggleEditMode() {
         showNotification('Changes saved.');
     }
 
-   const journalTitle = document.getElementById('journalTitleInput');
-   if (journalTitle) {
-    journalTitle.contentEditable = isEditMode ? 'true' : 'false';
-      
-   document.getElementById('journalPage').classList.toggle('is-editing', isEditMode);
+    const journalTitle = document.getElementById('journalTitleInput');
+    if (journalTitle) {
+        journalTitle.contentEditable = isEditMode ? 'true' : 'false';
+    }
+
+    // NEW: toggle the is-editing class on the journal page so that
+    // Edit-mode-only controls (e.g. the + button) appear/hide.
+    const journalPage = document.getElementById('journalPage');
+    if (journalPage) {
+        journalPage.classList.toggle('is-editing', isEditMode);
+    }
 }
-   
-}
+
 function lockJournalEditing() {
     document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
         .forEach(el => {
@@ -805,7 +806,15 @@ function lockJournalEditing() {
     if (button) {
         button.textContent = 'Edit';
     }
+
+    // NEW: hide Edit-mode-only controls (e.g. the + button) by
+    // removing the is-editing class from the journal page.
+    const journalPage = document.getElementById('journalPage');
+    if (journalPage) {
+        journalPage.classList.remove('is-editing');
+    }
 }
+
 async function changeGardenLocation() {
     const newLocation = prompt(
         "Enter your garden location:",
@@ -834,6 +843,7 @@ async function changeGardenLocation() {
 
     triggerAutoSaveFeedback();
 }
+
 async function geocodeGardenLocation(locationName) {
     const url =
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationName)}&count=1&language=en&format=json`;
