@@ -810,6 +810,9 @@ function toggleEditMode() {
     if (journalPage) {
         journalPage.classList.toggle('is-editing', isEditMode);
     }
+   // NEW: entering or leaving Edit mode clears any pending undo.
+    lastDeletedSection = null;
+    hideUndoBanner();
 }
 
 function lockJournalEditing() {
