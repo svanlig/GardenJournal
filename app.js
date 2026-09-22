@@ -253,18 +253,28 @@ function buildSectionElement(sectionData, index) {
         photoFrame.innerHTML = placeholderMarkup();
     }
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.className = 'hidden-file-input';
-    fileInput.accept = 'image/*';
-    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+    // Gallery picker (existing behavior)
+    const galleryInput = document.createElement('input');
+    galleryInput.type = 'file';
+    galleryInput.className = 'hidden-file-input';
+    galleryInput.accept = 'image/*';
+    galleryInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+
+    // Camera capture (opens the phone's camera on mobile via capture attr)
+    const cameraInput = document.createElement('input');
+    cameraInput.type = 'file';
+    cameraInput.className = 'hidden-file-input';
+    cameraInput.accept = 'image/*';
+    cameraInput.setAttribute('capture', 'environment');   // rear camera
+    cameraInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
     photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
 
     photoContainer.appendChild(photoFrame);
     photoWrapper.appendChild(photoContainer);
-    photoWrapper.appendChild(fileInput);
-
+    photoWrapper.appendChild(galleryInput);
+    photoWrapper.appendChild(cameraInput);
+   
     section.appendChild(textWrapper);
     section.appendChild(photoWrapper);
     section.appendChild(buildRemoveSectionButton(index));
