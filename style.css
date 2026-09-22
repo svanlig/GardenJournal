@@ -1179,7 +1179,7 @@ body {
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 300;
+    z-index: 1000;
     padding: 20px;
 }
 
