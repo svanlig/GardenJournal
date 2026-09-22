@@ -1131,8 +1131,7 @@ function undoLastDelete() {
 
     showNotification('Section restored.');
 }
-    return button;
-}
+
 /* ---------------------------------------------------------
    REMOVE SECTION
    Splices the section at `index` out of the current entry,
