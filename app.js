@@ -447,15 +447,17 @@ function renderEntry(index) {
     const container = document.getElementById('sectionsContainer');
     container.innerHTML = '';
 
-    // NEW: Undo banner sits at the top of the sections flow.
-    container.appendChild(buildUndoBanner());
+    // Remove any previous banner, then place a fresh one immediately
+    // above the sections container as a sibling, so it isn't a grid item.
+    const journalPage = document.getElementById('journalPage');
+    const oldBanner = document.getElementById('undoBanner');
+    if (oldBanner && oldBanner.parentElement) {
+       oldBanner.parentElement.removeChild(oldBanner);
+}
    
-    entry.sections.forEach((sectionData, i) => {
-        container.appendChild(buildSectionElement(sectionData, i));
-        if (i < entry.sections.length - 1) {
-            container.appendChild(buildDividerElement());
-        }
-    });
+    if (journalPage) {
+       journalPage.insertBefore(buildUndoBanner(), container);
+}
 
     // NEW: + button at the end of the sections flow.
     container.appendChild(buildAddLayoutControl());
