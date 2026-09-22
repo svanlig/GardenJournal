@@ -267,6 +267,7 @@ function buildSectionElement(sectionData, index) {
 
     section.appendChild(textWrapper);
     section.appendChild(photoWrapper);
+    section.appendChild(buildRemoveSectionButton(index));
     return section;
 }
 
