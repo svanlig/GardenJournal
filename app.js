@@ -783,6 +783,8 @@ function toggleEditMode() {
    const journalTitle = document.getElementById('journalTitleInput');
    if (journalTitle) {
     journalTitle.contentEditable = isEditMode ? 'true' : 'false';
+      
+   document.getElementById('journalPage').classList.toggle('is-editing', isEditMode);
 }
    
 }
