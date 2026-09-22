@@ -1116,6 +1116,101 @@ function hideUndoBanner() {
 }
 
 /* ---------------------------------------------------------
+   PHOTO SOURCE MENU
+   Small popup offering Camera or Gallery. Rendered on demand,
+   positioned near the tapped photo container.
+   --------------------------------------------------------- */
+
+let activePhotoMenu = null;   // the currently-open menu element, or null
+
+function openPhotoSourceMenu(photoContainer, index) {
+    closePhotoSourceMenu();
+
+    const menu = document.createElement('div');
+    menu.className = 'photo-source-menu';
+
+    const cameraBtn = document.createElement('button');
+    cameraBtn.type = 'button';
+    cameraBtn.innerHTML = '<span class="source-icon">📷</span><span>Take Photo</span>';
+    cameraBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        choosePhotoSource('camera', index);
+    });
+
+    const galleryBtn = document.createElement('button');
+    galleryBtn.type = 'button';
+    galleryBtn.innerHTML = '<span class="source-icon">🖼️</span><span>Choose from Gallery</span>';
+    galleryBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        choosePhotoSource('gallery', index);
+    });
+
+    menu.appendChild(cameraBtn);
+    menu.appendChild(galleryBtn);
+
+    // Position the menu just below the photo container.
+    const rect = photoContainer.getBoundingClientRect();
+    menu.style.position = 'absolute';
+    menu.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+    menu.style.left = (window.scrollX + rect.left) + 'px';
+
+    document.body.appendChild(menu);
+
+    // Force a reflow so the .visible transition (if any) applies cleanly.
+    void menu.offsetWidth;
+    menu.classList.add('visible');
+
+    activePhotoMenu = menu;
+}
+
+function closePhotoSourceMenu() {
+    if (activePhotoMenu && activePhotoMenu.parentElement) {
+        activePhotoMenu.parentElement.removeChild(activePhotoMenu);
+    }
+    activePhotoMenu = null;
+}
+
+function choosePhotoSource(source, index) {
+    closePhotoSourceMenu();
+
+    const container = document.getElementById('sectionsContainer');
+    const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+    if (!section) return;
+
+    // The two file inputs are siblings of the photo container, in
+    // the order: gallery first, camera second.
+    const inputs = section.querySelectorAll('input[type="file"]');
+    if (!inputs || inputs.length < 2) return;
+
+    const galleryInput = inputs[0];
+    const cameraInput = inputs[1];
+
+    if (source === 'camera') {
+        cameraInput.click();
+    } else {
+        galleryInput.click();
+    }
+}
+
+/* ---------------------------------------------------------
+   GLOBAL DISMISS FOR THE PHOTO SOURCE MENU
+   Clicking anywhere outside the menu closes it. Escape closes it.
+   --------------------------------------------------------- */
+document.addEventListener('click', (e) => {
+    if (!activePhotoMenu) return;
+    if (e.target === activePhotoMenu || activePhotoMenu.contains(e.target)) return;
+    closePhotoSourceMenu();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePhotoSourceMenu();
+    }
+});
+
+
+
+/* ---------------------------------------------------------
    UNDO LAST DELETE
    Re-inserts the stashed section at its original index.
    --------------------------------------------------------- */
