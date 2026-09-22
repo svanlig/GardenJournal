@@ -444,6 +444,9 @@ function renderEntry(index) {
         }
     });
 
+    // NEW: + button at the end of the sections flow.
+    container.appendChild(buildAddLayoutControl());
+
     const pageIndicator = document.getElementById('pageIndicator');
     if (pageIndicator) {
         pageIndicator.innerText =
@@ -456,7 +459,6 @@ function renderEntry(index) {
     const btnNext = document.getElementById('btnNext');
     if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
 }
-
 
 /* ---------------------------------------------------------
    AUTO-SAVE FEEDBACK
