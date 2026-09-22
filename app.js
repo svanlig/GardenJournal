@@ -383,6 +383,8 @@ function chooseLayout(layoutId) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
 
+    lastDeletedSection = null;   // NEW: adding is "another action"
+
     entry.sections.push({
         layout: layoutId,
         text: '',
