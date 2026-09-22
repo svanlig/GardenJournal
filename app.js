@@ -1033,5 +1033,104 @@ function buildRemoveSectionButton(index) {
         e.stopPropagation();
         removeSection(index);
     });
+   /* ---------------------------------------------------------
+   UNDO BANNER
+   Rendered at the top of the sections container. Hidden by
+   default; .visible makes it show (but only in Edit mode —
+   the CSS gates it on .is-editing).
+   --------------------------------------------------------- */
+function buildUndoBanner() {
+    const banner = document.createElement('div');
+    banner.className = 'undo-banner';
+    banner.id = 'undoBanner';
+
+    banner.innerHTML = `
+        <span class="undo-banner-message" id="undoBannerMessage"></span>
+        <span class="undo-banner-actions">
+            <button type="button" class="undo-banner-btn" id="undoBannerUndoBtn">Undo</button>
+            <button type="button" class="undo-banner-btn undo-banner-dismiss" id="undoBannerDismissBtn" aria-label="Dismiss">×</button>
+        </span>`;
+
+    banner.querySelector('#undoBannerUndoBtn').addEventListener('click', undoLastDelete);
+    banner.querySelector('#undoBannerDismissBtn').addEventListener('click', hideUndoBanner);
+
+    return banner;
+}
+
+function showUndoBanner() {
+    const banner = document.getElementById('undoBanner');
+    const message = document.getElementById('undoBannerMessage');
+    if (!banner || !message) return;
+
+    if (!lastDeletedSection) {
+        hideUndoBanner();
+        return;
+    }
+
+    const layout = lastDeletedSection.section.layout || 'arr-1';
+    const layoutName = (LAYOUTS.find(l => l.id === layout) || {}).name || 'Section';
+    message.textContent = `Removed: ${layoutName}`;
+    banner.classList.add('visible');
+}
+
+function hideUndoBanner() {
+    const banner = document.getElementById('undoBanner');
+    if (banner) banner.classList.remove('visible');
+}
+
+/* ---------------------------------------------------------
+   UNDO LAST DELETE
+   Re-inserts the stashed section at its original index.
+   --------------------------------------------------------- */
+function undoLastDelete() {
+    if (!lastDeletedSection) return;
+
+    const { section, index, entryIndex } = lastDeletedSection;
+    const entry = journalDatabase[entryIndex];
+    if (!entry) {
+        lastDeletedSection = null;
+        hideUndoBanner();
+        return;
+    }
+
+    // If the user navigated away from the entry they deleted from,
+    // still re-insert into the original entry (the index is relative
+    // to that entry's sections array), but do not change the current
+    // view. The user will see the effect when they navigate back.
+    const clampedIndex = Math.max(0, Math.min(index, entry.sections.length));
+    entry.sections.splice(clampedIndex, 0, section);
+
+    lastDeletedSection = null;
+
+    // Only re-render if we're still looking at the same entry.
+    if (currentEntryIndex === entryIndex) {
+        renderEntry(currentEntryIndex);
+        triggerAutoSaveFeedback();
+    }
+
+    showNotification('Section restored.');
+}
     return button;
+}
+/* ---------------------------------------------------------
+   REMOVE SECTION
+   Splices the section at `index` out of the current entry,
+   stashes it for undo, re-renders, and shows the Undo banner.
+   --------------------------------------------------------- */
+function removeSection(index) {
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+    if (index < 0 || index >= entry.sections.length) return;
+
+    const [removed] = entry.sections.splice(index, 1);
+
+    lastDeletedSection = {
+        section: removed,
+        index: index,
+        entryIndex: currentEntryIndex
+    };
+
+    renderEntry(currentEntryIndex);
+    triggerAutoSaveFeedback();
+    showUndoBanner();
 }
