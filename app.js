@@ -736,8 +736,10 @@ function triggerPhotoUpload(index) {
     const section = container.querySelector(`.journal-section[data-index="${index}"]`);
     if (!section) return;
 
-    const fileInput = section.querySelector('input[type="file"]');
-    if (fileInput) fileInput.click();
+    const photoContainer = section.querySelector('.photo-container');
+    if (!photoContainer) return;
+
+    openPhotoSourceMenu(photoContainer, index);
 }
 
 function handlePhotoSelect(event, index) {
