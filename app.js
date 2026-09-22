@@ -1061,7 +1061,10 @@ function buildUndoBanner() {
         </span>`;
 
     banner.querySelector('#undoBannerUndoBtn').addEventListener('click', undoLastDelete);
-    banner.querySelector('#undoBannerDismissBtn').addEventListener('click', hideUndoBanner);
+    banner.querySelector('#undoBannerDismissBtn').addEventListener('click', () => {
+        lastDeletedSection = null;
+        hideUndoBanner();
+    });
 
     return banner;
 }
