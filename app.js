@@ -82,12 +82,41 @@ const MONTH_NAMES = [
     "July", "August", "September", "October", "November", "December"
 ];
 
-const SECTION_COUNT = 4;
+/* ---------------------------------------------------------
+   LAYOUT REGISTRY
+   Single source of truth for the compositions that can appear
+   in a journal entry. Order here is the order shown in the
+   future layout chooser.
+   --------------------------------------------------------- */
+const LAYOUTS = [
+    { id: "arr-1", name: "Photo right / Text left" },
+    { id: "arr-2", name: "Wide photo / Text below" },
+    { id: "arr-3", name: "Photo left / Text right" },
+    { id: "arr-4", name: "Photo right / Text left" }
+];
+
+/* ---------------------------------------------------------
+   MIGRATION
+   Fills in a `layout` field on every section that lacks one,
+   based on its index. Existing entries get arr-1..arr-4 in
+   their original order, so rendering is visually unchanged.
+   --------------------------------------------------------- */
+function migrateJournalDatabase(db) {
+    db.forEach(entry => {
+        if (!Array.isArray(entry.sections)) entry.sections = [];
+        entry.sections.forEach((section, index) => {
+            if (!section.layout) {
+                section.layout = LAYOUTS[index] ? LAYOUTS[index].id : LAYOUTS[0].id;
+            }
+        });
+    });
+}
 
 /* ---------------------------------------------------------
    BOOTSTRAP
    --------------------------------------------------------- */
 window.onload = function () {
+    migrateJournalDatabase(journalDatabase);
     renderEntry(currentEntryIndex);
     setupWeatherListeners();
     lockJournalEditing();
@@ -150,59 +179,102 @@ function triggerSurpriseMe() {
 /* ---------------------------------------------------------
    JOURNAL RENDERING
    --------------------------------------------------------- */
-function renderEntry(index) {
-    if (index < 0 || index >= journalDatabase.length) return;
-    currentEntryIndex = index;
+/* ---------------------------------------------------------
+   SECTION BUILDER
+   Creates the DOM for one journal section from its data.
+   The inner structure is identical for all four layouts;
+   the composition class on the outer <section> is what
+   arranges text vs. photo visually via CSS.
+   --------------------------------------------------------- */
+function buildSectionElement(sectionData, index) {
+    const section = document.createElement('section');
+    section.className = 'journal-section ' + (sectionData.layout || 'arr-1');
+    section.dataset.index = String(index);
 
-    const entry = journalDatabase[currentEntryIndex];
-    document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
+    // ---- text wrapper ----
+    const textWrapper = document.createElement('div');
+    textWrapper.className = 'text-wrapper';
 
-    document.getElementById('entryInlineDate').value = entry.date;
-    const locationDisplay = document.getElementById('gardenLocationDisplay');
-    if (locationDisplay) {
-       locationDisplay.innerText = entry.location || 'Tallahassee, FL';
-    }
-    const weatherDisplay = document.getElementById('weatherStatsDisplay');
-    if (weatherDisplay) {
-    weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
-    }
-    document.getElementById('weatherFeelInput').innerText = entry.weatherFeel || '';
+    const label = document.createElement('span');
+    label.className = 'section-note-label';
+    label.textContent = getDefaultLabelForLayout(sectionData.layout);
 
-    for (let i = 0; i < SECTION_COUNT; i++) {
-        const textInput = document.getElementById('textInput' + (i + 1));
-        const photoFrame = document.getElementById('photoFrame' + (i + 1));
-        const secData = entry.sections[i];
+    const textInput = document.createElement('div');
+    textInput.className = 'text-area-input';
+    textInput.contentEditable = 'true';
+    textInput.setAttribute('placeholder', 'Click here to write notes...');
+    textInput.innerText = sectionData.text || '';
 
-        textInput.innerText = secData.text || '';
+    textInput.addEventListener('input', () => {
+        const current = journalDatabase[currentEntryIndex];
+        if (!current || !current.sections[index]) return;
+        current.sections[index].text = textInput.innerText;
 
-        if (secData.image) {
-            photoFrame.innerHTML = `<img src="${secData.image}" alt="Garden View Slot">`;
-        } else {
-            renderPlaceholder(i + 1);
+        // Derive the entry title from the FIRST section that has text,
+        // regardless of its position. Matches the decision made for
+        // the flexible layout system.
+        if (index === 0) {
+            const t = textInput.innerText.trim();
+            if (t.length > 0) {
+                current.displayTitle = t.split(' ').slice(0, 3).join(' ') + '...';
+            }
         }
+
+        clearTimeout(typingDebounceTimeout);
+        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+    });
+
+    textWrapper.appendChild(label);
+    textWrapper.appendChild(textInput);
+
+    // ---- photo wrapper ----
+    const photoWrapper = document.createElement('div');
+    photoWrapper.className = 'photo-wrapper';
+
+    const photoContainer = document.createElement('div');
+    photoContainer.className = 'photo-container';
+
+    const photoFrame = document.createElement('div');
+    photoFrame.className = 'photo-frame';
+
+    if (sectionData.image) {
+        const img = document.createElement('img');
+        img.src = sectionData.image;
+        img.alt = 'Garden View Slot';
+        photoFrame.appendChild(img);
+    } else {
+        photoFrame.innerHTML = placeholderMarkup();
     }
 
-    const pageIndicator = document.getElementById('pageIndicator');
-const btnPrev = document.getElementById('btnPrev');
-const btnNext = document.getElementById('btnNext');
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.className = 'hidden-file-input';
+    fileInput.accept = 'image/*';
+    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
-if (pageIndicator) {
-    pageIndicator.innerText =
-        `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
+    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+
+    photoContainer.appendChild(photoFrame);
+    photoWrapper.appendChild(photoContainer);
+    photoWrapper.appendChild(fileInput);
+
+    section.appendChild(textWrapper);
+    section.appendChild(photoWrapper);
+    return section;
 }
 
-if (btnPrev) {
-    btnPrev.disabled = (currentEntryIndex === 0);
+function getDefaultLabelForLayout(layoutId) {
+    switch (layoutId) {
+        case 'arr-1': return 'Morning Observations';
+        case 'arr-2': return 'Midday Harvest Notes';
+        case 'arr-3': return 'Pruning Reflections';
+        case 'arr-4': return 'Dusk Sanctuary Details';
+        default:      return 'Notes';
+    }
 }
 
-if (btnNext) {
-    btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
-}
-}
-
-function renderPlaceholder(id) {
-    const frame = document.getElementById('photoFrame' + id);
-    frame.innerHTML = `
+function placeholderMarkup() {
+    return `
         <div class="photo-placeholder-graphic">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="0" />
@@ -212,6 +284,62 @@ function renderPlaceholder(id) {
             <span>Select Photo</span>
         </div>`;
 }
+
+function buildDividerElement() {
+    const divider = document.createElement('div');
+    divider.className = 'divider-container';
+    divider.innerHTML = `
+        <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
+            <path d="M 10 12 Q 150 5, 310 14 T 620 7 T 790 11" />
+        </svg>`;
+    return divider;
+}
+
+
+function renderEntry(index) {
+    if (index < 0 || index >= journalDatabase.length) return;
+    currentEntryIndex = index;
+
+    const entry = journalDatabase[currentEntryIndex];
+
+    document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
+    document.getElementById('entryInlineDate').value = entry.date;
+
+    const locationDisplay = document.getElementById('gardenLocationDisplay');
+    if (locationDisplay) {
+        locationDisplay.innerText = entry.location || 'Tallahassee, FL';
+    }
+
+    const weatherDisplay = document.getElementById('weatherStatsDisplay');
+    if (weatherDisplay) {
+        weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
+    }
+
+    document.getElementById('weatherFeelInput').innerText = entry.weatherFeel || '';
+
+    const container = document.getElementById('sectionsContainer');
+    container.innerHTML = '';
+
+    entry.sections.forEach((sectionData, i) => {
+        container.appendChild(buildSectionElement(sectionData, i));
+        if (i < entry.sections.length - 1) {
+            container.appendChild(buildDividerElement());
+        }
+    });
+
+    const pageIndicator = document.getElementById('pageIndicator');
+    if (pageIndicator) {
+        pageIndicator.innerText =
+            `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
+    }
+
+    const btnPrev = document.getElementById('btnPrev');
+    if (btnPrev) btnPrev.disabled = (currentEntryIndex === 0);
+
+    const btnNext = document.getElementById('btnNext');
+    if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
+}
+
 
 /* ---------------------------------------------------------
    AUTO-SAVE FEEDBACK
@@ -247,17 +375,10 @@ function setupWeatherListeners() {
     });
 }
 /* ---------------------------------------------------------
-   EDITABLE FIELDS — TEXT SECTIONS
-   Listeners are attached once at parse time to the four
-   persistent .text-area-input nodes.
+   EDITABLE FIELD — JOURNAL TITLE
+   Attached once to the (static) title element. Only writes
+   back to the data model while in Edit mode.
    --------------------------------------------------------- */
-document.querySelectorAll('.text-area-input').forEach((input, idx) => {
-    input.addEventListener('input', () => {
-        journalDatabase[currentEntryIndex].sections[idx].text = input.innerText;
-
-        clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
 const journalTitle = document.getElementById('journalTitleInput');
 
 if (journalTitle) {
@@ -273,7 +394,6 @@ if (journalTitle) {
         }, 600);
     });
 }
-});
 
 /* ---------------------------------------------------------
    DATE EDITING
@@ -387,12 +507,7 @@ function createNewEntry() {
         location: "Tallahassee, FL",
         weatherStats: "",
         weatherFeel: "",
-        sections: [
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" }
-        ]
+        sections: []
     };
     journalDatabase.push(newBlankPage);
     renderEntry(journalDatabase.length - 1);
@@ -422,11 +537,11 @@ window.addEventListener('click', function () {
 
 function handleMenuAction(action) {
     if (action === 'edit') {
-        const firstInput = document.getElementById('textInput1');
+        const firstInput = document.querySelector('.journal-section .text-area-input');
         if (firstInput) {
             firstInput.classList.add('editing-focus');
             firstInput.focus();
-            showNotification('Direct edit focus triggered on Section 1.');
+            showNotification('Direct edit focus triggered on first section.');
             setTimeout(() => firstInput.classList.remove('editing-focus'), 1800);
         }
     } else if (action === 'photos') {
@@ -451,12 +566,7 @@ function handleMenuAction(action) {
                 displayTitle: "Single Wiped Sheet",
                 weatherStats: "75°F · Clear",
                 weatherFeel: "",
-                sections: [
-                    { text: "", image: "" },
-                    { text: "", image: "" },
-                    { text: "", image: "" },
-                    { text: "", image: "" }
-                ]
+                sections: []
             };
             renderEntry(0);
             showNotification('Single entry wiped cleanly.');
@@ -467,31 +577,42 @@ function handleMenuAction(action) {
 /* ---------------------------------------------------------
    PHOTOS
    --------------------------------------------------------- */
-function triggerPhotoUpload(id) {
+function triggerPhotoUpload(index) {
     if (!isEditMode) return;
 
-    const fileInput = document.getElementById('fileInput' + id);
-    if (fileInput) {
-        fileInput.click();
-    }
+    const container = document.getElementById('sectionsContainer');
+    const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+    if (!section) return;
+
+    const fileInput = section.querySelector('input[type="file"]');
+    if (fileInput) fileInput.click();
 }
 
-
-function handlePhotoSelect(event, id) {
+function handlePhotoSelect(event, index) {
     const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const frame = document.getElementById('photoFrame' + id);
-            frame.innerHTML = `<img src="${e.target.result}" alt="Uploaded Garden View Element">`;
-            journalDatabase[currentEntryIndex].sections[id - 1].image = e.target.result;
-            triggerAutoSaveFeedback();
-            showNotification(`Photo mapped successfully to Section ${id}.`);
-        };
-        reader.readAsDataURL(file);
-    }
-}
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const container = document.getElementById('sectionsContainer');
+        const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+        if (!section) return;
+
+        const photoFrame = section.querySelector('.photo-frame');
+        if (photoFrame) {
+            photoFrame.innerHTML = `<img src="${e.target.result}" alt="Uploaded Garden View Element">`;
+        }
+
+        const current = journalDatabase[currentEntryIndex];
+        if (current && current.sections[index]) {
+            current.sections[index].image = e.target.result;
+        }
+
+        triggerAutoSaveFeedback();
+        showNotification(`Photo added.`);
+    };
+    reader.readAsDataURL(file);
+}
 /* ---------------------------------------------------------
    NOTIFICATIONS
    --------------------------------------------------------- */

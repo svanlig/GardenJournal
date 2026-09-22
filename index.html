@@ -148,146 +148,76 @@
     </div>
 
 
-    <!-- =========================================================
-         VIEW: JOURNAL PAGE
-         ========================================================= -->
-    <div id="journalViewContainer" class="view-panel">
-        <footer class="bottom-nav">
-            <button class="btn-nav" id="btnPrev" onclick="navigatePage(-1)">← Previous</button>
-            <span class="nav-page-indicator" id="pageIndicator">Page 1 of 1</span>
-            <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button>
-        </footer>
-        <main class="journal-page paper-sheet" id="journalPage">
+   <!-- =========================================================
+     VIEW: JOURNAL PAGE
+     ========================================================= -->
+<div id="journalViewContainer" class="view-panel">
+    <footer class="bottom-nav">
+        <button class="btn-nav" id="btnPrev" onclick="navigatePage(-1)">← Previous</button>
+        <span class="nav-page-indicator" id="pageIndicator">Page 1 of 1</span>
+        <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button>
+    </footer>
 
-            <div class="entry-meta-stamp">
-                <div>
-                    <label>Journal Sheet Logs</label>
-                    <span id="autoSaveIndicator" class="auto-save-indicator">Saved ✓</span>
-                </div>
-               
-                <div>
-                    <span class="entry-date-label">Entry Date: </span>
-                    <input type="date" id="entryInlineDate" class="entry-inline-datepicker" onchange="handleInlineDateChange(this.value)">
-                </div>
-                
-                 <button id="editModeButton" class="btn-new-entry" onclick="toggleEditMode()">Edit</button>
-            </div>
-            
-            <div class="journal-title-input"
-                 id="journalTitleInput"
-                 contenteditable="false"
-                 placeholder="Give this garden day a title...">
+    <main class="journal-page paper-sheet" id="journalPage">
+
+        <div class="entry-meta-stamp">
+            <div>
+                <label>Journal Sheet Logs</label>
+                <span id="autoSaveIndicator" class="auto-save-indicator">Saved ✓</span>
             </div>
 
-           <div class="entry-weather-box">
-                <div class="weather-location-row">
-                    <span id="gardenLocationDisplay">Tallahassee, FL</span>
-                    <span class="weather-stats-display" id="weatherStatsDisplay">Weather loading...</span>
-                    <button type="button"
-                    id="changeLocationButton"
-                    class="btn-new-entry"
-                    onclick="changeGardenLocation()"
-                    style="display: none;">Change location</button>
-          </div>
+            <div>
+                <span class="entry-date-label">Entry Date: </span>
+                <input type="date" id="entryInlineDate" class="entry-inline-datepicker"
+                       onchange="handleInlineDateChange(this.value)">
+            </div>
 
-          <div class="weather-feel-row">
+            <button id="editModeButton" class="btn-new-entry"
+                    onclick="toggleEditMode()">Edit</button>
+        </div>
+
+        <div class="journal-title-input"
+             id="journalTitleInput"
+             contenteditable="false"
+             placeholder="Give this garden day a title...">
+        </div>
+
+        <div class="entry-weather-box">
+            <div class="weather-location-row">
+                <span id="gardenLocationDisplay">Tallahassee, FL</span>
+                <span class="weather-stats-display" id="weatherStatsDisplay">Weather loading...</span>
+                <button type="button"
+                        id="changeLocationButton"
+                        class="btn-new-entry"
+                        onclick="changeGardenLocation()"
+                        style="display: none;">Change location</button>
+            </div>
+
+            <div class="weather-feel-row">
                 <span class="weather-prompt">How does it feel today?</span>
                 <div class="weather-feel-input"
-                id="weatherFeelInput"
-                contenteditable="false"
-                placeholder="Hot and humid, but there was a lovely breeze this morning..."></div>
-        </div>
-    </div>
-
-            <svg class="botanical-bg-decor decor-top-left" width="100" height="100" viewBox="0 0 100 100" fill="none">
-                <path d="M10,90 Q30,60 80,20" stroke="#1B511F" stroke-width="1"/>
-                <path d="M30,65 Q20,50 35,45 Q45,55 30,65 Z" fill="#578859"/>
-            </svg>
-
-            <svg class="botanical-bg-decor decor-bottom-right" width="110" height="110" viewBox="0 0 100 100" fill="none">
-                <path d="M90,90 Q60,70 20,20" stroke="#1B511F" stroke-width="1"/>
-                <circle cx="45" cy="45" r="8" fill="var(--citrus-yellow)" opacity="0.75"/>
-            </svg>
-
-            <div class="journal-sections-container" id="sectionsContainer">
-
-                <!-- Composition 1: photo right / text left -->
-                <section class="journal-section arr-1" id="section1">
-                    <div class="text-wrapper">
-                        <span class="section-note-label">Morning Observations</span>
-                        <div class="text-area-input" id="textInput1" contenteditable="true" placeholder="Click here to write notes..."></div>
-                    </div>
-                    <div class="photo-wrapper">
-                        <div class="photo-container" onclick="triggerPhotoUpload(1)">
-                            <div class="photo-frame" id="photoFrame1"></div>
-                        </div>
-                        <input type="file" id="fileInput1" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 1)">
-                    </div>
-                </section>
-
-                <div class="divider-container" id="divider1">
-                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
-                        <path d="M 10 12 Q 150 5, 310 14 T 620 7 T 790 11" />
-                    </svg>
-                </div>
-
-                <!-- Composition 2: wide photo on top / text underneath -->
-                <section class="journal-section arr-2" id="section2">
-                    <div class="photo-wrapper">
-                        <div class="photo-container" onclick="triggerPhotoUpload(2)">
-                            <div class="photo-frame" id="photoFrame2"></div>
-                        </div>
-                        <input type="file" id="fileInput2" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 2)">
-                    </div>
-                    <div class="text-wrapper">
-                        <span class="section-note-label">Midday Harvest Notes</span>
-                        <div class="text-area-input" id="textInput2" contenteditable="true" placeholder="Type wide horizontally layout notes directly..."></div>
-                    </div>
-                </section>
-
-                <div class="divider-container" id="divider2">
-                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
-                        <path d="M 15 8 Q 210 15, 400 6 T 785 13" />
-                    </svg>
-                </div>
-
-                <!-- Composition 3: photo left / text right -->
-                <section class="journal-section arr-3" id="section3">
-                    <div class="photo-wrapper">
-                        <div class="photo-container" onclick="triggerPhotoUpload(3)">
-                            <div class="photo-frame" id="photoFrame3"></div>
-                        </div>
-                        <input type="file" id="fileInput3" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 3)">
-                    </div>
-                    <div class="text-wrapper">
-                        <span class="section-note-label">Pruning Reflections</span>
-                        <div class="text-area-input" id="textInput3" contenteditable="true" placeholder="Click here to record structural notes..."></div>
-                    </div>
-                </section>
-
-                <div class="divider-container" id="divider3">
-                    <svg class="wobbly-line" viewBox="0 0 800 20" preserveAspectRatio="none">
-                        <path d="M 8 10 Q 190 6, 450 14 T 792 9" />
-                    </svg>
-                </div>
-
-                <!-- Composition 4: photo right / text left -->
-                <section class="journal-section arr-4" id="section4">
-                    <div class="text-wrapper">
-                        <span class="section-note-label">Dusk Sanctuary Details</span>
-                        <div class="text-area-input" id="textInput4" contenteditable="true" placeholder="Capture quiet twilight garden items..."></div>
-                    </div>
-                    <div class="photo-wrapper">
-                        <div class="photo-container" onclick="triggerPhotoUpload(4)">
-                            <div class="photo-frame" id="photoFrame4"></div>
-                        </div>
-                        <input type="file" id="fileInput4" class="hidden-file-input" accept="image/*" onchange="handlePhotoSelect(event, 4)">
-                    </div>
-                </section>
-
+                     id="weatherFeelInput"
+                     contenteditable="false"
+                     placeholder="Hot and humid, but there was a lovely breeze this morning..."></div>
             </div>
-        </main>
-    </div>
+        </div>
+
+        <svg class="botanical-bg-decor decor-top-left" width="100" height="100" viewBox="0 0 100 100" fill="none">
+            <path d="M10,90 Q30,60 80,20" stroke="#1B511F" stroke-width="1"/>
+            <path d="M30,65 Q20,50 35,45 Q45,55 30,65 Z" fill="#578859"/>
+        </svg>
+
+        <svg class="botanical-bg-decor decor-bottom-right" width="110" height="110" viewBox="0 0 100 100" fill="none">
+            <path d="M90,90 Q60,70 20,20" stroke="#1B511F" stroke-width="1"/>
+            <circle cx="45" cy="45" r="8" fill="var(--citrus-yellow)" opacity="0.75"/>
+        </svg>
+
+        <!-- Sections are now rendered dynamically by app.js from
+             journalDatabase[currentEntryIndex].sections. -->
+        <div class="journal-sections-container" id="sectionsContainer"></div>
+
+    </main>
+</div>
     <!-- =========================================================
          VIEW: MONTH ARCHIVE
          ========================================================= -->
