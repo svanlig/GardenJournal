@@ -1384,3 +1384,106 @@ body {
     font-size: 1.2rem;
     line-height: 1;
 }
+/* =========================================================
+   STAGE 3 — per-section delete button + Undo banner
+   ========================================================= */
+
+/* ---- Delete (−) button on each section ---- */
+
+.journal-section {
+    position: relative;   /* anchor for the absolutely-positioned − button */
+}
+
+.remove-section-btn {
+    display: none;                 /* hidden by default */
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 5;
+    background: var(--bg-paper);
+    border: 2px solid var(--coral-red);
+    color: var(--coral-red);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.journal-page.is-editing .remove-section-btn {
+    display: flex;
+}
+
+.remove-section-btn:hover {
+    background: var(--coral-red);
+    color: var(--bg-paper);
+}
+
+/* ---- Undo banner ---- */
+
+.undo-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--mustard);
+    color: var(--deep-green);
+    border: 2px solid var(--deep-green);
+    padding: 10px 14px;
+    margin: 0 0 12px 0;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+}
+
+.journal-page.is-editing .undo-banner.visible {
+    display: flex;
+}
+
+.undo-banner-message {
+    flex: 1 1 auto;
+    font-weight: 600;
+}
+
+.undo-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.undo-banner-btn {
+    background: transparent;
+    border: 2px solid var(--deep-green);
+    color: var(--deep-green);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.undo-banner-btn:hover {
+    background: var(--deep-green);
+    color: var(--bg-paper);
+}
+
+.undo-banner-btn.undo-banner-dismiss {
+    border-color: transparent;
+    color: var(--deep-green);
+    padding: 5px 8px;
+}
+
+.undo-banner-btn.undo-banner-dismiss:hover {
+    background: transparent;
+    color: var(--coral-red);
+}
