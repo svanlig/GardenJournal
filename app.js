@@ -1051,6 +1051,10 @@ function buildRemoveSectionButton(index) {
         e.stopPropagation();
         removeSection(index);
     });
+    return button;
+}
+
+
    /* ---------------------------------------------------------
    UNDO BANNER
    Rendered at the top of the sections container. Hidden by
