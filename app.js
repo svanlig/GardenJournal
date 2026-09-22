@@ -5,6 +5,13 @@
    ========================================================= */
 let isEditMode = false;
 /* ---------------------------------------------------------
+   UNDO STATE
+   One-level undo stash for the most recent section deletion.
+   Cleared on any other action or when leaving Edit mode.
+   --------------------------------------------------------- */
+let lastDeletedSection = null;   // { section: {...}, index: N, entryIndex: M } or null
+
+/* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
 let journalDatabase = [
