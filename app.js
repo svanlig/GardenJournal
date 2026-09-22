@@ -5,6 +5,13 @@
    ========================================================= */
 let isEditMode = false;
 /* ---------------------------------------------------------
+   UNDO STATE
+   One-level undo stash for the most recent section deletion.
+   Cleared on any other action or when leaving Edit mode.
+   --------------------------------------------------------- */
+let lastDeletedSection = null;   // { section: {...}, index: N, entryIndex: M } or null
+
+/* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
 let journalDatabase = [
@@ -246,20 +253,31 @@ function buildSectionElement(sectionData, index) {
         photoFrame.innerHTML = placeholderMarkup();
     }
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.className = 'hidden-file-input';
-    fileInput.accept = 'image/*';
-    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+    // Gallery picker (existing behavior)
+    const galleryInput = document.createElement('input');
+    galleryInput.type = 'file';
+    galleryInput.className = 'hidden-file-input';
+    galleryInput.accept = 'image/*';
+    galleryInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
-    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+    // Camera capture (opens the phone's camera on mobile via capture attr)
+    const cameraInput = document.createElement('input');
+    cameraInput.type = 'file';
+    cameraInput.className = 'hidden-file-input';
+    cameraInput.accept = 'image/*';
+    cameraInput.setAttribute('capture', 'environment');   // rear camera
+    cameraInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+
+    photoContainer.addEventListener('click', (event) => triggerPhotoUpload(event, index));
 
     photoContainer.appendChild(photoFrame);
     photoWrapper.appendChild(photoContainer);
-    photoWrapper.appendChild(fileInput);
-
+    photoWrapper.appendChild(galleryInput);
+    photoWrapper.appendChild(cameraInput);
+   
     section.appendChild(textWrapper);
     section.appendChild(photoWrapper);
+    section.appendChild(buildRemoveSectionButton(index));
     return section;
 }
 
@@ -375,6 +393,8 @@ function chooseLayout(layoutId) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
 
+    lastDeletedSection = null;   // NEW: adding is "another action"
+
     entry.sections.push({
         layout: layoutId,
         text: '',
@@ -437,6 +457,9 @@ function renderEntry(index) {
     const container = document.getElementById('sectionsContainer');
     container.innerHTML = '';
 
+    // NEW: Undo banner sits at the top of the sections flow.
+    container.appendChild(buildUndoBanner());
+   
     entry.sections.forEach((sectionData, i) => {
         container.appendChild(buildSectionElement(sectionData, i));
         if (i < entry.sections.length - 1) {
@@ -446,6 +469,12 @@ function renderEntry(index) {
 
     // NEW: + button at the end of the sections flow.
     container.appendChild(buildAddLayoutControl());
+
+   // INSERTION 2: after re-render, keep the Undo banner visible
+    // if there is a pending deletion for this entry.
+    if (lastDeletedSection && lastDeletedSection.entryIndex === currentEntryIndex) {
+        showUndoBanner();
+    }
 
     const pageIndicator = document.getElementById('pageIndicator');
     if (pageIndicator) {
@@ -619,6 +648,7 @@ function openJournalFromArchive(dbIndex) {
    ENTRY CREATION / NAVIGATION
    --------------------------------------------------------- */
 function createNewEntry() {
+    lastDeletedSection = null;   // NEW
     const todayStr = new Date().toISOString().split('T')[0];
     const newBlankPage = {
         date: todayStr,
@@ -674,6 +704,9 @@ function handleMenuAction(action) {
     } else if (action === 'delete') {
         const confirmed = confirm('Confirm Delete?');
         if (!confirmed) return;
+       
+        lastDeletedSection = null;   // NEW
+       
         if (journalDatabase.length > 1) {
             journalDatabase.splice(currentEntryIndex, 1);
             const targetIndex = Math.max(0, currentEntryIndex - 1);
@@ -696,15 +729,25 @@ function handleMenuAction(action) {
 /* ---------------------------------------------------------
    PHOTOS
    --------------------------------------------------------- */
-function triggerPhotoUpload(index) {
+
+function triggerPhotoUpload(event, index) {
     if (!isEditMode) return;
+
+    // Prevent this click from bubbling to document, where the global
+    // outside-click handler would immediately close the menu we're
+    // about to open.
+    if (event && event.stopPropagation) {
+        event.stopPropagation();
+    }
 
     const container = document.getElementById('sectionsContainer');
     const section = container.querySelector(`.journal-section[data-index="${index}"]`);
     if (!section) return;
 
-    const fileInput = section.querySelector('input[type="file"]');
-    if (fileInput) fileInput.click();
+    const photoContainer = section.querySelector('.photo-container');
+    if (!photoContainer) return;
+
+    openPhotoSourceMenu(photoContainer, index);
 }
 
 function handlePhotoSelect(event, index) {
@@ -787,6 +830,9 @@ function toggleEditMode() {
     if (journalPage) {
         journalPage.classList.toggle('is-editing', isEditMode);
     }
+   // NEW: entering or leaving Edit mode clears any pending undo.
+    lastDeletedSection = null;
+    hideUndoBanner();
 }
 
 function lockJournalEditing() {
@@ -1008,4 +1054,222 @@ function restoreJournal() {
     });
 
     fileInput.click();
+}
+/* ---------------------------------------------------------
+   REMOVE-SECTION BUTTON
+   Small − button rendered inside every section. Hidden by CSS
+   unless #journalPage has the is-editing class.
+   --------------------------------------------------------- */
+function buildRemoveSectionButton(index) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'remove-section-btn';
+    button.title = 'Remove this section';
+    button.setAttribute('aria-label', 'Remove section');
+    button.textContent = '−';
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeSection(index);
+    });
+    return button;
+}
+
+
+   /* ---------------------------------------------------------
+   UNDO BANNER
+   Rendered at the top of the sections container. Hidden by
+   default; .visible makes it show (but only in Edit mode —
+   the CSS gates it on .is-editing).
+   --------------------------------------------------------- */
+function buildUndoBanner() {
+    const banner = document.createElement('div');
+    banner.className = 'undo-banner';
+    banner.id = 'undoBanner';
+
+    banner.innerHTML = `
+        <span class="undo-banner-message" id="undoBannerMessage"></span>
+        <span class="undo-banner-actions">
+            <button type="button" class="undo-banner-btn" id="undoBannerUndoBtn">Undo</button>
+            <button type="button" class="undo-banner-btn undo-banner-dismiss" id="undoBannerDismissBtn" aria-label="Dismiss">×</button>
+        </span>`;
+
+    banner.querySelector('#undoBannerUndoBtn').addEventListener('click', undoLastDelete);
+    banner.querySelector('#undoBannerDismissBtn').addEventListener('click', () => {
+        lastDeletedSection = null;
+        hideUndoBanner();
+    });
+
+    return banner;
+}
+
+function showUndoBanner() {
+    const banner = document.getElementById('undoBanner');
+    const message = document.getElementById('undoBannerMessage');
+    if (!banner || !message) return;
+
+    if (!lastDeletedSection) {
+        hideUndoBanner();
+        return;
+    }
+
+    const layout = lastDeletedSection.section.layout || 'arr-1';
+    const layoutName = (LAYOUTS.find(l => l.id === layout) || {}).name || 'Section';
+    message.textContent = `Removed: ${layoutName}`;
+    banner.classList.add('visible');
+}
+
+function hideUndoBanner() {
+    const banner = document.getElementById('undoBanner');
+    if (banner) banner.classList.remove('visible');
+}
+
+/* ---------------------------------------------------------
+   PHOTO SOURCE MENU
+   Small popup offering Camera or Gallery. Rendered on demand,
+   positioned near the tapped photo container.
+   --------------------------------------------------------- */
+
+let activePhotoMenu = null;   // the currently-open menu element, or null
+
+function openPhotoSourceMenu(photoContainer, index) {
+    closePhotoSourceMenu();
+
+    const menu = document.createElement('div');
+    menu.className = 'photo-source-menu';
+
+    const cameraBtn = document.createElement('button');
+    cameraBtn.type = 'button';
+    cameraBtn.innerHTML = '<span class="source-icon">📷</span><span>Take Photo</span>';
+    cameraBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        choosePhotoSource('camera', index);
+    });
+
+    const galleryBtn = document.createElement('button');
+    galleryBtn.type = 'button';
+    galleryBtn.innerHTML = '<span class="source-icon">🖼️</span><span>Choose from Gallery</span>';
+    galleryBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        choosePhotoSource('gallery', index);
+    });
+
+    menu.appendChild(cameraBtn);
+    menu.appendChild(galleryBtn);
+
+    // Position the menu just below the photo container.
+    const rect = photoContainer.getBoundingClientRect();
+    menu.style.position = 'absolute';
+    menu.style.top = (window.scrollY + rect.bottom + 6) + 'px';
+    menu.style.left = (window.scrollX + rect.left) + 'px';
+
+    document.body.appendChild(menu);
+
+    // Force a reflow so the .visible transition (if any) applies cleanly.
+    void menu.offsetWidth;
+    menu.classList.add('visible');
+
+    activePhotoMenu = menu;
+}
+
+function closePhotoSourceMenu() {
+    if (activePhotoMenu && activePhotoMenu.parentElement) {
+        activePhotoMenu.parentElement.removeChild(activePhotoMenu);
+    }
+    activePhotoMenu = null;
+}
+
+function choosePhotoSource(source, index) {
+    closePhotoSourceMenu();
+
+    const container = document.getElementById('sectionsContainer');
+    const section = container.querySelector(`.journal-section[data-index="${index}"]`);
+    if (!section) return;
+
+    // The two file inputs are siblings of the photo container, in
+    // the order: gallery first, camera second.
+    const inputs = section.querySelectorAll('input[type="file"]');
+    if (!inputs || inputs.length < 2) return;
+
+    const galleryInput = inputs[0];
+    const cameraInput = inputs[1];
+
+    if (source === 'camera') {
+        cameraInput.click();
+    } else {
+        galleryInput.click();
+    }
+}
+
+/* ---------------------------------------------------------
+   GLOBAL DISMISS FOR THE PHOTO SOURCE MENU
+   Clicking anywhere outside the menu closes it. Escape closes it.
+   --------------------------------------------------------- */
+document.addEventListener('click', (e) => {
+    if (!activePhotoMenu) return;
+    if (e.target === activePhotoMenu || activePhotoMenu.contains(e.target)) return;
+    closePhotoSourceMenu();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePhotoSourceMenu();
+    }
+});
+
+
+
+/* ---------------------------------------------------------
+   UNDO LAST DELETE
+   Re-inserts the stashed section at its original index.
+   --------------------------------------------------------- */
+function undoLastDelete() {
+    if (!lastDeletedSection) return;
+
+    const { section, index, entryIndex } = lastDeletedSection;
+    const entry = journalDatabase[entryIndex];
+    if (!entry) {
+        lastDeletedSection = null;
+        hideUndoBanner();
+        return;
+    }
+
+    // If the user navigated away from the entry they deleted from,
+    // still re-insert into the original entry (the index is relative
+    // to that entry's sections array), but do not change the current
+    // view. The user will see the effect when they navigate back.
+    const clampedIndex = Math.max(0, Math.min(index, entry.sections.length));
+    entry.sections.splice(clampedIndex, 0, section);
+
+    lastDeletedSection = null;
+
+    // Only re-render if we're still looking at the same entry.
+    if (currentEntryIndex === entryIndex) {
+        renderEntry(currentEntryIndex);
+        triggerAutoSaveFeedback();
+    }
+
+    showNotification('Section restored.');
+}
+
+/* ---------------------------------------------------------
+   REMOVE SECTION
+   Splices the section at `index` out of the current entry,
+   stashes it for undo, re-renders, and shows the Undo banner.
+   --------------------------------------------------------- */
+function removeSection(index) {
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+    if (index < 0 || index >= entry.sections.length) return;
+
+    const [removed] = entry.sections.splice(index, 1);
+
+    lastDeletedSection = {
+        section: removed,
+        index: index,
+        entryIndex: currentEntryIndex
+    };
+
+    renderEntry(currentEntryIndex);
+    triggerAutoSaveFeedback();
+    showUndoBanner();
 }
