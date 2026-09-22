@@ -638,6 +638,7 @@ function openJournalFromArchive(dbIndex) {
    ENTRY CREATION / NAVIGATION
    --------------------------------------------------------- */
 function createNewEntry() {
+    lastDeletedSection = null;   // NEW
     const todayStr = new Date().toISOString().split('T')[0];
     const newBlankPage = {
         date: todayStr,
