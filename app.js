@@ -458,6 +458,12 @@ function renderEntry(index) {
     // NEW: + button at the end of the sections flow.
     container.appendChild(buildAddLayoutControl());
 
+   // INSERTION 2: after re-render, keep the Undo banner visible
+    // if there is a pending deletion for this entry.
+    if (lastDeletedSection && lastDeletedSection.entryIndex === currentEntryIndex) {
+        showUndoBanner();
+    }
+
     const pageIndicator = document.getElementById('pageIndicator');
     if (pageIndicator) {
         pageIndicator.innerText =
