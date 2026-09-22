@@ -295,6 +295,25 @@ function buildDividerElement() {
     return divider;
 }
 
+/* ---------------------------------------------------------
+   ADD LAYOUT CONTROL
+   Renders the + button below the last section. Lives inside
+   #sectionsContainer so it flows with the sections. Hidden
+   by CSS unless #journalPage has the is-editing class.
+   --------------------------------------------------------- */
+function buildAddLayoutControl() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'add-layout-control';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'add-layout-btn';
+    button.innerHTML = '<span class="add-layout-plus">+</span><span>Add layout</span>';
+    button.addEventListener('click', openLayoutChooser);
+
+    wrapper.appendChild(button);
+    return wrapper;
+}
 
 function renderEntry(index) {
     if (index < 0 || index >= journalDatabase.length) return;
