@@ -1016,3 +1016,21 @@ function restoreJournal() {
 
     fileInput.click();
 }
+/* ---------------------------------------------------------
+   REMOVE-SECTION BUTTON
+   Small − button rendered inside every section. Hidden by CSS
+   unless #journalPage has the is-editing class.
+   --------------------------------------------------------- */
+function buildRemoveSectionButton(index) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'remove-section-btn';
+    button.title = 'Remove this section';
+    button.setAttribute('aria-label', 'Remove section');
+    button.textContent = '−';
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeSection(index);
+    });
+    return button;
+}
