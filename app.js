@@ -284,6 +284,7 @@ function buildSectionElement(sectionData, index) {
     section.appendChild(textWrapper);
     section.appendChild(photoWrapper);
     section.appendChild(buildRemoveSectionButton(index));
+    section.appendChild(buildDragHandle(index));      // NEW
     return section;
 }
 
