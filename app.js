@@ -1015,6 +1015,21 @@ function toggleEditMode() {
    // NEW: entering or leaving Edit mode clears any pending undo.
     lastDeletedSection = null;
     hideUndoBanner();
+
+    // NEW: safety — abort any in-progress drag when leaving Edit mode.
+    if (!isEditMode && sectionDrag) {
+        if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
+            sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
+        }
+        if (sectionDrag.sectionEl) {
+            sectionDrag.sectionEl.classList.remove('is-dragging');
+        }
+        document.body.classList.remove('is-dragging-section');
+        window.removeEventListener('pointermove', onSectionDragMove);
+        window.removeEventListener('pointerup', onSectionDragEnd);
+        window.removeEventListener('pointercancel', onSectionDragEnd);
+        sectionDrag = null;
+    }
 }
 
 function lockJournalEditing() {
