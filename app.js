@@ -12,6 +12,12 @@ let isEditMode = false;
 let lastDeletedSection = null;   // { section: {...}, index: N, entryIndex: M } or null
 
 /* ---------------------------------------------------------
+   DRAG STATE
+   Tracks the in-progress drag of a section. Null when idle.
+   --------------------------------------------------------- */
+let sectionDrag = null;   // { index, startY, currentTargetIndex, placeholder, sectionEl } or null
+
+/* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
 let journalDatabase = [
