@@ -1457,7 +1457,20 @@ function removeSection(index) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
     if (index < 0 || index >= entry.sections.length) return;
-
+    if (sectionDrag) {
+    // abort
+       if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
+           sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
+       }
+       if (sectionDrag.sectionEl) {
+           sectionDrag.sectionEl.classList.remove('is-dragging');
+       }
+       document.body.classList.remove('is-dragging-section');
+       window.removeEventListener('pointermove', onSectionDragMove);
+       window.removeEventListener('pointerup', onSectionDragEnd);
+       window.removeEventListener('pointercancel', onSectionDragEnd);
+       sectionDrag = null;
+   }
     const [removed] = entry.sections.splice(index, 1);
 
     lastDeletedSection = {
