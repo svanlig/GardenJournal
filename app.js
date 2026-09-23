@@ -12,6 +12,12 @@ let isEditMode = false;
 let lastDeletedSection = null;   // { section: {...}, index: N, entryIndex: M } or null
 
 /* ---------------------------------------------------------
+   DRAG STATE
+   Tracks the in-progress drag of a section. Null when idle.
+   --------------------------------------------------------- */
+let sectionDrag = null;   // { index, startY, currentTargetIndex, placeholder, sectionEl } or null
+
+/* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
 let journalDatabase = [
@@ -278,6 +284,7 @@ function buildSectionElement(sectionData, index) {
     section.appendChild(textWrapper);
     section.appendChild(photoWrapper);
     section.appendChild(buildRemoveSectionButton(index));
+    section.appendChild(buildDragHandle(index));      // NEW
     return section;
 }
 
@@ -488,6 +495,181 @@ function renderEntry(index) {
     const btnNext = document.getElementById('btnNext');
     if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
 }
+
+/* ---------------------------------------------------------
+   DRAG HANDLE
+   Small grip icon rendered in the top-left of every section.
+   Hidden by CSS unless #journalPage has the is-editing class.
+   Pointer Events, so mouse and touch use the same code path.
+   --------------------------------------------------------- */
+function buildDragHandle(index) {
+    const handle = document.createElement('button');
+    handle.type = 'button';
+    handle.className = 'drag-handle';
+    handle.title = 'Drag to reorder';
+    handle.setAttribute('aria-label', 'Drag to reorder section');
+    handle.textContent = '⋮⋮';   // vertical dots, reads as a grip
+
+    handle.addEventListener('pointerdown', (e) => {
+        startSectionDrag(e, index, handle);
+    });
+
+    // Prevent the click from bubbling up to the section (which
+    // might trigger text focus or photo click on some browsers).
+    handle.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+
+    return handle;
+}
+
+/* ---------------------------------------------------------
+   DRAG LIFECYCLE
+   --------------------------------------------------------- */
+
+function startSectionDrag(e, index, handle) {
+    // Only in Edit mode.
+    if (!isEditMode) return;
+
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+    if (index < 0 || index >= entry.sections.length) return;
+
+    // Prevent the browser from starting a scroll or text selection.
+    e.preventDefault();
+    e.stopPropagation();
+
+    const container = document.getElementById('sectionsContainer');
+    const sectionEl = container.querySelector(`.journal-section[data-index="${index}"]`);
+    if (!sectionEl) return;
+
+    // Create the placeholder bar that will move as the user drags.
+    const placeholder = document.createElement('div');
+    placeholder.className = 'journal-section drop-placeholder';
+
+    sectionDrag = {
+        index: index,
+        startY: e.clientY,
+        sectionEl: sectionEl,
+        placeholder: placeholder,
+        container: container
+    };
+
+    sectionEl.classList.add('is-dragging');
+    document.body.classList.add('is-dragging-section');
+
+    // Insert the placeholder immediately after the dragged section
+    // so it's visible from the first frame.
+    if (sectionEl.nextSibling) {
+        container.insertBefore(placeholder, sectionEl.nextSibling);
+    } else {
+        container.appendChild(placeholder);
+    }
+
+    // Attach global move/up handlers. Using pointer events means
+    // these fire for both mouse and touch.
+    window.addEventListener('pointermove', onSectionDragMove);
+    window.addEventListener('pointerup', onSectionDragEnd);
+    window.addEventListener('pointercancel', onSectionDragEnd);
+}
+
+function onSectionDragMove(e) {
+    if (!sectionDrag) return;
+    e.preventDefault();
+
+    const container = sectionDrag.container;
+
+    // Find the section the pointer is currently over.
+    // We walk all visible sections and find which one's vertical
+    // midpoint the cursor has crossed.
+    const sections = Array.from(
+        container.querySelectorAll('.journal-section:not(.is-dragging):not(.drop-placeholder)')
+    );
+
+    let targetEl = null;
+    for (const el of sections) {
+        const rect = el.getBoundingClientRect();
+        if (e.clientY < rect.top + rect.height / 2) {
+            targetEl = el;
+            break;
+        }
+    }
+
+    // Move the placeholder to just before the target element,
+    // or to the end of the container if the pointer is below all
+    // sections.
+    if (targetEl) {
+        if (sectionDrag.placeholder.nextSibling !== targetEl) {
+            container.insertBefore(sectionDrag.placeholder, targetEl);
+        }
+    } else {
+        // Below all sections — put the placeholder just before the
+        // + button, or at the very end if the + isn't present.
+        const addControl = container.querySelector('.add-layout-control');
+        if (addControl) {
+            container.insertBefore(sectionDrag.placeholder, addControl);
+        } else {
+            container.appendChild(sectionDrag.placeholder);
+        }
+    }
+}
+
+function onSectionDragEnd(e) {
+    if (!sectionDrag) return;
+
+    const { index, container, placeholder, sectionEl } = sectionDrag;
+
+    // Determine the new array position from the placeholder's DOM
+    // position. We count how many non-dragging sections come before
+    // the placeholder.
+    const children = Array.from(container.children);
+    const placeholderPos = children.indexOf(placeholder);
+
+    let newIndex = 0;
+    for (let i = 0; i < placeholderPos; i++) {
+        const child = children[i];
+        if (child.classList && child.classList.contains('journal-section')) {
+            if (!child.classList.contains('drop-placeholder') &&
+                !child.classList.contains('is-dragging')) {
+                newIndex++;
+            }
+        }
+    }
+
+    // Clamp just in case.
+    const entry = journalDatabase[currentEntryIndex];
+    if (entry) {
+        newIndex = Math.max(0, Math.min(newIndex, entry.sections.length - 1));
+    }
+
+    // Clean up DOM and state.
+    placeholder.remove();
+    sectionEl.classList.remove('is-dragging');
+    document.body.classList.remove('is-dragging-section');
+
+    window.removeEventListener('pointermove', onSectionDragMove);
+    window.removeEventListener('pointerup', onSectionDragEnd);
+    window.removeEventListener('pointercancel', onSectionDragEnd);
+
+    sectionDrag = null;
+
+    // If the position didn't change, do nothing.
+    if (!entry || newIndex === index) return;
+
+    // Reorder the array: remove the section from its old spot,
+    // insert it at the new position.
+    const [moved] = entry.sections.splice(index, 1);
+    entry.sections.splice(newIndex, 0, moved);
+
+    // Re-render the sections. Any pending undo is cleared because
+    // reordering counts as "another action."
+    lastDeletedSection = null;
+
+    renderEntry(currentEntryIndex);
+    triggerAutoSaveFeedback();
+    showNotification(`Section moved.`);
+}
+
 
 /* ---------------------------------------------------------
    AUTO-SAVE FEEDBACK
@@ -833,6 +1015,21 @@ function toggleEditMode() {
    // NEW: entering or leaving Edit mode clears any pending undo.
     lastDeletedSection = null;
     hideUndoBanner();
+
+    // NEW: safety — abort any in-progress drag when leaving Edit mode.
+    if (!isEditMode && sectionDrag) {
+        if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
+            sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
+        }
+        if (sectionDrag.sectionEl) {
+            sectionDrag.sectionEl.classList.remove('is-dragging');
+        }
+        document.body.classList.remove('is-dragging-section');
+        window.removeEventListener('pointermove', onSectionDragMove);
+        window.removeEventListener('pointerup', onSectionDragEnd);
+        window.removeEventListener('pointercancel', onSectionDragEnd);
+        sectionDrag = null;
+    }
 }
 
 function lockJournalEditing() {
@@ -1260,7 +1457,20 @@ function removeSection(index) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
     if (index < 0 || index >= entry.sections.length) return;
-
+    if (sectionDrag) {
+    // abort
+       if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
+           sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
+       }
+       if (sectionDrag.sectionEl) {
+           sectionDrag.sectionEl.classList.remove('is-dragging');
+       }
+       document.body.classList.remove('is-dragging-section');
+       window.removeEventListener('pointermove', onSectionDragMove);
+       window.removeEventListener('pointerup', onSectionDragEnd);
+       window.removeEventListener('pointercancel', onSectionDragEnd);
+       sectionDrag = null;
+   }
     const [removed] = entry.sections.splice(index, 1);
 
     lastDeletedSection = {

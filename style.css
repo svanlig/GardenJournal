@@ -1541,3 +1541,76 @@ body {
     font-size: 1.1rem;
     line-height: 1;
 }
+/* =========================================================
+   STAGE 4 — drag handle + drag/drop visual feedback
+   ========================================================= */
+
+/* ---- Drag handle on each section (top-left, mirroring − top-right) ---- */
+
+.drag-handle {
+    display: none;                 /* hidden by default */
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 5;
+    background: var(--bg-paper);
+    border: 2px solid var(--deep-green);
+    color: var(--deep-green);
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    cursor: grab;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;            /* prevent browser scroll while dragging */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.journal-page.is-editing .drag-handle {
+    display: flex;
+}
+
+.drag-handle:hover {
+    background: var(--deep-green);
+    color: var(--bg-paper);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* ---- Section states during a drag ---- */
+
+/* The section being dragged: slightly transparent so the user
+   sees it lifted out of the flow. */
+.journal-section.is-dragging {
+    opacity: 0.5;
+}
+
+/* A placeholder bar showing where the dragged section will land. */
+.journal-section.drop-placeholder {
+    display: block;
+    min-height: 6px;
+    height: 6px;
+    background: var(--coral-red);
+    border-radius: 0;
+    margin: 6px 0;
+    transition: none;
+}
+
+/* Prevent text selection while dragging anywhere on the page. */
+body.is-dragging-section {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grabbing;
+}
+
+body.is-dragging-section * {
+    cursor: grabbing !important;
+}
