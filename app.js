@@ -1390,13 +1390,29 @@ function openPhotoSourceMenu(photoContainer, index) {
     galleryBtn.type = 'button';
     galleryBtn.innerHTML = '<span class="source-icon">🖼️</span><span>Choose from Gallery</span>';
     galleryBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        choosePhotoSource('gallery', index);
+       e.stopPropagation();
+       choosePhotoSource('gallery', index);
     });
+
+    // Only offer Adjust Framing when there's already a photo in the section.
+    const section = journalDatabase[currentEntryIndex]?.sections[index];
+    const hasImage = !!(section && section.image);
 
     menu.appendChild(cameraBtn);
     menu.appendChild(galleryBtn);
 
+    if (hasImage) {
+       const framingBtn = document.createElement('button');
+       framingBtn.type = 'button';
+       framingBtn.innerHTML = '<span class="source-icon">✥</span><span>Adjust Framing</span>';
+       framingBtn.addEventListener('click', (e) => {
+           e.stopPropagation();
+           closePhotoSourceMenu();
+           openPhotoFramingPanel(index);
+       });
+       menu.appendChild(framingBtn);
+   }
+   
     // Position the menu just below the photo container.
     const rect = photoContainer.getBoundingClientRect();
     menu.style.position = 'absolute';
