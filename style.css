@@ -669,12 +669,7 @@ body {
 
 /* 3. The photo-frame drops its fixed 4:3 aspect ratio for Layout 1
    only, and instead flexes to fill the container. The image inside
-   uses object-fit: cover so it fills without distortion. */
-/* .journal-section.arr-1 .photo-frame {
-    aspect-ratio: auto;        ** override the shared 4 / 3 ***
-    flex: 1 1 auto;
-    height: 100%;
-}  editing this out because it is overriding the pictures */
+   uses object-fit: cover so it fills without distortion. (this part is deleted)*/
 
 /* 4. Make sure the img actually fills the frame (the shared rule
    already does this, but we re-state it here so Layout 1 is
