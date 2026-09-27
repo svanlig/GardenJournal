@@ -484,6 +484,54 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+/* ---------------------------------------------------------
+   PHOTO FRAMING PANEL (Path C)
+   Opens a small modal that lets the user pick a preset
+   position (3×3) and a fit mode (cover / contain) for the
+   photo in the given section.
+
+   Step 3 version: opens an empty modal. Step 4 fills it.
+   --------------------------------------------------------- */
+
+let framingPanelState = null;   // { sectionIndex, workingPos, workingFit }
+
+function openPhotoFramingPanel(sectionIndex) {
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+    const section = entry.sections[sectionIndex];
+    if (!section || !section.image) return;
+
+    framingPanelState = {
+        sectionIndex: sectionIndex,
+        workingPos: section.imagePos || 'center',
+        workingFit: section.imageFit || 'cover'
+    };
+
+    const overlay = document.getElementById('photoFramingOverlay');
+    if (!overlay) return;
+
+    // Step 3: just populate the preview with the section's image so
+    // we can confirm the panel opens correctly. Step 4 adds controls.
+    const preview = document.getElementById('photoFramingPreview');
+    if (preview) {
+        preview.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = section.image;
+        img.alt = 'Framing preview';
+        img.draggable = false;
+        applyPhotoFraming(img, framingPanelState.workingPos, framingPanelState.workingFit);
+        preview.appendChild(img);
+    }
+
+    overlay.classList.add('visible');
+}
+
+function closePhotoFramingPanel() {
+    framingPanelState = null;
+    const overlay = document.getElementById('photoFramingOverlay');
+    if (overlay) overlay.classList.remove('visible');
+}
+
 function renderEntry(index) {
     if (index < 0 || index >= journalDatabase.length) return;
     currentEntryIndex = index;
