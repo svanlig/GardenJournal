@@ -1614,3 +1614,22 @@ body.is-dragging-section {
 body.is-dragging-section * {
     cursor: grabbing !important;
 }
+
+/* Same framing classes, applied inside the framing panel preview.
+   The preview uses the same <img> classes as the section's frame,
+   so these rules mirror the ones above. */
+
+.photo-framing-preview img.pos-top-left      { object-position: 0%   0%;   }
+.photo-framing-preview img.pos-top-center    { object-position: 50%  0%;   }
+.photo-framing-preview img.pos-top-right     { object-position: 100% 0%;   }
+
+.photo-framing-preview img.pos-center-left   { object-position: 0%   50%;  }
+.photo-framing-preview img.pos-center        { object-position: 50%  50%;  }
+.photo-framing-preview img.pos-center-right  { object-position: 100% 50%;  }
+
+.photo-framing-preview img.pos-bottom-left   { object-position: 0%   100%; }
+.photo-framing-preview img.pos-bottom-center { object-position: 50%  100%; }
+.photo-framing-preview img.pos-bottom-right  { object-position: 100% 100%; }
+
+.photo-framing-preview img.fit-cover   { object-fit: cover;   }
+.photo-framing-preview img.fit-contain { object-fit: contain; }
