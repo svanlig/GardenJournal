@@ -512,16 +512,91 @@ function openPhotoFramingPanel(sectionIndex) {
 
     // Step 3: just populate the preview with the section's image so
     // we can confirm the panel opens correctly. Step 4 adds controls.
-    const preview = document.getElementById('photoFramingPreview');
-    if (preview) {
-        preview.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = section.image;
-        img.alt = 'Framing preview';
-        img.draggable = false;
-        applyPhotoFraming(img, framingPanelState.workingPos, framingPanelState.workingFit);
-        preview.appendChild(img);
-    }
+   const preview = document.getElementById('photoFramingPreview');
+if (preview) {
+    preview.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = section.image;
+    img.alt = 'Framing preview';
+    img.draggable = false;
+    img.id = 'photoFramingPreviewImg';
+    applyPhotoFraming(img, framingPanelState.workingPos, framingPanelState.workingFit);
+    preview.appendChild(img);
+}
+
+// Build the controls into the body.
+const body = document.getElementById('photoFramingBody');
+if (body) {
+    body.innerHTML = '';
+
+    // ---- Position grid ----
+    const posLabel = document.createElement('div');
+    posLabel.className = 'photo-framing-section-label';
+    posLabel.textContent = 'Position';
+    body.appendChild(posLabel);
+
+    const grid = document.createElement('div');
+    grid.className = 'photo-framing-grid';
+
+    PHOTO_POSITIONS.forEach(pos => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'photo-framing-pos-btn';
+        btn.dataset.pos = pos;
+        if (pos === framingPanelState.workingPos) {
+            btn.classList.add('is-selected');
+        }
+        btn.setAttribute('aria-label', 'Position ' + pos);
+        // A small dot indicating the position within a 3×3 layout.
+        // Simple visual: an empty box with a small filled square in
+        // the corresponding cell.
+        btn.innerHTML = '<span class="pos-dot"></span>';
+        btn.addEventListener('click', () => {
+            framingPanelState.workingPos = pos;
+            updateFramingPanelSelection();
+            applyPhotoFraming(
+                document.getElementById('photoFramingPreviewImg'),
+                framingPanelState.workingPos,
+                framingPanelState.workingFit
+            );
+        });
+        grid.appendChild(btn);
+    });
+    body.appendChild(grid);
+
+    // ---- Fit toggle ----
+    const fitLabel = document.createElement('div');
+    fitLabel.className = 'photo-framing-section-label';
+    fitLabel.textContent = 'Fit';
+    body.appendChild(fitLabel);
+
+    const fitRow = document.createElement('div');
+    fitRow.className = 'photo-framing-fit-row';
+
+    [['cover', 'Fill'], ['contain', 'Fit']].forEach(([value, label]) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'photo-framing-fit-btn';
+        btn.dataset.fit = value;
+        btn.textContent = label;
+        if (value === framingPanelState.workingFit) {
+            btn.classList.add('is-selected');
+        }
+        btn.addEventListener('click', () => {
+            framingPanelState.workingFit = value;
+            updateFramingPanelSelection();
+            applyPhotoFraming(
+                document.getElementById('photoFramingPreviewImg'),
+                framingPanelState.workingPos,
+                framingPanelState.workingFit
+            );
+        });
+        fitRow.appendChild(btn);
+    });
+    body.appendChild(fitRow);
+}
+
+overlay.classList.add('visible');
 
     overlay.classList.add('visible');
 }
