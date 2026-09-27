@@ -1765,3 +1765,95 @@ body.is-dragging-section * {
     background: var(--coral-red);
     border-color: var(--coral-red);
 }
+/* ---- Controls inside the framing panel body ---- */
+
+.photo-framing-section-label {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--deep-green);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    margin-top: 4px;
+}
+
+.photo-framing-section-label + .photo-framing-grid,
+.photo-framing-section-label + .photo-framing-fit-row {
+    margin-bottom: 20px;
+}
+
+/* ---- 3×3 position grid ---- */
+
+.photo-framing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    max-width: 220px;
+}
+
+.photo-framing-pos-btn {
+    aspect-ratio: 1 / 1;
+    background: var(--bg-paper);
+    border: 2px solid var(--deep-green);
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-framing-pos-btn .pos-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--deep-green);
+    transition: background-color 0.15s ease, width 0.15s ease, height 0.15s ease;
+}
+
+.photo-framing-pos-btn:hover {
+    background: rgba(27, 81, 31, 0.06);
+}
+
+.photo-framing-pos-btn.is-selected {
+    background: var(--deep-green);
+    border-color: var(--deep-green);
+}
+
+.photo-framing-pos-btn.is-selected .pos-dot {
+    background: var(--citrus-yellow);
+    width: 12px;
+    height: 12px;
+}
+
+/* ---- Fit mode row ---- */
+
+.photo-framing-fit-row {
+    display: flex;
+    gap: 8px;
+}
+
+.photo-framing-fit-btn {
+    flex: 1 1 0;
+    background: var(--bg-paper);
+    border: 2px solid var(--deep-green);
+    color: var(--deep-green);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.photo-framing-fit-btn:hover {
+    background: rgba(27, 81, 31, 0.06);
+}
+
+.photo-framing-fit-btn.is-selected {
+    background: var(--deep-green);
+    color: var(--bg-paper);
+}
