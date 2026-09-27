@@ -271,6 +271,41 @@
         </div>
     </div>
 </div>
+    <!-- =========================================================
+     PHOTO FRAMING PANEL (Path C)
+     Opened from the photo source menu via "Adjust Framing".
+     Step 3: skeleton with preview only. Step 4 fills it.
+     ========================================================= -->
+<div class="photo-framing-overlay" id="photoFramingOverlay">
+    <div class="photo-framing-panel">
+
+        <div class="photo-framing-header">
+            <h2 class="photo-framing-title">Adjust Framing</h2>
+            <button type="button"
+                    class="photo-framing-close"
+                    onclick="closePhotoFramingPanel()"
+                    aria-label="Close">×</button>
+        </div>
+
+        <div class="photo-framing-preview" id="photoFramingPreview">
+            <!-- Image inserted by JS on open -->
+        </div>
+
+        <div class="photo-framing-body" id="photoFramingBody">
+            <!-- Step 4: controls go here -->
+        </div>
+
+        <div class="photo-framing-footer">
+            <button type="button"
+                    class="photo-framing-cancel"
+                    onclick="closePhotoFramingPanel()">Cancel</button>
+            <button type="button"
+                    class="photo-framing-done"
+                    onclick="applyPhotoFramingAndClose()">Done</button>
+        </div>
+
+    </div>
+</div>
     <script src="app.js"></script>
 </body>
 </html>
