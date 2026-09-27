@@ -310,6 +310,41 @@ function placeholderMarkup() {
         </div>`;
 }
 
+/* ---------------------------------------------------------
+   PHOTO FRAMING (Path C)
+   Applies a preset position and fit mode to a photo by setting
+   CSS classes. The browser's object-position and object-fit
+   do the visual work — no pixel math, no clamping.
+
+   pos: one of PHOTO_POSITIONS, default "center"
+   fit: "cover" | "contain", default "cover"
+   --------------------------------------------------------- */
+
+const PHOTO_POSITIONS = [
+    "top-left",     "top-center",     "top-right",
+    "center-left",  "center",         "center-right",
+    "bottom-left",  "bottom-center",  "bottom-right"
+];
+
+function applyPhotoFraming(imgEl, pos, fit) {
+    if (!imgEl) return;
+
+    // Remove any prior framing classes.
+    PHOTO_POSITIONS.forEach(p => imgEl.classList.remove('pos-' + p));
+    imgEl.classList.remove('fit-cover');
+    imgEl.classList.remove('fit-contain');
+
+    // Fall back to defaults if the values are missing or unknown.
+    const safePos = PHOTO_POSITIONS.includes(pos) ? pos : 'center';
+    const safeFit = (fit === 'contain') ? 'contain' : 'cover';
+
+    // Apply the classes. These do nothing visually until Step 2
+    // adds the CSS rules for them — that's intentional, so we can
+    // verify the classes land on the element without a visual change.
+    imgEl.classList.add('pos-' + safePos);
+    imgEl.classList.add('fit-' + safeFit);
+}
+
 function buildDividerElement() {
     const divider = document.createElement('div');
     divider.className = 'divider-container';
