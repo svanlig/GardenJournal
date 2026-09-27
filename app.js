@@ -601,6 +601,20 @@ overlay.classList.add('visible');
     overlay.classList.add('visible');
 }
 
+/* Reflects the current working position/fit in the panel's buttons. */
+function updateFramingPanelSelection() {
+    if (!framingPanelState) return;
+    const body = document.getElementById('photoFramingBody');
+    if (!body) return;
+
+    body.querySelectorAll('.photo-framing-pos-btn').forEach(btn => {
+        btn.classList.toggle('is-selected', btn.dataset.pos === framingPanelState.workingPos);
+    });
+    body.querySelectorAll('.photo-framing-fit-btn').forEach(btn => {
+        btn.classList.toggle('is-selected', btn.dataset.fit === framingPanelState.workingFit);
+    });
+}
+
 function closePhotoFramingPanel() {
     framingPanelState = null;
     const overlay = document.getElementById('photoFramingOverlay');
@@ -1673,5 +1687,34 @@ function removeSection(index) {
    before closing. For now, this just closes.
    --------------------------------------------------------- */
 function applyPhotoFramingAndClose() {
+    if (!framingPanelState) {
+        closePhotoFramingPanel();
+        return;
+    }
+
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) {
+        closePhotoFramingPanel();
+        return;
+    }
+    const section = entry.sections[framingPanelState.sectionIndex];
+    if (section) {
+        // Store only non-default values to keep the data tidy.
+        if (framingPanelState.workingPos && framingPanelState.workingPos !== 'center') {
+            section.imagePos = framingPanelState.workingPos;
+        } else {
+            delete section.imagePos;
+        }
+
+        if (framingPanelState.workingFit && framingPanelState.workingFit !== 'cover') {
+            section.imageFit = framingPanelState.workingFit;
+        } else {
+            delete section.imageFit;
+        }
+    }
+
     closePhotoFramingPanel();
+    renderEntry(currentEntryIndex);
+    triggerAutoSaveFeedback();
+    showNotification('Framing updated.');
 }
