@@ -250,14 +250,23 @@ function buildSectionElement(sectionData, index) {
     const photoFrame = document.createElement('div');
     photoFrame.className = 'photo-frame';
 
-    if (sectionData.image) {
-        const img = document.createElement('img');
-        img.src = sectionData.image;
-        img.alt = 'Garden View Slot';
-        photoFrame.appendChild(img);
-    } else {
-        photoFrame.innerHTML = placeholderMarkup();
-    }
+   if (sectionData.image) {
+    const img = document.createElement('img');
+    img.src = sectionData.image;
+    img.alt = 'Garden View Slot';
+
+    // Path C framing — reads optional imagePos and imageFit,
+    // falls back to "center" and "cover" if missing.
+    applyPhotoFraming(
+        img,
+        sectionData.imagePos,
+        sectionData.imageFit
+    );
+
+    photoFrame.appendChild(img);
+} else {
+    photoFrame.innerHTML = placeholderMarkup();
+}
 
     // Gallery picker (existing behavior)
     const galleryInput = document.createElement('input');
