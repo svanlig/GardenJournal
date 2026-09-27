@@ -1591,3 +1591,12 @@ function removeSection(index) {
     triggerAutoSaveFeedback();
     showUndoBanner();
 }
+
+/* ---------------------------------------------------------
+   APPLY FRAMING AND CLOSE (stub for Step 3)
+   Step 4 will write the working state back to the data model
+   before closing. For now, this just closes.
+   --------------------------------------------------------- */
+function applyPhotoFramingAndClose() {
+    closePhotoFramingPanel();
+}
