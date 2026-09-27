@@ -1615,6 +1615,35 @@ body.is-dragging-section * {
     cursor: grabbing !important;
 }
 
+/* =========================================================
+   PATH C — PHOTO FRAMING
+   Preset positions (9) and fit modes (2) applied as classes
+   on the <img> inside .photo-frame.
+
+   Defaults: pos-center + fit-cover, which matches the original
+   behavior. Adding this block changes nothing for entries that
+   don't set imagePos / imageFit.
+   ========================================================= */
+
+/* ---- Position: object-position 3x3 grid ---- */
+
+.photo-frame img.pos-top-left      { object-position: 0%   0%;   }
+.photo-frame img.pos-top-center    { object-position: 50%  0%;   }
+.photo-frame img.pos-top-right     { object-position: 100% 0%;   }
+
+.photo-frame img.pos-center-left   { object-position: 0%   50%;  }
+.photo-frame img.pos-center        { object-position: 50%  50%;  }
+.photo-frame img.pos-center-right  { object-position: 100% 50%;  }
+
+.photo-frame img.pos-bottom-left   { object-position: 0%   100%; }
+.photo-frame img.pos-bottom-center { object-position: 50%  100%; }
+.photo-frame img.pos-bottom-right  { object-position: 100% 100%; }
+
+/* ---- Fit mode: object-fit ---- */
+
+.photo-frame img.fit-cover   { object-fit: cover;   }
+.photo-frame img.fit-contain { object-fit: contain; }
+
 /* Same framing classes, applied inside the framing panel preview.
    The preview uses the same <img> classes as the section's frame,
    so these rules mirror the ones above. */
