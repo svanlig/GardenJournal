@@ -652,12 +652,8 @@ body {
 
 /* 1. Let the photo-wrapper stretch to the full row height.
    By default grid items stretch, but the flex display below
-   would otherwise shrink it to its content. */
-.journal-section.arr-1 .photo-wrapper {
-    height: 100%;
-    align-self: stretch;
-    align-items: stretch;      /* was: center — lets the child fill vertically */
-}
+   would otherwise shrink it to its content.(deleted this) */
+
 
 /* 2. The photo-container fills the wrapper's height.
    It keeps its white mat + padding + shadow. */
