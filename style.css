@@ -650,23 +650,6 @@ body {
    Layout 1 — photo column matches text column height
    ========================================================= */
 
-/* 1. Let the photo-wrapper stretch to the full row height.
-   By default grid items stretch, but the flex display below
-   would otherwise shrink it to its content.(deleted this) */
-
-
-/* 2. The photo-container fills the wrapper's height.
-   It keeps its white mat + padding + shadow. */
-.journal-section.arr-1 .photo-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-/* 3. The photo-frame drops its fixed 4:3 aspect ratio for Layout 1
-   only, and instead flexes to fill the container. The image inside
-   uses object-fit: cover so it fills without distortion. (this part is deleted)*/
-
 /* 4. Make sure the img actually fills the frame (the shared rule
    already does this, but we re-state it here so Layout 1 is
    self-contained and doesn't depend on cascade order). */
