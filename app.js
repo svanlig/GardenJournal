@@ -1,5 +1,5 @@
 /* =========================================================
-   GARDEN JOURNAL — APPLICATION LOGIC
+   GARDEN JOURNAL — APPLICATION LOGIC - Photo framing: data model + applyPhotoFraming (Step 1)
    Function names are unchanged so existing inline handlers
    in index.html continue to resolve.
    ========================================================= */
