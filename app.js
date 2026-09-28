@@ -491,12 +491,14 @@ function renderEntry(index) {
         showUndoBanner();
     }
 
-    const pageIndicator = document.getElementById('pageIndicator');
-    if (pageIndicator) {
-        pageIndicator.innerText =
-            `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
-    }
+    const pageText = `Page ${currentEntryIndex + 1} of ${journalDatabase.length}`;
 
+    const pageIndicator = document.getElementById('pageIndicator');
+    if (pageIndicator) pageIndicator.innerText = pageText;
+
+    const pageIndicatorBottom = document.getElementById('pageIndicatorBottom');
+    if (pageIndicatorBottom) pageIndicatorBottom.innerText = pageText;'
+   
     const btnPrev = document.getElementById('btnPrev');
     if (btnPrev) btnPrev.disabled = (currentEntryIndex === 0);
 
