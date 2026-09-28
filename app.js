@@ -1207,34 +1207,49 @@ function lockJournalEditing() {
 }
 
 async function changeGardenLocation() {
-    const newLocation = prompt(
+    const entry = journalDatabase[currentEntryIndex];
+    if (!entry) return;
+
+    const currentLocation = entry.location || '';
+    const newLocationRaw = prompt(
         "Enter your garden location:",
-        journalDatabase[currentEntryIndex].location || ""
+        currentLocation
     );
+    if (newLocationRaw === null) return;
 
-    if (!newLocation || !newLocation.trim()) return;
+    const newLocation = newLocationRaw.trim() || currentLocation;
+    if (!newLocation) return;
 
-    journalDatabase[currentEntryIndex].location = newLocation.trim();
+    const newClimateRaw = prompt(
+        "Growing climate/zone (optional). Examples: 8b, Zone 8b, USDA Zone 8b, Mediterranean climate.",
+        entry.climate || ''
+    );
+    if (newClimateRaw === null) return;
+    const newClimate = newClimateRaw.trim();
 
-    const locationDisplay = document.getElementById('gardenLocationDisplay');
-    if (locationDisplay) {
-        locationDisplay.innerText = newLocation.trim();
+    if (newLocation !== currentLocation) {
+        entry.location = newLocation;
+
+        const locationDisplay = document.getElementById('gardenLocationDisplay');
+        if (locationDisplay) locationDisplay.innerText = newLocation;
+
+        const weatherDisplay = document.getElementById('weatherStatsDisplay');
+        if (weatherDisplay) weatherDisplay.innerText = "Weather loading...";
+
+        try {
+            await updateEntryWeather();
+        } catch (error) {
+            console.error("Location weather update failed:", error);
+        }
     }
 
-    const weatherDisplay = document.getElementById('weatherStatsDisplay');
-    if (weatherDisplay) {
-        weatherDisplay.innerText = "Weather loading...";
-    }
+    entry.climate = newClimate;
 
-    try {
-        await updateEntryWeather();
-    } catch (error) {
-        console.error("Location weather update failed:", error);
-    }
+    const climateDisplay = document.getElementById('gardenClimateDisplay');
+    if (climateDisplay) climateDisplay.innerText = newClimate;
 
     triggerAutoSaveFeedback();
 }
-
 async function geocodeGardenLocation(locationName) {
     const url =
         `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationName)}&count=1&language=en&format=json`;
