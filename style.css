@@ -1830,3 +1830,75 @@ body.is-dragging-section * {
     color: var(--leaf-green);
     opacity: 0.7;
 }
+/* =========================================================
+   COMPOSITION 5: THREE NOTES
+   Three equal-width text panels, no photos. Row height is
+   set by the tallest panel; the other two stretch to match.
+   ========================================================= */
+
+.journal-section.arr-5 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    align-items: stretch;
+}
+
+/* Each column is a self-contained panel with its own label
+   and editable area. */
+.journal-section.arr-5 .text-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 0;
+}
+
+/* Column 1: mustard */
+.journal-section.arr-5 .text-wrapper:nth-child(1) {
+    background-color: var(--mustard);
+    color: var(--deep-green);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(1) .section-note-label {
+    color: var(--deep-green);
+    border-bottom-color: rgba(27, 81, 31, 0.2);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(1) .text-area-input {
+    color: var(--deep-green);
+}
+
+/* Column 2: muted purple */
+.journal-section.arr-5 .text-wrapper:nth-child(2) {
+    background-color: var(--muted-purple);
+    color: var(--bg-paper);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(2) .section-note-label {
+    color: var(--bg-paper);
+    border-bottom-color: rgba(251, 250, 233, 0.3);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(2) .text-area-input {
+    color: var(--bg-paper);
+}
+
+/* Column 3: coral */
+.journal-section.arr-5 .text-wrapper:nth-child(3) {
+    background-color: var(--coral-red);
+    color: var(--bg-paper);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(3) .section-note-label {
+    color: var(--bg-paper);
+    border-bottom-color: rgba(251, 250, 233, 0.3);
+}
+.journal-section.arr-5 .text-wrapper:nth-child(3) .text-area-input {
+    color: var(--bg-paper);
+}
+
+/* Mobile: stack the three columns vertically. */
+@media (max-width: 940px) {
+    .journal-section.arr-5 {
+        grid-template-columns: 1fr !important;
+        display: grid !important;
+        gap: 15px !important;
+    }
+}
