@@ -1652,13 +1652,12 @@ body.is-dragging-section * {
     font-weight: 200;
 }
 
-.bottom-page-indicator {
-    text-align: center;
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--deep-green);
+/* Bottom-of-sheet variant of the page navigation. Same buttons
+   and indicator styling as the top nav, but scoped spacing and a
+   divider so it reads as the end of the journal content. */
+.bottom-nav--footer {
     margin-top: 24px;
+    margin-bottom: 8px;
     padding-top: 12px;
     border-top: 1px dashed rgba(27, 81, 31, 0.2);
 }
