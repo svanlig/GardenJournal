@@ -986,6 +986,108 @@ function showNotification(msg) {
     setTimeout(() => { box.classList.remove('visible'); }, 3000);
 }
 
+/* ---------------------------------------------------------
+   PNG EXPORT
+   Clones #journalPage into an off-screen container, strips the
+   app chrome, and asks html2canvas to render the clone to a
+   canvas. The canvas becomes a PNG download.
+
+   html2canvas captures the full element, not just the viewport,
+   because the clone is laid out at its natural size inside the
+   off-screen container.
+   --------------------------------------------------------- */
+async function exportJournalAsPNG() {
+    if (typeof html2canvas !== 'function') {
+        showNotification('PNG export unavailable. Check your connection.');
+        return;
+    }
+
+    const source = document.getElementById('journalPage');
+    const container = document.getElementById('pngExportContainer');
+    if (!source || !container) return;
+
+    // Close the menu so we're not photographing an open dropdown.
+    const dropdown = document.getElementById('appDropdown');
+    if (dropdown) dropdown.classList.remove('show');
+
+    // Deep-clone the journal page so we don't disturb the live DOM.
+    const clone = source.cloneNode(true);
+
+    // Strip chrome. Keep this list in sync with the @media print block
+    // and the CSS for #pngExportContainer.
+    const hideSelectors = [
+        '.app-bar',
+        '.bottom-nav',
+        '.bottom-nav--footer',
+        '.entry-meta-stamp',
+        '.botanical-bg-decor',
+        '.add-layout-control',
+        '.remove-section-btn',
+        '.drag-handle',
+        '.undo-banner',
+        '.photo-source-menu',
+        '.layout-chooser-overlay',
+        '.photo-framing-overlay',
+        '.app-notification-box'
+    ];
+    hideSelectors.forEach(sel => {
+        clone.querySelectorAll(sel).forEach(el => el.remove());
+    });
+
+    // Ensure the print header is present in the clone.
+    let printHeader = clone.querySelector('.print-header');
+    if (!printHeader) {
+        printHeader = document.createElement('div');
+        printHeader.className = 'print-header';
+        printHeader.innerHTML = '<h1>My Garden Journal</h1>';
+        clone.insertBefore(printHeader, clone.firstChild);
+    }
+
+    // Put the clone in the off-screen container.
+    container.innerHTML = '';
+    container.appendChild(clone);
+
+    // Wait for fonts and one layout frame so the clone is fully
+    // rendered before html2canvas photographs it.
+    if (document.fonts && document.fonts.ready) {
+        try { await document.fonts.ready; } catch (_) {}
+    }
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    try {
+        const canvas = await html2canvas(clone, {
+            backgroundColor: '#FFFFFF',
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            windowWidth: clone.scrollWidth,
+            windowHeight: clone.scrollHeight
+        });
+
+        const dataUrl = canvas.toDataURL('image/png');
+
+        const entryTitle = (journalDatabase[currentEntryIndex]?.displayTitle || 'journal')
+            .replace(/[^a-z0-9\-_]+/gi, '-')
+            .toLowerCase()
+            .slice(0, 40);
+        const dateStr = new Date().toISOString().split('T')[0];
+
+        const link = document.createElement('a');
+        link.download = `garden-journal-${dateStr}-${entryTitle}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showNotification('PNG exported.');
+    } catch (err) {
+        console.error('PNG export failed:', err);
+        showNotification('PNG export failed. See console for details.');
+    } finally {
+        container.innerHTML = '';
+    }
+}
+
 function toggleEditMode() {
     isEditMode = !isEditMode;
 
