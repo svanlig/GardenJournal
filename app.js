@@ -210,7 +210,18 @@ function buildSectionElement(sectionData, index) {
 
     const label = document.createElement('span');
     label.className = 'section-note-label';
-    label.textContent = getDefaultLabelForLayout(sectionData.layout);
+    label.textContent = sectionData.label || getDefaultLabelForLayout(sectionData.layout);
+    label.contentEditable = 'false';              // controlled by Edit/Read mode
+    label.setAttribute('placeholder', 'Add a title...');
+
+    // Listen for edits and write back to the data model.
+    label.addEventListener('input', () => {
+       const current = journalDatabase[currentEntryIndex];
+       if (!current || !current.sections[index]) return;
+       current.sections[index].label = label.innerText;
+       clearTimeout(typingDebounceTimeout);
+       typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+    });
 
     const textInput = document.createElement('div');
     textInput.className = 'text-area-input';
