@@ -1851,9 +1851,11 @@ body.is-dragging-section * {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    padding: 16px;
+    padding: 12px;
     border-radius: 0;
 }
+
+
 
 /* Column 1: mustard */
 .journal-section.arr-5 .text-wrapper:nth-child(1) {
@@ -1892,6 +1894,18 @@ body.is-dragging-section * {
 }
 .journal-section.arr-5 .text-wrapper:nth-child(3) .text-area-input {
     color: var(--bg-paper);
+}
+
+/* Tighter label and text inside the three-note panels. */
+.journal-section.arr-5 .text-wrapper .section-note-label {
+    margin-bottom: 6px;
+    padding-bottom: 2px;
+    font-size: 0.95rem;
+}
+
+.journal-section.arr-5 .text-area-input {
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 /* Mobile: stack the three columns vertically. */
