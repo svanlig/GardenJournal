@@ -762,13 +762,18 @@ if (journalTitle) {
 /* ---------------------------------------------------------
    DATE EDITING
    --------------------------------------------------------- */
-/* ---------------------------------------------------------
-   DATE EDITING
-   --------------------------------------------------------- */
 async function handleInlineDateChange(dateValue) {
     if (!dateValue) return;
 
     journalDatabase[currentEntryIndex].date = dateValue;
+
+    // NEW: update the journal-date element under the title so
+    // it reflects the new date immediately, without waiting for
+    // the next renderEntry.
+    const journalDateEl = document.getElementById('journalDate');
+    if (journalDateEl) {
+        journalDateEl.innerText = formatJournalDate(dateValue);
+    }
 
     const weatherDisplay = document.getElementById('weatherStatsDisplay');
     if (weatherDisplay) {
