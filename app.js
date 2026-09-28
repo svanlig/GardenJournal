@@ -448,13 +448,23 @@ function openLayoutChooser() {
         const preview = document.createElement('div');
         preview.className = 'layout-choice-preview';
 
-        // Mini rendering of the composition using the same class names
-        // as the real section, so the diagram matches what gets added.
-        preview.innerHTML = `
-            <div class="preview-section ${layout.id}">
-                <div class="preview-photo"></div>
-                <div class="preview-text"></div>
-            </div>`;
+    // Mini rendering of the composition using the same class names
+    // as the real section, so the diagram matches what gets added.
+    if (layout.id === 'arr-5') {
+            // Three notes: three colored text blocks, no photo.
+            preview.innerHTML = `
+                <div class="preview-section arr-5">
+                    <div class="preview-text" style="background: var(--mustard);"></div>
+                    <div class="preview-text" style="background: var(--muted-purple);"></div>
+                    <div class="preview-text" style="background: var(--coral-red);"></div>
+                </div>`;
+    } else {
+            preview.innerHTML = `
+                <div class="preview-section ${layout.id}">
+                    <div class="preview-photo"></div>
+                    <div class="preview-text"></div>
+                </div>`;
+    }
 
         const label = document.createElement('span');
         label.className = 'layout-choice-label';
