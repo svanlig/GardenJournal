@@ -1651,3 +1651,14 @@ body.is-dragging-section * {
     font-style: italic;
     font-weight: 200;
 }
+
+.bottom-page-indicator {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--deep-green);
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(27, 81, 31, 0.2);
+}
