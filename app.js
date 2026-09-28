@@ -289,13 +289,10 @@ function buildSectionElement(sectionData, index) {
 }
 
 function getDefaultLabelForLayout(layoutId) {
-    switch (layoutId) {
-        case 'arr-1': return 'Morning Observations';
-        case 'arr-2': return 'Midday Harvest Notes';
-        case 'arr-3': return 'Pruning Reflections';
-        case 'arr-4': return 'Dusk Sanctuary Details';
-        default:      return 'Notes';
-    }
+    // All new sections start with an empty title. The user can
+    // type one in Edit mode; existing seed entries keep whatever
+    // titles they already have.
+    return '';
 }
 
 function placeholderMarkup() {
