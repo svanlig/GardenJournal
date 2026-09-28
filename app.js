@@ -455,6 +455,11 @@ function renderEntry(index) {
     const entry = journalDatabase[currentEntryIndex];
 
     document.getElementById('journalTitleInput').innerText = entry.displayTitle || '';
+    const journalDateEl = document.getElementById('journalDate');
+    if (journalDateEl) {
+       journalDateEl.innerText = formatJournalDate(entry.date || '');
+    }
+   
     document.getElementById('entryInlineDate').value = entry.date;
 
     const locationDisplay = document.getElementById('gardenLocationDisplay');
