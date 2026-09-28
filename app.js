@@ -159,6 +159,18 @@ function exitArchiveView() {
     document.querySelector('.app-bar').style.display = 'flex';
 }
 
+function formatJournalDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = String(dateStr).split('-');
+    if (parts.length !== 3) return dateStr;
+    const [y, m, d] = parts;
+    const monthIndex = parseInt(m, 10) - 1;
+    if (isNaN(monthIndex) || monthIndex < 0 || monthIndex > 11) return dateStr;
+    const monthName = MONTH_NAMES[monthIndex];
+    const day = parseInt(d, 10);
+    return `${monthName} ${day}, ${y}`;
+}
+
 /* ---------------------------------------------------------
    LANDING PAGE HANDLERS
    --------------------------------------------------------- */
