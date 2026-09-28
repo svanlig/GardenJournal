@@ -1740,6 +1740,10 @@ body.is-dragging-section * {
     .divider-container {
         margin: 6px 0;
     }
+
+    .journal-section.arr-5 {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
 }
 /* =========================================================
    PNG EXPORT CONTAINER
@@ -1802,6 +1806,10 @@ body.is-dragging-section * {
     color: var(--deep-green);
     letter-spacing: 0.5px;
     margin: 0;
+}
+
+#pngExportContainer .journal-section.arr-5 {
+    grid-template-columns: repeat(3, 1fr) !important;
 }
 
 /* =========================================================
