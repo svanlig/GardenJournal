@@ -1823,3 +1823,10 @@ body.is-dragging-section * {
     padding: 0;
     min-height: 1em;
 }
+/* Separator before the climate value, but only when it has content. */
+#gardenClimateDisplay:not(:empty)::before {
+    content: "· ";
+    margin-right: 2px;
+    color: var(--leaf-green);
+    opacity: 0.7;
+}
