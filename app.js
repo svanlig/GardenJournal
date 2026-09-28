@@ -900,6 +900,8 @@ function handleMenuAction(action) {
         }, 2500);
     } else if (action === 'export-pdf') {
         window.print();
+    } else if (action === 'export-png') {
+        exportJournalAsPNG();
     } else if (action === 'delete') {
         const confirmed = confirm('Confirm Delete?');
         if (!confirmed) return;
