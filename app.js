@@ -978,7 +978,7 @@ function showNotification(msg) {
 function toggleEditMode() {
     isEditMode = !isEditMode;
 
-    document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input')
+    document.querySelectorAll('.text-area-input, .weather-stats-input, .weather-feel-input, .section-note-label')
         .forEach(el => {
             el.contentEditable = isEditMode ? 'true' : 'false';
         });
