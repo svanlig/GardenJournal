@@ -497,7 +497,7 @@ function renderEntry(index) {
     if (pageIndicator) pageIndicator.innerText = pageText;
 
     const pageIndicatorBottom = document.getElementById('pageIndicatorBottom');
-    if (pageIndicatorBottom) pageIndicatorBottom.innerText = pageText;'
+    if (pageIndicatorBottom) pageIndicatorBottom.innerText = pageText;
    
     const btnPrev = document.getElementById('btnPrev');
     if (btnPrev) btnPrev.disabled = (currentEntryIndex === 0);
