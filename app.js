@@ -504,6 +504,13 @@ function renderEntry(index) {
 
     const btnNext = document.getElementById('btnNext');
     if (btnNext) btnNext.disabled = (currentEntryIndex === journalDatabase.length - 1);
+
+    const btnPrevBottom = document.getElementById('btnPrevBottom');
+    if (btnPrevBottom) btnPrevBottom.disabled = (currentEntryIndex === 0);
+
+    const btnNextBottom = document.getElementById('btnNextBottom');
+    if (btnNextBottom) btnNextBottom.disabled = (currentEntryIndex === journalDatabase.length - 1);
+   
 }
 
 /* ---------------------------------------------------------
