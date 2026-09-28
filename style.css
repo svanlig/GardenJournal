@@ -1758,6 +1758,11 @@ body.is-dragging-section * {
     pointer-events: none;
 }
 
+#pngExportContainer .journal-date {
+    color: var(--deep-green);
+    margin-bottom: 12px;
+}
+
 #pngExportContainer .paper-sheet {
     box-shadow: none;
     border: none;
