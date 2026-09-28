@@ -216,9 +216,12 @@
              journalDatabase[currentEntryIndex].sections. -->
         <div class="journal-sections-container" id="sectionsContainer"></div>
 
-        <!-- Bottom page indicator, mirrors the top one -->
-        <div class="bottom-page-indicator">
-        <span id="pageIndicatorBottom">Page 1 of 1</span></div>
+        <!-- Bottom page navigation, mirrors the top nav -->
+        <footer class="bottom-nav bottom-nav--footer">
+            <button class="btn-nav" id="btnPrevBottom" onclick="navigatePage(-1)">← Previous</button>
+            <span class="nav-page-indicator" id="pageIndicatorBottom">Page 1 of 1</span>
+            <button class="btn-nav" id="btnNextBottom" onclick="navigatePage(1)">Next →</button>
+        </footer>
         
     </main>
 </div>
