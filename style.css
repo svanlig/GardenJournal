@@ -1902,3 +1902,12 @@ body.is-dragging-section * {
         gap: 15px !important;
     }
 }
+.layout-choice-preview .preview-section.arr-5 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+.layout-choice-preview .preview-section.arr-5 .preview-text {
+    height: 100%;
+    min-height: 40px;
+}
