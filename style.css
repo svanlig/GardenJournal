@@ -1858,8 +1858,9 @@ body.is-dragging-section * {
     height: auto;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;   /* <-- add this line */
     min-width: 0;
-    padding: 12px;
+    padding: 8px;
     border-radius: 0;
 }
 
@@ -1911,10 +1912,6 @@ body.is-dragging-section * {
     font-size: 0.95rem;
 }
 
-.journal-section.arr-5 .text-area-input {
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
 
 /* Mobile: stack the three columns vertically. */
 @media (max-width: 940px) {
