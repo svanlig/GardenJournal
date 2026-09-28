@@ -1661,3 +1661,78 @@ body.is-dragging-section * {
     padding-top: 12px;
     border-top: 1px dashed rgba(27, 81, 31, 0.2);
 }
+/* =========================================================
+   PRINT STYLESHEET
+   ========================================================= */
+
+.print-header { display: none; }
+
+@media print {
+    .app-bar,
+    .bottom-nav,
+    .bottom-nav--footer,
+    .entry-meta-stamp,
+    .botanical-bg-decor,
+    .add-layout-control,
+    .remove-section-btn,
+    .drag-handle,
+    .undo-banner,
+    .photo-source-menu,
+    .layout-chooser-overlay,
+    .photo-framing-overlay,
+    .app-notification-box {
+        display: none !important;
+    }
+
+    body {
+        padding: 0;
+        margin: 0;
+        background: #FFFFFF;
+    }
+
+    .paper-sheet {
+        width: 100%;
+        max-width: none;
+        min-height: 0;
+        box-shadow: none;
+        border: none;
+        background: #FFFFFF;
+    }
+
+    .journal-page {
+        padding: 20px 0;
+        min-height: 0;
+    }
+
+    .print-header {
+        display: block;
+        text-align: center;
+        padding-bottom: 14px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid var(--deep-green);
+    }
+
+    .print-header h1 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--deep-green);
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .journal-title-input {
+        font-size: 1.8rem;
+        color: var(--deep-green);
+        margin: 4px 0 12px 0;
+    }
+
+    .journal-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .divider-container {
+        margin: 6px 0;
+    }
+}
