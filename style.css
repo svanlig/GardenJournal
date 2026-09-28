@@ -628,6 +628,8 @@ body {
 .journal-sections-container {
     display: grid;
     grid-auto-rows: auto;
+    align-content: start;   /* <-- rows pack at the top, don't stretch */
+    flex-grow: 1;
     gap: 4px;
 }
 
