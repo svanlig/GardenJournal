@@ -217,6 +217,11 @@ function buildSectionElement(sectionData, index) {
     section.className = 'journal-section ' + (sectionData.layout || 'arr-1');
     section.dataset.index = String(index);
 
+    // NEW: three-note layout builds three text panels, no photo.
+    if (sectionData.layout === 'arr-5') {
+        return buildThreeNoteSection(section, sectionData, index);
+    }
+
     // ---- text wrapper ----
     const textWrapper = document.createElement('div');
     textWrapper.className = 'text-wrapper';
