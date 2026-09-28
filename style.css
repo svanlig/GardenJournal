@@ -1736,3 +1736,60 @@ body.is-dragging-section * {
         margin: 6px 0;
     }
 }
+/* =========================================================
+   PNG EXPORT CONTAINER
+   Holds a clone of #journalPage during PNG rendering. Positioned
+   far off-screen so it's rendered by the browser but never seen.
+   The hide-list below must stay in sync with the @media print
+   block above.
+   ========================================================= */
+
+#pngExportContainer {
+    position: fixed;
+    left: -99999px;
+    top: 0;
+    width: 906px;
+    background: #FFFFFF;
+    pointer-events: none;
+}
+
+#pngExportContainer .paper-sheet {
+    box-shadow: none;
+    border: none;
+    background: #FFFFFF;
+    width: 100%;
+    min-height: 0;
+}
+
+#pngExportContainer .app-bar,
+#pngExportContainer .bottom-nav,
+#pngExportContainer .bottom-nav--footer,
+#pngExportContainer .entry-meta-stamp,
+#pngExportContainer .botanical-bg-decor,
+#pngExportContainer .add-layout-control,
+#pngExportContainer .remove-section-btn,
+#pngExportContainer .drag-handle,
+#pngExportContainer .undo-banner,
+#pngExportContainer .photo-source-menu,
+#pngExportContainer .layout-chooser-overlay,
+#pngExportContainer .photo-framing-overlay,
+#pngExportContainer .app-notification-box {
+    display: none !important;
+}
+
+#pngExportContainer .print-header {
+    display: block;
+    text-align: center;
+    padding-bottom: 14px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--deep-green);
+}
+
+#pngExportContainer .print-header h1 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--deep-green);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
