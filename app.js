@@ -105,7 +105,7 @@ const LAYOUTS = [
     { id: "arr-1", name: "Photo right / Text left" },
     { id: "arr-2", name: "Wide photo / Text below" },
     { id: "arr-3", name: "Photo left / Text right" },
-    { id: "arr-4", name: "Photo right / Text left" }
+    { id: "arr-4", name: "Photo right / Text left" },
     { id: "arr-5", name: "Three notes" }
 ];
 
