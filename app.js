@@ -347,6 +347,67 @@ function buildDividerElement() {
 }
 
 /* ---------------------------------------------------------
+   THREE-NOTE SECTION (arr-5)
+   Builds three text panels side by side. Each has its own
+   label and editable text area, stored in section.labels[]
+   and section.texts[].
+   --------------------------------------------------------- */
+function buildThreeNoteSection(section, sectionData, index) {
+    // Ensure the data arrays exist and have three entries.
+    const texts = Array.isArray(sectionData.texts)
+        ? [...sectionData.texts]
+        : ['', '', ''];
+    while (texts.length < 3) texts.push('');
+
+    const labels = Array.isArray(sectionData.labels)
+        ? [...sectionData.labels]
+        : ['', '', ''];
+    while (labels.length < 3) labels.push('');
+
+    // Write the normalized arrays back into the data model so the
+    // rest of the code (save/backup) works consistently.
+    sectionData.texts = texts;
+    sectionData.labels = labels;
+
+    for (let col = 0; col < 3; col++) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'text-wrapper';
+
+        const label = document.createElement('span');
+        label.className = 'section-note-label';
+        label.textContent = labels[col] || '';
+        label.contentEditable = 'false';
+        label.setAttribute('placeholder', 'Add a title...');
+        label.addEventListener('input', () => {
+            const current = journalDatabase[currentEntryIndex];
+            if (!current || !current.sections[index]) return;
+            current.sections[index].labels[col] = label.innerText;
+            clearTimeout(typingDebounceTimeout);
+            typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+        });
+
+        const textInput = document.createElement('div');
+        textInput.className = 'text-area-input';
+        textInput.contentEditable = 'true';
+        textInput.setAttribute('placeholder', 'Write a note...');
+        textInput.innerText = texts[col] || '';
+        textInput.addEventListener('input', () => {
+            const current = journalDatabase[currentEntryIndex];
+            if (!current || !current.sections[index]) return;
+            current.sections[index].texts[col] = textInput.innerText;
+            clearTimeout(typingDebounceTimeout);
+            typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(textInput);
+        section.appendChild(wrapper);
+    }
+
+    return section;
+}
+
+/* ---------------------------------------------------------
    ADD LAYOUT CONTROL
    Renders the + button below the last section. Lives inside
    #sectionsContainer so it flows with the sections. Hidden
