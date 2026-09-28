@@ -1704,6 +1704,11 @@ body.is-dragging-section * {
         min-height: 0;
     }
 
+    .journal-date {
+       color: var(--deep-green);
+       margin-bottom: 12px;
+}
+
     .print-header {
         display: block;
         text-align: center;
