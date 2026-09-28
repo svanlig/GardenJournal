@@ -1860,7 +1860,7 @@ body.is-dragging-section * {
     flex-direction: column;
     justify-content: flex-start;   /* <-- add this line */
     min-width: 0;
-    padding: 8px;
+    padding: 8px 12px 4px 12px;   /* was: 12px */
     border-radius: 0;
 }
 
