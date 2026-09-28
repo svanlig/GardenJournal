@@ -403,7 +403,10 @@ function buildThreeNoteSection(section, sectionData, index) {
         wrapper.appendChild(textInput);
         section.appendChild(wrapper);
     }
-
+   
+    section.appendChild(buildRemoveSectionButton(index));
+    section.appendChild(buildDragHandle(index));
+      
     return section;
 }
 
