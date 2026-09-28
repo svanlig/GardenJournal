@@ -484,6 +484,11 @@ function renderEntry(index) {
         weatherDisplay.innerText = entry.weatherStats || 'Weather loading...';
     }
 
+    const climateDisplay = document.getElementById('gardenClimateDisplay');
+    if (climateDisplay) {
+       climateDisplay.innerText = entry.climate || '';
+    }
+
     document.getElementById('weatherFeelInput').innerText = entry.weatherFeel || '';
 
     const container = document.getElementById('sectionsContainer');
