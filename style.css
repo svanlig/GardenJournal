@@ -1644,3 +1644,10 @@ body.is-dragging-section * {
     font-style: italic;
     font-weight: 400;
 }
+
+.section-note-label:empty::before {
+    content: attr(placeholder);
+    opacity: 0.5;
+    font-style: italic;
+    font-weight: 200;
+}
