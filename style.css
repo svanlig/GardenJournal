@@ -2031,3 +2031,23 @@ body.is-dragging-section * {
         max-height: 200mm;
     }
 }
+
+.layout-choice-preview .preview-section.arr-6 {
+    display: block;
+}
+.layout-choice-preview .preview-section.arr-6 .preview-text {
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    background: var(--leaf-green);
+}
+
+.layout-choice-preview .preview-section.arr-7 {
+    display: block;
+}
+.layout-choice-preview .preview-section.arr-7 .preview-photo {
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    background: var(--leaf-green);
+}
