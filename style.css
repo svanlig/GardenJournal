@@ -1931,3 +1931,32 @@ body.is-dragging-section * {
     height: 100%;
     min-height: 40px;
 }
+/* =========================================================
+   COMPOSITION 6: TEXT BLOCK
+   Full-width leaf-green text panel, no photo.
+   ========================================================= */
+
+.journal-section.arr-6 {
+    display: block;
+    width: 100%;
+}
+
+.journal-section.arr-6 .text-wrapper {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px;
+    background-color: var(--leaf-green);
+    color: var(--bg-paper);
+}
+
+.journal-section.arr-6 .text-wrapper .section-note-label {
+    color: var(--bg-paper);
+    border-bottom-color: rgba(251, 250, 233, 0.3);
+}
+
+.journal-section.arr-6 .text-wrapper .text-area-input {
+    color: var(--bg-paper);
+}
