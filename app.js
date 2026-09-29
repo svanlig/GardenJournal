@@ -366,7 +366,7 @@ function buildThreeNoteSection(section, sectionData, index) {
         const label = document.createElement('span');
         label.className = 'section-note-label';
         label.textContent = labels[col] || '';
-        label.contentEditable = 'false';
+        label.contentEditable = isEditMode ? 'true' : 'false';
         label.setAttribute('placeholder', 'Add a title...');
         label.addEventListener('input', () => {
             const current = journalDatabase[currentEntryIndex];
