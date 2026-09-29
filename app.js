@@ -252,16 +252,6 @@ function buildSectionElement(sectionData, index) {
         if (!current || !current.sections[index]) return;
         current.sections[index].text = textInput.innerText;
 
-        // Derive the entry title from the FIRST section that has text,
-        // regardless of its position. Matches the decision made for
-        // the flexible layout system.
-        if (index === 0) {
-            const t = textInput.innerText.trim();
-            if (t.length > 0) {
-                current.displayTitle = t.split(' ').slice(0, 3).join(' ') + '...';
-            }
-        }
-
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
