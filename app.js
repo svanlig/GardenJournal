@@ -107,7 +107,8 @@ const LAYOUTS = [
     { id: "arr-3", name: "Photo left / Text right" },
     { id: "arr-4", name: "Photo right / Text left" },
     { id: "arr-5", name: "Three notes" },
-    { id: "arr-6", name: "Text block" }
+    { id: "arr-6", name: "Text block" },
+    { id: "arr-7", name: "Image only" }
 ];
 
 /* ---------------------------------------------------------
