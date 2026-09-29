@@ -392,6 +392,51 @@ function buildTextOnlySection(section, sectionData, index) {
 }
 
 /* ---------------------------------------------------------
+   IMAGE-ONLY SECTION (arr-7)
+   Full-width image, natural proportions, no crop.
+   Uses section.image / section.imagePos / section.imageFit,
+   same as other layouts, but displays the image uncropped.
+   --------------------------------------------------------- */
+function buildImageOnlySection(section, sectionData, index) {
+    const photoWrapper = document.createElement('div');
+    photoWrapper.className = 'photo-wrapper';
+
+    const photoContainer = document.createElement('div');
+    photoContainer.className = 'photo-container';
+
+    const photoFrame = document.createElement('div');
+    photoFrame.className = 'photo-frame';
+
+    if (sectionData.image) {
+        const img = document.createElement('img');
+        img.src = sectionData.image;
+        img.alt = 'Garden image';
+        photoFrame.appendChild(img);
+    } else {
+        photoFrame.innerHTML = placeholderMarkup();
+    }
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.className = 'hidden-file-input';
+    fileInput.accept = 'image/*';
+    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+
+    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+
+    photoContainer.appendChild(photoFrame);
+    photoWrapper.appendChild(photoContainer);
+    photoWrapper.appendChild(fileInput);
+
+    section.appendChild(photoWrapper);
+
+    section.appendChild(buildRemoveSectionButton(index));
+    section.appendChild(buildDragHandle(index));
+
+    return section;
+}
+
+/* ---------------------------------------------------------
    THREE-NOTE SECTION (arr-5)
    Builds three text panels side by side. Each has its own
    label and editable text area, stored in section.labels[]
