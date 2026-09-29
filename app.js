@@ -229,7 +229,7 @@ function buildSectionElement(sectionData, index) {
     const label = document.createElement('span');
     label.className = 'section-note-label';
     label.textContent = sectionData.label || getDefaultLabelForLayout(sectionData.layout);
-    label.contentEditable = 'false';              // controlled by Edit/Read mode
+    label.contentEditable = isEditMode ? 'true' : 'false';
     label.setAttribute('placeholder', 'Add a title...');
 
     // Listen for edits and write back to the data model.
