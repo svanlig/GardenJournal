@@ -342,6 +342,51 @@ function buildDividerElement() {
 }
 
 /* ---------------------------------------------------------
+   TEXT-ONLY SECTION (arr-6)
+   One full-width text panel, leaf green. No photo.
+   Uses the standard section.text and section.label fields.
+   --------------------------------------------------------- */
+function buildTextOnlySection(section, sectionData, index) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'text-wrapper';
+
+    const label = document.createElement('span');
+    label.className = 'section-note-label';
+    label.textContent = sectionData.label || '';
+    label.contentEditable = isEditMode ? 'true' : 'false';
+    label.setAttribute('placeholder', 'Add a title...');
+    label.addEventListener('input', () => {
+        const current = journalDatabase[currentEntryIndex];
+        if (!current || !current.sections[index]) return;
+        current.sections[index].label = label.innerText;
+        clearTimeout(typingDebounceTimeout);
+        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+    });
+
+    const textInput = document.createElement('div');
+    textInput.className = 'text-area-input';
+    textInput.contentEditable = isEditMode ? 'true' : 'false';
+    textInput.setAttribute('placeholder', 'Write a note...');
+    textInput.innerText = sectionData.text || '';
+    textInput.addEventListener('input', () => {
+        const current = journalDatabase[currentEntryIndex];
+        if (!current || !current.sections[index]) return;
+        current.sections[index].text = textInput.innerText;
+        clearTimeout(typingDebounceTimeout);
+        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+    });
+
+    wrapper.appendChild(label);
+    wrapper.appendChild(textInput);
+    section.appendChild(wrapper);
+
+    section.appendChild(buildRemoveSectionButton(index));
+    section.appendChild(buildDragHandle(index));
+
+    return section;
+}
+
+/* ---------------------------------------------------------
    THREE-NOTE SECTION (arr-5)
    Builds three text panels side by side. Each has its own
    label and editable text area, stored in section.labels[]
