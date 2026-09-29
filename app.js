@@ -222,6 +222,10 @@ function buildSectionElement(sectionData, index) {
     if (sectionData.layout === 'arr-5') {
         return buildThreeNoteSection(section, sectionData, index);
     }
+    
+    if (sectionData.layout === 'arr-6') {
+        return buildTextOnlySection(section, sectionData, index);
+    }
 
     // ---- text wrapper ----
     const textWrapper = document.createElement('div');
