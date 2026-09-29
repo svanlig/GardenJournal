@@ -422,7 +422,7 @@ function buildImageOnlySection(section, sectionData, index) {
     fileInput.accept = 'image/*';
     fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
-    photoContainer.addEventListener('click', () => triggerPhotoUpload(index));
+    photoContainer.addEventListener('click', (event) => triggerPhotoUpload(event, index));
 
     photoContainer.appendChild(photoFrame);
     photoWrapper.appendChild(photoContainer);
