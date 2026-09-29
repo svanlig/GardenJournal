@@ -1978,3 +1978,56 @@ body.is-dragging-section * {
     height: 100%;
     min-height: 60px;
 }
+
+/* =========================================================
+   COMPOSITION 7: IMAGE ONLY
+   Full-width image at natural proportions, no crop.
+   Centered, capped at 80% of the section width and 80% of
+   the viewport height (on screen) / 200mm (print).
+   ========================================================= */
+
+.journal-section.arr-7 {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.journal-section.arr-7 .photo-wrapper {
+    display: block;
+    width: 100%;
+}
+
+.journal-section.arr-7 .photo-container {
+    width: auto;
+    max-width: 80%;
+    margin: 0 auto;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+.journal-section.arr-7 .photo-frame {
+    width: 100%;
+    aspect-ratio: auto;
+    height: auto;
+    overflow: visible;
+    background: transparent;
+    display: block;
+    padding: 0;
+    border: none;
+}
+
+.journal-section.arr-7 .photo-frame img {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    object-fit: contain;
+    display: block;
+}
+
+@media print {
+    .journal-section.arr-7 .photo-frame img {
+        max-height: 200mm;
+    }
+}
