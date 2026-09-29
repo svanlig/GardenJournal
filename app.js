@@ -228,6 +228,10 @@ function buildSectionElement(sectionData, index) {
         return buildTextOnlySection(section, sectionData, index);
     }
 
+    if (sectionData.layout === 'arr-7') {
+        return buildImageOnlySection(section, sectionData, index);
+    }
+
     // ---- text wrapper ----
     const textWrapper = document.createElement('div');
     textWrapper.className = 'text-wrapper';
