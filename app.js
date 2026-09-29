@@ -416,17 +416,27 @@ function buildImageOnlySection(section, sectionData, index) {
         photoFrame.innerHTML = placeholderMarkup();
     }
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.className = 'hidden-file-input';
-    fileInput.accept = 'image/*';
-    fileInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+    // Gallery picker
+    const galleryInput = document.createElement('input');
+    galleryInput.type = 'file';
+    galleryInput.className = 'hidden-file-input';
+    galleryInput.accept = 'image/*';
+    galleryInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
+
+    // Camera input (opens camera on mobile)
+    const cameraInput = document.createElement('input');
+    cameraInput.type = 'file';
+    cameraInput.className = 'hidden-file-input';
+    cameraInput.accept = 'image/*';
+    cameraInput.setAttribute('capture', 'environment');
+    cameraInput.addEventListener('change', (event) => handlePhotoSelect(event, index));
 
     photoContainer.addEventListener('click', (event) => triggerPhotoUpload(event, index));
 
     photoContainer.appendChild(photoFrame);
     photoWrapper.appendChild(photoContainer);
-    photoWrapper.appendChild(fileInput);
+    photoWrapper.appendChild(galleryInput);
+    photoWrapper.appendChild(cameraInput);
 
     section.appendChild(photoWrapper);
 
