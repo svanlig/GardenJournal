@@ -501,14 +501,38 @@ function openLayoutChooser() {
                     <div class="preview-text" style="background: var(--muted-purple);"></div>
                     <div class="preview-text" style="background: var(--coral-red);"></div>
                 </div>`;
-    } else {
+     } else {
             preview.innerHTML = `
                 <div class="preview-section ${layout.id}">
                     <div class="preview-photo"></div>
                     <div class="preview-text"></div>
                 </div>`;
+     }
+     if (layout.id === 'arr-5') {
+       preview.innerHTML = `
+           <div class="preview-section arr-5">
+               <div class="preview-text" style="background: var(--mustard);"></div>
+               <div class="preview-text" style="background: var(--muted-purple);"></div>
+               <div class="preview-text" style="background: var(--coral-red);"></div>
+           </div>`;
+     } else if (layout.id === 'arr-6') {
+       preview.innerHTML = `
+           <div class="preview-section arr-6">
+              <div class="preview-text" style="background: var(--leaf-green);"></div>
+           </div>`;
+    } else if (layout.id === 'arr-7') {
+       preview.innerHTML = `
+           <div class="preview-section arr-7">
+             <div class="preview-photo" style="background: var(--leaf-green);"></div>
+           </div>`;
+    } else {
+       preview.innerHTML = `
+           <div class="preview-section ${layout.id}">
+               <div class="preview-photo"></div>
+               <div class="preview-text"></div>
+           </div>`;
     }
-
+       
         const label = document.createElement('span');
         label.className = 'layout-choice-label';
         label.textContent = layout.name;
