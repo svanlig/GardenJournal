@@ -2109,4 +2109,19 @@ async function persistDeletedEntry(entry) {
         _showSaveFailedIndicator();
     }
 }
+async function persistDeletedSection(section) {
+    if (!section || !section._id) return;
+    try {
+        const tx = _db.transaction(['sections'], 'readwrite');
+        tx.objectStore('sections').put(section);
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Failed to persist section tombstone:', err);
+        _showSaveFailedIndicator();
+    }
+}
 
