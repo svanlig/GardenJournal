@@ -175,11 +175,17 @@ window.onload = async function () {
     }
 
     migrateJournalDatabase(journalDatabase);
-    renderEntry(currentEntryIndex);
+    if (journalDatabase.length === 0) {
+       // Journal is empty — go to the landing page.
+       showLandingPage();
+    } else {
+       renderEntry(currentEntryIndex);
+       document.querySelector('.app-bar').style.display = 'none';
+    }
+   
     setupWeatherListeners();
     lockJournalEditing();
-    setupPhotoPositionListeners && setupPhotoPositionListeners();
-    document.querySelector('.app-bar').style.display = 'none';
+    if (typeof setupPhotoPositionListeners === 'function') setupPhotoPositionListeners();
 };
 
 /* ---------------------------------------------------------
