@@ -413,6 +413,7 @@ function buildTextOnlySection(section, sectionData, index) {
         const current = journalDatabase[currentEntryIndex];
         if (!current || !current.sections[index]) return;
         current.sections[index].label = label.innerText;
+        markSectionDirty(current.sections[index]);
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
@@ -426,6 +427,7 @@ function buildTextOnlySection(section, sectionData, index) {
         const current = journalDatabase[currentEntryIndex];
         if (!current || !current.sections[index]) return;
         current.sections[index].text = textInput.innerText;
+        markSectionDirty(current.sections[index]);
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
