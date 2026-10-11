@@ -1267,35 +1267,32 @@ function handleMenuAction(action) {
     } else if (action === 'delete') {
         const confirmed = confirm('Confirm Delete?');
         if (!confirmed) return;
-       
-        lastDeletedSection = null;   // NEW
-       
-        if (journalDatabase.length > 1) {
-          const [removed] = journalDatabase.splice(currentEntryIndex, 1);
-          if (removed) {
-           removed.deleted = true;
-           removed.deletedAt = Date.now();
-        }
-        const targetIndex = Math.max(0, currentEntryIndex - 1);
-        renderEntry(targetIndex);
-        if (removed) persistDeletedEntry(removed);
-        showNotification('Entry removed from journal indexes.');
-        }
-        else {
-          // Last entry — delete it and return to the landing page.
-          const [removed] = journalDatabase.splice(currentEntryIndex, 1);
-          if (removed) {
-              removed.deleted = true;
-              removed.deletedAt = Date.now();
-              // Persist the tombstone so the delete survives reload.
-              persistImmediately();
-          }
-          currentEntryIndex = 0;
 
-          // Redirect to the landing page — no journal entries to show.
-          showLandingPage();
-          showNotification('Last entry removed. Journal is empty.');
-      }
+        lastDeletedSection = null;
+
+        if (journalDatabase.length > 1) {
+            const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+            if (removed) {
+                removed.deleted = true;
+                removed.deletedAt = Date.now();
+            }
+            const targetIndex = Math.max(0, currentEntryIndex - 1);
+            renderEntry(targetIndex);
+            if (removed) persistDeletedEntry(removed);
+            showNotification('Entry removed from journal indexes.');
+        } else {
+            // Last entry — delete it and return to the landing page.
+            const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+            if (removed) {
+                removed.deleted = true;
+                removed.deletedAt = Date.now();
+                persistDeletedEntry(removed);
+            }
+            currentEntryIndex = 0;
+
+            showLandingPage();
+            showNotification('Last entry removed. Journal is empty.');
+        }
     }
 }
 
