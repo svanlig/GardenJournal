@@ -1271,16 +1271,20 @@ function handleMenuAction(action) {
             renderEntry(targetIndex);
             showNotification('Entry removed from journal indexes.');
         } else {
-            journalDatabase[0] = {
-                date: new Date().toISOString().split('T')[0],
-                displayTitle: "Single Wiped Sheet",
-                weatherStats: "75°F · Clear",
-                weatherFeel: "",
-                sections: []
-            };
-            renderEntry(0);
-            showNotification('Single entry wiped cleanly.');
-        }
+          // Last entry — delete it and return to the landing page.
+          const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+          if (removed) {
+              removed.deleted = true;
+              removed.deletedAt = Date.now();
+              // Persist the tombstone so the delete survives reload.
+              persistImmediately();
+          }
+          currentEntryIndex = 0;
+
+          // Redirect to the landing page — no journal entries to show.
+          showLandingPage();
+          showNotification('Last entry removed. Journal is empty.');
+      }
     }
 }
 
