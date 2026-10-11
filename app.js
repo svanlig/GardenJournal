@@ -295,9 +295,10 @@ function buildSectionElement(sectionData, index) {
        const current = journalDatabase[currentEntryIndex];
        if (!current || !current.sections[index]) return;
        current.sections[index].label = label.innerText;
+       markSectionDirty(current.sections[index]);
        clearTimeout(typingDebounceTimeout);
        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
+   });
 
     const textInput = document.createElement('div');
     textInput.className = 'text-area-input';
@@ -306,13 +307,13 @@ function buildSectionElement(sectionData, index) {
     textInput.innerText = sectionData.text || '';
 
     textInput.addEventListener('input', () => {
-        const current = journalDatabase[currentEntryIndex];
-        if (!current || !current.sections[index]) return;
-        current.sections[index].text = textInput.innerText;
-
-        clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
+       const current = journalDatabase[currentEntryIndex];
+       if (!current || !current.sections[index]) return;
+       current.sections[index].text = textInput.innerText;
+       markSectionDirty(current.sections[index]);
+       clearTimeout(typingDebounceTimeout);
+       typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+   });
 
     textWrapper.appendChild(label);
     textWrapper.appendChild(textInput);
