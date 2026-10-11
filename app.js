@@ -1977,6 +1977,10 @@ function removeSection(index) {
     showUndoBanner();
 }
 
+/* ---------------------------------------------------------
+   new function for syncing
+   --------------------------------------------------------- */
+
 function _newId() {
     return (crypto.randomUUID && crypto.randomUUID())
         || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10));
@@ -2006,6 +2010,11 @@ function markSectionDirty(section) {
     ensureSectionId(section);
     section._dirty = true;
 }
+
+/* ---------------------------------------------------------
+   new async function for syncing
+   --------------------------------------------------------- */
+
 async function persistImmediately() {
     if (_persistTimer) {
         clearTimeout(_persistTimer);
@@ -2013,4 +2022,28 @@ async function persistImmediately() {
     }
     await _flushPersist();
 }
+/* ---------------------------------------------------------
+   new hydratefrom stored function for syncing
+   --------------------------------------------------------- */
+function hydrateFromStored(stored) {
+    const byEntry = new Map();
+    stored.entries.forEach(e => byEntry.set(e._id, { ...e, sections: [] }));
+
+    // Sort sections by their sortOrder within each entry.
+    const sectionsByEntry = new Map();
+    stored.sections.forEach(s => {
+        if (!sectionsByEntry.has(s._entryId)) sectionsByEntry.set(s._entryId, []);
+        sectionsByEntry.get(s._entryId).push(s);
+    });
+    sectionsByEntry.forEach(arr => arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
+
+    // Attach.
+    byEntry.forEach((entry, id) => {
+        entry.sections = sectionsByEntry.get(id) || [];
+    });
+
+    // Preserve order of entries as stored (by their stored order index).
+    return stored.entries.map(e => byEntry.get(e._id));
+}
+
 
