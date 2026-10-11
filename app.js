@@ -1348,6 +1348,7 @@ function handlePhotoSelect(event, index) {
         const current = journalDatabase[currentEntryIndex];
         if (current && current.sections[index]) {
             current.sections[index].image = e.target.result;
+            markSectionDirty(current.sections[index]);
         }
 
         triggerAutoSaveFeedback();
