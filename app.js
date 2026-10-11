@@ -502,7 +502,6 @@ function buildImageOnlySection(section, sectionData, index) {
    and section.texts[].
    --------------------------------------------------------- */
 function buildThreeNoteSection(section, sectionData, index) {
-    // Ensure the data arrays exist and have three entries.
     const texts = Array.isArray(sectionData.texts)
         ? [...sectionData.texts]
         : ['', '', ''];
@@ -513,8 +512,6 @@ function buildThreeNoteSection(section, sectionData, index) {
         : ['', '', ''];
     while (labels.length < 3) labels.push('');
 
-    // Write the normalized arrays back into the data model so the
-    // rest of the code (save/backup) works consistently.
     sectionData.texts = texts;
     sectionData.labels = labels;
 
@@ -531,6 +528,7 @@ function buildThreeNoteSection(section, sectionData, index) {
             const current = journalDatabase[currentEntryIndex];
             if (!current || !current.sections[index]) return;
             current.sections[index].labels[col] = label.innerText;
+            markSectionDirty(current.sections[index]);
             clearTimeout(typingDebounceTimeout);
             typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
         });
@@ -544,6 +542,7 @@ function buildThreeNoteSection(section, sectionData, index) {
             const current = journalDatabase[currentEntryIndex];
             if (!current || !current.sections[index]) return;
             current.sections[index].texts[col] = textInput.innerText;
+            markSectionDirty(current.sections[index]);
             clearTimeout(typingDebounceTimeout);
             typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
         });
@@ -552,13 +551,12 @@ function buildThreeNoteSection(section, sectionData, index) {
         wrapper.appendChild(textInput);
         section.appendChild(wrapper);
     }
-   
+
     section.appendChild(buildRemoveSectionButton(index));
     section.appendChild(buildDragHandle(index));
-      
+
     return section;
 }
-
 /* ---------------------------------------------------------
    ADD LAYOUT CONTROL
    Renders the + button below the last section. Lives inside
