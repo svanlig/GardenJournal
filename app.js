@@ -672,20 +672,22 @@ function chooseLayout(layoutId) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
 
-    lastDeletedSection = null;   // NEW: adding is "another action"
+    lastDeletedSection = null;
 
-    entry.sections.push({
+    const newSection = {
         layout: layoutId,
         text: '',
         image: ''
-    });
+    };
+    ensureSectionId(newSection, entry._id);
+    markSectionDirty(newSection);
+
+    entry.sections.push(newSection);
+
+    markEntryDirty(entry);
 
     closeLayoutChooser();
-
-    // Re-render to pick up the new section. renderEntry re-attaches
-    // all listeners and rebuilds the container including the + control.
     renderEntry(currentEntryIndex);
-
     triggerAutoSaveFeedback();
 
     const layoutName = (LAYOUTS.find(l => l.id === layoutId) || {}).name || 'Layout';
