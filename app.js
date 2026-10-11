@@ -1970,3 +1970,11 @@ function markSectionDirty(section) {
     ensureSectionId(section);
     section._dirty = true;
 }
+async function persistImmediately() {
+    if (_persistTimer) {
+        clearTimeout(_persistTimer);
+        _persistTimer = null;
+    }
+    await _flushPersist();
+}
+
