@@ -2074,7 +2074,6 @@ function hydrateFromStored(stored) {
     const byEntry = new Map();
     stored.entries.forEach(e => byEntry.set(e._id, { ...e, sections: [] }));
 
-    // Sort sections by their sortOrder within each entry.
     const sectionsByEntry = new Map();
     stored.sections.forEach(s => {
         if (!sectionsByEntry.has(s._entryId)) sectionsByEntry.set(s._entryId, []);
@@ -2082,26 +2081,18 @@ function hydrateFromStored(stored) {
     });
     sectionsByEntry.forEach(arr => arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
 
-    // Attach.
     byEntry.forEach((entry, id) => {
         entry.sections = sectionsByEntry.get(id) || [];
-    });
-
-    // Preserve order of entries as stored (by their stored order index).
-    return stored.entries.map(e => byEntry.get(e._id));
-}
-
-/* Convert the nested in-memory model to a flat list of section records,
-   each tagged with the _entryId of its parent entry. Used for restore
-   and for the initial persist. */
-function flattenSections(db) {
-    const out = [];
-    db.forEach(entry => {
-        (entry.sections || []).forEach(sec => {
-            out.push({ ...sec, _entryId: entry._id });
+        // Backfill sortOrder for any section missing it.
+        entry.sections.forEach((s, i) => {
+            if (typeof s.sortOrder !== 'number') {
+                s.sortOrder = i;
+                markSectionDirty(s);   // so it gets written back with the correct order
+            }
         });
     });
-    return out;
+
+    return stored.entries.map(e => byEntry.get(e._id));
 }
 /* Write a single tombstone record for an entry that was removed from
    memory. Because the entry is no longer in journalDatabase,
