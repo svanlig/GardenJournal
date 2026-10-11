@@ -1994,33 +1994,29 @@ function removeSection(index) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
     if (index < 0 || index >= entry.sections.length) return;
-    if (sectionDrag) {
-    // abort
-       if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
-           sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
-       }
-       if (sectionDrag.sectionEl) {
-           sectionDrag.sectionEl.classList.remove('is-dragging');
-       }
-       document.body.classList.remove('is-dragging-section');
-       window.removeEventListener('pointermove', onSectionDragMove);
-       window.removeEventListener('pointerup', onSectionDragEnd);
-       window.removeEventListener('pointercancel', onSectionDragEnd);
-       sectionDrag = null;
-   }
+
     const [removed] = entry.sections.splice(index, 1);
 
-    lastDeletedSection = {
-        section: removed,
-        index: index,
-        entryIndex: currentEntryIndex
-    };
+    // Tombstone the removed section so the delete survives reload.
+    if (removed) {
+        removed.deleted = true;
+        removed.deletedAt = Date.now();
+        persistDeletedSection(removed);
+    }
+
+    // Reassign sortOrder to the remaining sections.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
+
+    lastDeletedSection = { section: removed, index, entryIndex: currentEntryIndex };
 
     renderEntry(currentEntryIndex);
     triggerAutoSaveFeedback();
     showUndoBanner();
 }
-
 /* ---------------------------------------------------------
    new function for syncing
    --------------------------------------------------------- */
