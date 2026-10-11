@@ -2051,3 +2051,28 @@ body.is-dragging-section * {
     min-height: 60px;
     background: var(--leaf-green);
 }
+/* =========================================================
+   STAGE 1 — persistence support
+   ========================================================= */
+
+.conflict-indicator {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid var(--coral-red);
+    color: var(--coral-red);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: transparent;
+}
+
+.conflict-indicator.visible {
+    display: inline-flex;
+}
+
+.auto-save-indicator.save-failed {
+    color: var(--coral-red);
+}
