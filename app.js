@@ -1857,3 +1857,33 @@ function removeSection(index) {
     triggerAutoSaveFeedback();
     showUndoBanner();
 }
+
+function _newId() {
+    return (crypto.randomUUID && crypto.randomUUID())
+        || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10));
+}
+
+function ensureEntryId(entry) {
+    if (!entry._id) entry._id = _newId();
+    if (typeof entry._seed !== 'boolean') entry._seed = false;
+    return entry;
+}
+
+function ensureSectionId(section) {
+    if (!section._id) section._id = _newId();
+    if (typeof section._dirty !== 'boolean') section._dirty = false;
+    return section;
+}
+
+function markEntryDirty(entry) {
+    if (!entry) return;
+    ensureEntryId(entry);
+    entry._dirty = true;
+    if (entry._seed) entry._seed = false;   // user touched it — no longer seed
+}
+
+function markSectionDirty(section) {
+    if (!section) return;
+    ensureSectionId(section);
+    section._dirty = true;
+}
