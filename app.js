@@ -1271,11 +1271,17 @@ function handleMenuAction(action) {
         lastDeletedSection = null;   // NEW
        
         if (journalDatabase.length > 1) {
-            journalDatabase.splice(currentEntryIndex, 1);
-            const targetIndex = Math.max(0, currentEntryIndex - 1);
-            renderEntry(targetIndex);
-            showNotification('Entry removed from journal indexes.');
-        } else {
+          const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+          if (removed) {
+           removed.deleted = true;
+           removed.deletedAt = Date.now();
+        }
+        const targetIndex = Math.max(0, currentEntryIndex - 1);
+        renderEntry(targetIndex);
+        if (removed) persistDeletedEntry(removed);
+        showNotification('Entry removed from journal indexes.');
+        }
+        else {
           // Last entry — delete it and return to the landing page.
           const [removed] = journalDatabase.splice(currentEntryIndex, 1);
           if (removed) {
@@ -2088,5 +2094,23 @@ function flattenSections(db) {
     });
     return out;
 }
-
+/* Write a single tombstone record for an entry that was removed from
+   memory. Because the entry is no longer in journalDatabase,
+   persistImmediately() would not pick it up — it has to be written
+   directly. */
+async function persistDeletedEntry(entry) {
+    if (!entry || !entry._id) return;
+    try {
+        const tx = _db.transaction(['entries'], 'readwrite');
+        tx.objectStore('entries').put(entry);
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Failed to persist entry tombstone:', err);
+        _showSaveFailedIndicator();
+    }
+}
 
