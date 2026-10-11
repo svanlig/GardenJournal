@@ -2028,6 +2028,7 @@ function ensureEntryId(entry) {
 function ensureSectionId(section) {
     if (!section._id) section._id = _newId();
     if (typeof section._dirty !== 'boolean') section._dirty = false;
+    if (entryId && !section._entryId) section._entryId = entryId
     return section;
 }
 
