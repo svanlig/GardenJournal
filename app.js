@@ -150,19 +150,21 @@ window.onload = async function () {
         if (stored.entries.length > 0) {
             // Hydrate from IndexedDB.
             journalDatabase = hydrateFromStored(stored);
-        } else if (!initialized) {
-            // First run — seed data. Mark as seed, assign IDs, persist.
-            journalDatabase.forEach(entry => {
-                entry._seed = true;
-                ensureEntryId(entry);
-                (entry.sections || []).forEach(sec => {
-                    ensureSectionId(sec);
-                    sec._dirty = true;   // written on the initial persist
-                });
-                entry._dirty = true;
-            });
-            await persistImmediately();
-            await setMeta('initialized', true);
+       } else if (!initialized) {
+    // First run — seed data. Mark as seed, assign IDs, persist.
+    journalDatabase.forEach(entry => {
+        entry._seed = true;
+        ensureEntryId(entry);
+        (entry.sections || []).forEach((sec, i) => {
+            ensureSectionId(sec, entry._id);
+            sec.sortOrder = i;   // <-- position in the entry
+            sec._dirty = true;
+        });
+        entry._dirty = true;
+    });
+    await persistImmediately();
+    await setMeta('initialized', true);
+}
         } else {
             // User has used the app; their journal is empty.
             // Do not seed. Leave journalDatabase empty.
