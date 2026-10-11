@@ -2036,10 +2036,10 @@ function ensureEntryId(entry) {
     return entry;
 }
 
-function ensureSectionId(section) {
+function ensureSectionId(section, entryId) {
     if (!section._id) section._id = _newId();
     if (typeof section._dirty !== 'boolean') section._dirty = false;
-    if (entryId && !section._entryId) section._entryId = entryId
+    if (entryId && !section._entryId) section._entryId = entryId;
     return section;
 }
 
