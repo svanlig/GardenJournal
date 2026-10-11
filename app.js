@@ -999,27 +999,36 @@ async function _flushPersist() {
     _persistInFlight = true;
 
     try {
-        // Collect all dirty records.
         const dirtyEntries = [];
         const dirtySections = [];
-        const dirtyPhotos = [];   // photos are written immediately at upload; none here
+        const dirtyPhotos = [];
 
         journalDatabase.forEach(entry => {
-            if (entry._dirty) dirtyEntries.push(entry);
+            if (entry._dirty) {
+                // Strip the inline sections array before writing the entry.
+                // Sections live only in the sections store.
+                const { sections, ...entryWithoutSections } = entry;
+                dirtyEntries.push(entryWithoutSections);
+            }
             (entry.sections || []).forEach(sec => {
-                if (sec._dirty) dirtySections.push({ ...sec, _entryId: entry._id });
+                if (!sec._entryId) sec._entryId = entry._id;
+                if (sec._dirty) dirtySections.push({ ...sec });
             });
         });
 
-        if (dirtyEntries.length || dirtySections.length) {
+        if (dirtyEntries.length || dirtySections.length || dirtyPhotos.length) {
             await persistBatch(dirtyEntries, dirtySections, dirtyPhotos);
-            dirtyEntries.forEach(e => { e._dirty = false; });
-            dirtySections.forEach(s => {
-                const entry = journalDatabase.find(en => en._id === s._entryId);
-                if (entry) {
-                    const sec = entry.sections.find(x => x._id === s._id);
-                    if (sec) sec._dirty = false;
-                }
+
+            // Clear dirty flags on the real in-memory objects.
+            dirtyEntries.forEach(de => {
+                const entry = journalDatabase.find(e => e._id === de._id);
+                if (entry) entry._dirty = false;
+            });
+            dirtySections.forEach(ds => {
+                const entry = journalDatabase.find(e => e._id === ds._entryId);
+                if (!entry) return;
+                const sec = entry.sections.find(x => x._id === ds._id);
+                if (sec) sec._dirty = false;
             });
         }
 
@@ -1027,7 +1036,6 @@ async function _flushPersist() {
     } catch (err) {
         console.error('Persist failed:', err);
         _showSaveFailedIndicator();
-        // Leave _dirty flags so a later flush retries.
     } finally {
         _persistInFlight = false;
         if (_persistPendingAgain) {
@@ -1036,7 +1044,6 @@ async function _flushPersist() {
         }
     }
 }
-
 function _showSavedIndicator() {
     const el = document.getElementById('autoSaveIndicator');
     if (!el) return;
