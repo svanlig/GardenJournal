@@ -926,15 +926,98 @@ function onSectionDragEnd(e) {
    --------------------------------------------------------- */
 function triggerAutoSaveFeedback() {
     const indicator = document.getElementById('autoSaveIndicator');
-    if (!indicator) return;
-    indicator.style.opacity = '1';
+    if (indicator) {
+        indicator.classList.remove('save-failed');
+        indicator.style.opacity = '0';   // hide until save actually succeeds
+    }
 
+    // Mark the current entry as dirty. Section-level dirties are set
+    // by the mutation sites themselves.
+    const current = journalDatabase[currentEntryIndex];
+    if (current) markEntryDirty(current);
+
+    _schedulePersistFlush();
+}
+
+function _schedulePersistFlush() {
+    if (_persistTimer) clearTimeout(_persistTimer);
+    _persistTimer = setTimeout(() => {
+        _persistTimer = null;
+        _flushPersist();
+    }, PERSIST_DEBOUNCE_MS);
+}
+
+async function _flushPersist() {
+    if (_persistInFlight) {
+        _persistPendingAgain = true;
+        return;
+    }
+    _persistInFlight = true;
+
+    try {
+        // Collect all dirty records.
+        const dirtyEntries = [];
+        const dirtySections = [];
+        const dirtyPhotos = [];   // photos are written immediately at upload; none here
+
+        journalDatabase.forEach(entry => {
+            if (entry._dirty) dirtyEntries.push(entry);
+            (entry.sections || []).forEach(sec => {
+                if (sec._dirty) dirtySections.push({ ...sec, _entryId: entry._id });
+            });
+        });
+
+        if (dirtyEntries.length || dirtySections.length) {
+            await persistBatch(dirtyEntries, dirtySections, dirtyPhotos);
+            dirtyEntries.forEach(e => { e._dirty = false; });
+            dirtySections.forEach(s => {
+                const entry = journalDatabase.find(en => en._id === s._entryId);
+                if (entry) {
+                    const sec = entry.sections.find(x => x._id === s._id);
+                    if (sec) sec._dirty = false;
+                }
+            });
+        }
+
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Persist failed:', err);
+        _showSaveFailedIndicator();
+        // Leave _dirty flags so a later flush retries.
+    } finally {
+        _persistInFlight = false;
+        if (_persistPendingAgain) {
+            _persistPendingAgain = false;
+            _schedulePersistFlush();
+        }
+    }
+}
+
+function _showSavedIndicator() {
+    const el = document.getElementById('autoSaveIndicator');
+    if (!el) return;
+    el.textContent = 'Saved ✓';
+    el.classList.remove('save-failed');
+    el.style.opacity = '1';
     clearTimeout(autoSaveFeedbackTimeout);
     autoSaveFeedbackTimeout = setTimeout(() => {
-        indicator.style.opacity = '0';
+        el.style.opacity = '0';
     }, 1200);
 }
 
+function _showSaveFailedIndicator() {
+    const el = document.getElementById('autoSaveIndicator');
+    if (!el) return;
+    el.textContent = 'Save failed — retrying';
+    el.classList.add('save-failed');
+    el.style.opacity = '1';
+    // Do not auto-hide; the next success replaces it.
+}
+
+// Flush on tab hide (best effort) and on page hide.
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) _flushPersist();
+});
 /* ---------------------------------------------------------
    EDITABLE FIELDS — WEATHER
    --------------------------------------------------------- */
