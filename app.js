@@ -1701,6 +1701,7 @@ function backupJournal() {
 
     showNotification('Garden Journal backup downloaded successfully.');
 }
+
 function restoreJournal() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -1708,18 +1709,16 @@ function restoreJournal() {
 
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
-
         if (!file) return;
 
-         const confirmed = confirm(
-          'Restore this backup? Your current journal entries will be replaced.'
-         );
+        const confirmed = confirm(
+            'Restore this backup? Your current journal entries will be replaced.'
+        );
+        if (!confirmed) return;
 
-       if (!confirmed) return;
+        const reader = new FileReader();
 
-       const reader = new FileReader();
-       
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             try {
                 const restoredData = JSON.parse(e.target.result);
 
@@ -1727,11 +1726,33 @@ function restoreJournal() {
                     throw new Error('Invalid backup format.');
                 }
 
-                journalDatabase = restoredData;
+                // Prepare a processed copy first — do not touch the
+                // live journalDatabase until we know it's valid.
+                const prepared = restoredData.map(entry => {
+                    ensureEntryId(entry);
+                    if (typeof entry._seed !== 'boolean') entry._seed = false;
+                    entry._dirty = true;
+                    (entry.sections || []).forEach(sec => {
+                        ensureSectionId(sec);
+                        sec._dirty = true;
+                    });
+                    return entry;
+                });
+
+                // Commit to memory.
+                journalDatabase = prepared;
                 currentEntryIndex = 0;
 
-                renderEntry(currentEntryIndex);
+                // Persist as the source of truth. This replaces the
+                // entries/sections stores and sets the initialized flag.
+                await replaceAll(
+                    journalDatabase,
+                    flattenSections(journalDatabase),
+                    []
+                );
+                await setMeta('initialized', true);
 
+                renderEntry(0);
                 showNotification('Garden Journal restored successfully.');
 
             } catch (error) {
