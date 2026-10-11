@@ -1,3 +1,10 @@
+/* ---------- Stage 1: persistence state ---------- */
+
+let _persistTimer = null;
+let _persistInFlight = false;
+let _persistPendingAgain = false;
+const PERSIST_DEBOUNCE_MS = 500;
+
 /* =========================================================
    GARDEN JOURNAL — APPLICATION LOGIC
    Function names are unchanged so existing inline handlers
