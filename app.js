@@ -1967,16 +1967,21 @@ function undoLastDelete() {
         return;
     }
 
-    // If the user navigated away from the entry they deleted from,
-    // still re-insert into the original entry (the index is relative
-    // to that entry's sections array), but do not change the current
-    // view. The user will see the effect when they navigate back.
     const clampedIndex = Math.max(0, Math.min(index, entry.sections.length));
+    section.deleted = false;
+    section.deletedAt = null;
+    section._entryId = entry._id;
     entry.sections.splice(clampedIndex, 0, section);
+
+    // Reassign sortOrder.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
 
     lastDeletedSection = null;
 
-    // Only re-render if we're still looking at the same entry.
     if (currentEntryIndex === entryIndex) {
         renderEntry(currentEntryIndex);
         triggerAutoSaveFeedback();
@@ -1984,7 +1989,6 @@ function undoLastDelete() {
 
     showNotification('Section restored.');
 }
-
 /* ---------------------------------------------------------
    REMOVE SECTION
    Splices the section at `index` out of the current entry,
