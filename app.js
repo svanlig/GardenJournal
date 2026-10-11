@@ -138,11 +138,47 @@ function migrateJournalDatabase(db) {
 /* ---------------------------------------------------------
    BOOTSTRAP
    --------------------------------------------------------- */
-window.onload = function () {
+window.onload = async function () {
+    try {
+        await openDatabase();
+
+        // If the user has used the app before (initialized flag),
+        // do NOT fall back to seed data even if entries are empty.
+        const initialized = await getMeta('initialized');
+        const stored = await loadAll();
+
+        if (stored.entries.length > 0) {
+            // Hydrate from IndexedDB.
+            journalDatabase = hydrateFromStored(stored);
+        } else if (!initialized) {
+            // First run — seed data. Mark as seed, assign IDs, persist.
+            journalDatabase.forEach(entry => {
+                entry._seed = true;
+                ensureEntryId(entry);
+                (entry.sections || []).forEach(sec => {
+                    ensureSectionId(sec);
+                    sec._dirty = true;   // written on the initial persist
+                });
+                entry._dirty = true;
+            });
+            await persistImmediately();
+            await setMeta('initialized', true);
+        } else {
+            // User has used the app; their journal is empty.
+            // Do not seed. Leave journalDatabase empty.
+            journalDatabase = [];
+        }
+    } catch (err) {
+        console.error('Failed to load from IndexedDB; falling back to seed data.', err);
+        // In-memory seed data remains as the working copy; it will
+        // persist on the next mutation.
+    }
+
     migrateJournalDatabase(journalDatabase);
     renderEntry(currentEntryIndex);
     setupWeatherListeners();
     lockJournalEditing();
+    setupPhotoPositionListeners && setupPhotoPositionListeners();
     document.querySelector('.app-bar').style.display = 'none';
 };
 
