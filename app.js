@@ -2067,4 +2067,17 @@ function hydrateFromStored(stored) {
     return stored.entries.map(e => byEntry.get(e._id));
 }
 
+/* Convert the nested in-memory model to a flat list of section records,
+   each tagged with the _entryId of its parent entry. Used for restore
+   and for the initial persist. */
+function flattenSections(db) {
+    const out = [];
+    db.forEach(entry => {
+        (entry.sections || []).forEach(sec => {
+            out.push({ ...sec, _entryId: entry._id });
+        });
+    });
+    return out;
+}
+
 
