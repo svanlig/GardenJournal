@@ -185,7 +185,6 @@ window.onload = async function () {
    
     setupWeatherListeners();
     lockJournalEditing();
-    if (typeof setupPhotoPositionListeners === 'function') setupPhotoPositionListeners();
 };
 
 /* ---------------------------------------------------------
