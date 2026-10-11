@@ -678,13 +678,13 @@ function chooseLayout(layoutId) {
     const newSection = {
         layout: layoutId,
         text: '',
-        image: ''
+        image: '',
+        sortOrder: entry.sections.length   // <-- append at end
     };
     ensureSectionId(newSection, entry._id);
     markSectionDirty(newSection);
 
     entry.sections.push(newSection);
-
     markEntryDirty(entry);
 
     closeLayoutChooser();
