@@ -955,6 +955,14 @@ function onSectionDragEnd(e) {
     const [moved] = entry.sections.splice(index, 1);
     entry.sections.splice(newIndex, 0, moved);
 
+    // Reassign sortOrder for every section in this entry and mark
+    // each one dirty, so the new order is persisted.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
+
     // Re-render the sections. Any pending undo is cleared because
     // reordering counts as "another action."
     lastDeletedSection = null;
