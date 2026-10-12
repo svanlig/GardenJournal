@@ -152,15 +152,16 @@ window.onload = async function () {
             journalDatabase = hydrateFromStored(stored);
         } else if (!initialized) {
             // First run — seed data. Mark as seed, assign IDs, persist.
-            journalDatabase.forEach(entry => {
-            entry._seed = true;
-            ensureEntryId(entry);
-            (entry.sections || []).forEach((sec, i) => {
-            ensureSectionId(sec, entry._id);
-            sec.sortOrder = i;   // <-- position in the entry
-            sec._dirty = true;
-        });
-        entry._dirty = true;
+            journalDatabase.forEach((entry, i) => {
+                entry._seed = true;
+                entry.sortOrder = i;
+                ensureEntryId(entry);
+                (entry.sections || []).forEach((sec, j) => {
+                ensureSectionId(sec, entry._id);
+                sec.sortOrder = j;
+               sec._dirty = true;
+          });
+          entry._dirty = true;
        });
            
     await persistImmediately();
