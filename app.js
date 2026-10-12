@@ -1,4 +1,4 @@
-/* ---------- Stage 1: persistence state ---------- */
+/* ---------- Stage 1:: persistence state ---------- */
 
 let _persistTimer = null;
 let _persistInFlight = false;
