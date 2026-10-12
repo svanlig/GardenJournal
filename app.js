@@ -2173,7 +2173,7 @@ function hydrateFromStored(stored) {
         const da = a.date || '';
         const db = b.date || '';
         if (da === db) return 0;
-        return da < db ? 1 : -1;   // newest first
+        return da < db ? -1 : 1;   // newest first - changed to oldest first
     });
     return entries;
 }
