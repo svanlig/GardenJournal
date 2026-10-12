@@ -2147,26 +2147,27 @@ function hydrateFromStored(stored) {
     const byEntry = new Map();
     stored.entries.forEach(e => byEntry.set(e._id, { ...e, sections: [] }));
 
+    // Group sections by entry, then backfill and sort.
     const sectionsByEntry = new Map();
     stored.sections.forEach(s => {
         if (!sectionsByEntry.has(s._entryId)) sectionsByEntry.set(s._entryId, []);
         sectionsByEntry.get(s._entryId).push(s);
     });
-    sectionsByEntry.forEach(arr => arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
+    sectionsByEntry.forEach(arr => {
+        arr.forEach((s, i) => {
+            if (typeof s.sortOrder !== 'number') {
+                s.sortOrder = i;
+                s._dirty = true;
+            }
+        });
+        arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    });
 
     byEntry.forEach((entry, id) => {
         entry.sections = sectionsByEntry.get(id) || [];
-        // Backfill sortOrder for any section missing it.
-        entry.sections.forEach((s, i) => {
-            if (typeof s.sortOrder !== 'number') {
-                s.sortOrder = i;
-                markSectionDirty(s);   // so it gets written back with the correct order
-            }
-        });
     });
 
-   // Sort entries by date descending (newest first).
-    // Reverse to (a.date < b.date) for oldest first.
+    // Sort entries by date descending (newest first).
     const entries = stored.entries.map(e => byEntry.get(e._id));
     entries.sort((a, b) => {
         const da = a.date || '';
@@ -2175,7 +2176,6 @@ function hydrateFromStored(stored) {
         return da < db ? 1 : -1;   // newest first
     });
     return entries;
-   
 }
 
 /* Write a single tombstone record for an entry that was removed from
