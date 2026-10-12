@@ -150,21 +150,22 @@ window.onload = async function () {
         if (stored.entries.length > 0) {
             // Hydrate from IndexedDB.
             journalDatabase = hydrateFromStored(stored);
-       } else if (!initialized) {
-    // First run — seed data. Mark as seed, assign IDs, persist.
-    journalDatabase.forEach(entry => {
-        entry._seed = true;
-        ensureEntryId(entry);
-        (entry.sections || []).forEach((sec, i) => {
+        } else if (!initialized) {
+            // First run — seed data. Mark as seed, assign IDs, persist.
+            journalDatabase.forEach(entry => {
+            entry._seed = true;
+            ensureEntryId(entry);
+            (entry.sections || []).forEach((sec, i) => {
             ensureSectionId(sec, entry._id);
             sec.sortOrder = i;   // <-- position in the entry
             sec._dirty = true;
         });
         entry._dirty = true;
-    });
+       });
+           
     await persistImmediately();
     await setMeta('initialized', true);
-}
+           
         } else {
             // User has used the app; their journal is empty.
             // Do not seed. Leave journalDatabase empty.
@@ -188,7 +189,60 @@ window.onload = async function () {
     setupWeatherListeners();
     lockJournalEditing();
 };
+/* ---------------------------------------------------------
+   BOOTSTRAP
+   --------------------------------------------------------- */
+window.onload = async function () {
+    try {
+        await openDatabase();
 
+        // If the user has used the app before (initialized flag),
+        // do NOT fall back to seed data even if entries are empty.
+        const initialized = await getMeta('initialized');
+        const stored = await loadAll();
+
+        if (stored.entries.length > 0) {
+            // Hydrate from IndexedDB.
+            journalDatabase = hydrateFromStored(stored);
+        } else if (!initialized) {
+            // First run — seed data. Mark as seed, assign IDs, persist.
+            journalDatabase.forEach(entry => {
+                entry._seed = true;
+                ensureEntryId(entry);
+                (entry.sections || []).forEach((sec, i) => {
+                    ensureSectionId(sec, entry._id);
+                    sec.sortOrder = i;
+                    sec._dirty = true;
+                });
+                entry._dirty = true;
+            });
+
+            await persistImmediately();
+            await setMeta('initialized', true);
+        } else {
+            // User has used the app; their journal is empty.
+            // Do not seed. Leave journalDatabase empty.
+            journalDatabase = [];
+        }
+    } catch (err) {
+        console.error('Failed to load from IndexedDB; falling back to seed data.', err);
+        // In-memory seed data remains as the working copy; it will
+        // persist on the next mutation.
+    }
+
+    migrateJournalDatabase(journalDatabase);
+
+    if (journalDatabase.length === 0) {
+        // Journal is empty — go to the landing page.
+        showLandingPage();
+    } else {
+        renderEntry(currentEntryIndex);
+        document.querySelector('.app-bar').style.display = 'none';
+    }
+
+    setupWeatherListeners();
+    lockJournalEditing();
+};
 /* ---------------------------------------------------------
    VIEW SWITCHING
    --------------------------------------------------------- */
