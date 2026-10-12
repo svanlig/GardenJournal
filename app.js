@@ -2165,15 +2165,15 @@ function hydrateFromStored(stored) {
         });
     });
 
-   // Sort entries by sortOrder, and backfill any that are missing it.
+   // Sort entries by date descending (newest first).
+    // Reverse to (a.date < b.date) for oldest first.
     const entries = stored.entries.map(e => byEntry.get(e._id));
-    entries.forEach((e, i) => {
-        if (typeof e.sortOrder !== 'number') {
-            e.sortOrder = i;
-            e._dirty = true;   // will be written back on next flush
-        }
+    entries.sort((a, b) => {
+        const da = a.date || '';
+        const db = b.date || '';
+        if (da === db) return 0;
+        return da < db ? 1 : -1;   // newest first
     });
-    entries.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
     return entries;
    
 }
