@@ -2156,8 +2156,19 @@ function hydrateFromStored(stored) {
         });
     });
 
-    return stored.entries.map(e => byEntry.get(e._id));
+   // Sort entries by sortOrder, and backfill any that are missing it.
+    const entries = stored.entries.map(e => byEntry.get(e._id));
+    entries.forEach((e, i) => {
+        if (typeof e.sortOrder !== 'number') {
+            e.sortOrder = i;
+            e._dirty = true;   // will be written back on next flush
+        }
+    });
+    entries.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    return entries;
+   
 }
+
 /* Write a single tombstone record for an entry that was removed from
    memory. Because the entry is no longer in journalDatabase,
    persistImmediately() would not pick it up — it has to be written
