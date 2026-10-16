@@ -8,6 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Betania+Patmos&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Kalam:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
+    <div class="conflict-indicator" id="conflictIndicator" hidden>
+        <span class="conflict-count" id="conflictCount">0</span>
+        <span class="conflict-label">conflict(s)</span>
+    </div>
 </head>
 <body>
 
@@ -285,6 +290,7 @@
     </div>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="storage.js"></script>
     <script src="app.js"></script>
     <!-- Off-screen container used for PNG export. -->
     <div id="pngExportContainer" aria-hidden="true"></div>

@@ -1,3 +1,10 @@
+/* ---------- Stage 1:: persistence state ---------- */
+
+let _persistTimer = null;
+let _persistInFlight = false;
+let _persistPendingAgain = false;
+const PERSIST_DEBOUNCE_MS = 500;
+
 /* =========================================================
    GARDEN JOURNAL — APPLICATION LOGIC
    Function names are unchanged so existing inline handlers
@@ -131,14 +138,119 @@ function migrateJournalDatabase(db) {
 /* ---------------------------------------------------------
    BOOTSTRAP
    --------------------------------------------------------- */
-window.onload = function () {
+window.onload = async function () {
+    try {
+        await openDatabase();
+
+        // If the user has used the app before (initialized flag),
+        // do NOT fall back to seed data even if entries are empty.
+        const initialized = await getMeta('initialized');
+        const stored = await loadAll();
+
+        if (stored.entries.length > 0) {
+            // Hydrate from IndexedDB.
+            journalDatabase = hydrateFromStored(stored);
+        } else if (!initialized) {
+            // First run — seed data. Mark as seed, assign IDs, persist.
+            journalDatabase.forEach((entry, i) => {
+                entry._seed = true;
+                entry.sortOrder = i;
+                ensureEntryId(entry);
+                (entry.sections || []).forEach((sec, j) => {
+                ensureSectionId(sec, entry._id);
+                sec.sortOrder = j;
+               sec._dirty = true;
+          });
+          entry._dirty = true;
+       });
+           
+    await persistImmediately();
+    await setMeta('initialized', true);
+           
+        } else {
+            // User has used the app; their journal is empty.
+            // Do not seed. Leave journalDatabase empty.
+            journalDatabase = [];
+        }
+    } catch (err) {
+        console.error('Failed to load from IndexedDB; falling back to seed data.', err);
+        // In-memory seed data remains as the working copy; it will
+        // persist on the next mutation.
+    }
+
     migrateJournalDatabase(journalDatabase);
-    renderEntry(currentEntryIndex);
+    if (journalDatabase.length === 0) {
+       // Journal is empty — go to the landing page.
+       showLandingPage();
+    } else {
+       renderEntry(currentEntryIndex);
+       document.querySelector('.app-bar').style.display = 'none';
+    }
+   
     setupWeatherListeners();
     lockJournalEditing();
-    document.querySelector('.app-bar').style.display = 'none';
+
+   // Ensure any backfilled sortOrder values get written.
+   if (journalDatabase.some(e => e._dirty)) {
+       persistImmediately();
+    }
+   
 };
 
+/* ---------------------------------------------------------
+   BOOTSTRAP
+   --------------------------------------------------------- */
+window.onload = async function () {
+    try {
+        await openDatabase();
+
+        // If the user has used the app before (initialized flag),
+        // do NOT fall back to seed data even if entries are empty.
+        const initialized = await getMeta('initialized');
+        const stored = await loadAll();
+
+        if (stored.entries.length > 0) {
+            // Hydrate from IndexedDB.
+            journalDatabase = hydrateFromStored(stored);
+        } else if (!initialized) {
+            // First run — seed data. Mark as seed, assign IDs, persist.
+            journalDatabase.forEach(entry => {
+                entry._seed = true;
+                ensureEntryId(entry);
+                (entry.sections || []).forEach((sec, i) => {
+                    ensureSectionId(sec, entry._id);
+                    sec.sortOrder = i;
+                    sec._dirty = true;
+                });
+                entry._dirty = true;
+            });
+
+            await persistImmediately();
+            await setMeta('initialized', true);
+        } else {
+            // User has used the app; their journal is empty.
+            // Do not seed. Leave journalDatabase empty.
+            journalDatabase = [];
+        }
+    } catch (err) {
+        console.error('Failed to load from IndexedDB; falling back to seed data.', err);
+        // In-memory seed data remains as the working copy; it will
+        // persist on the next mutation.
+    }
+
+    migrateJournalDatabase(journalDatabase);
+
+    if (journalDatabase.length === 0) {
+        // Journal is empty — go to the landing page.
+        showLandingPage();
+    } else {
+        renderEntry(currentEntryIndex);
+        document.querySelector('.app-bar').style.display = 'none';
+    }
+
+    setupWeatherListeners();
+    lockJournalEditing();
+};
 /* ---------------------------------------------------------
    VIEW SWITCHING
    --------------------------------------------------------- */
@@ -247,9 +359,10 @@ function buildSectionElement(sectionData, index) {
        const current = journalDatabase[currentEntryIndex];
        if (!current || !current.sections[index]) return;
        current.sections[index].label = label.innerText;
+       markSectionDirty(current.sections[index]);
        clearTimeout(typingDebounceTimeout);
        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
+   });
 
     const textInput = document.createElement('div');
     textInput.className = 'text-area-input';
@@ -258,13 +371,13 @@ function buildSectionElement(sectionData, index) {
     textInput.innerText = sectionData.text || '';
 
     textInput.addEventListener('input', () => {
-        const current = journalDatabase[currentEntryIndex];
-        if (!current || !current.sections[index]) return;
-        current.sections[index].text = textInput.innerText;
-
-        clearTimeout(typingDebounceTimeout);
-        typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
-    });
+       const current = journalDatabase[currentEntryIndex];
+       if (!current || !current.sections[index]) return;
+       current.sections[index].text = textInput.innerText;
+       markSectionDirty(current.sections[index]);
+       clearTimeout(typingDebounceTimeout);
+       typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
+   });
 
     textWrapper.appendChild(label);
     textWrapper.appendChild(textInput);
@@ -364,6 +477,7 @@ function buildTextOnlySection(section, sectionData, index) {
         const current = journalDatabase[currentEntryIndex];
         if (!current || !current.sections[index]) return;
         current.sections[index].label = label.innerText;
+        markSectionDirty(current.sections[index]);
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
@@ -377,6 +491,7 @@ function buildTextOnlySection(section, sectionData, index) {
         const current = journalDatabase[currentEntryIndex];
         if (!current || !current.sections[index]) return;
         current.sections[index].text = textInput.innerText;
+        markSectionDirty(current.sections[index]);
         clearTimeout(typingDebounceTimeout);
         typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
     });
@@ -453,7 +568,6 @@ function buildImageOnlySection(section, sectionData, index) {
    and section.texts[].
    --------------------------------------------------------- */
 function buildThreeNoteSection(section, sectionData, index) {
-    // Ensure the data arrays exist and have three entries.
     const texts = Array.isArray(sectionData.texts)
         ? [...sectionData.texts]
         : ['', '', ''];
@@ -464,8 +578,6 @@ function buildThreeNoteSection(section, sectionData, index) {
         : ['', '', ''];
     while (labels.length < 3) labels.push('');
 
-    // Write the normalized arrays back into the data model so the
-    // rest of the code (save/backup) works consistently.
     sectionData.texts = texts;
     sectionData.labels = labels;
 
@@ -482,6 +594,7 @@ function buildThreeNoteSection(section, sectionData, index) {
             const current = journalDatabase[currentEntryIndex];
             if (!current || !current.sections[index]) return;
             current.sections[index].labels[col] = label.innerText;
+            markSectionDirty(current.sections[index]);
             clearTimeout(typingDebounceTimeout);
             typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
         });
@@ -495,6 +608,7 @@ function buildThreeNoteSection(section, sectionData, index) {
             const current = journalDatabase[currentEntryIndex];
             if (!current || !current.sections[index]) return;
             current.sections[index].texts[col] = textInput.innerText;
+            markSectionDirty(current.sections[index]);
             clearTimeout(typingDebounceTimeout);
             typingDebounceTimeout = setTimeout(() => { triggerAutoSaveFeedback(); }, 600);
         });
@@ -503,13 +617,12 @@ function buildThreeNoteSection(section, sectionData, index) {
         wrapper.appendChild(textInput);
         section.appendChild(wrapper);
     }
-   
+
     section.appendChild(buildRemoveSectionButton(index));
     section.appendChild(buildDragHandle(index));
-      
+
     return section;
 }
-
 /* ---------------------------------------------------------
    ADD LAYOUT CONTROL
    Renders the + button below the last section. Lives inside
@@ -624,20 +737,22 @@ function chooseLayout(layoutId) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
 
-    lastDeletedSection = null;   // NEW: adding is "another action"
+    lastDeletedSection = null;
 
-    entry.sections.push({
+    const newSection = {
         layout: layoutId,
         text: '',
-        image: ''
-    });
+        image: '',
+        sortOrder: entry.sections.length   // <-- append at end
+    };
+    ensureSectionId(newSection, entry._id);
+    markSectionDirty(newSection);
+
+    entry.sections.push(newSection);
+    markEntryDirty(entry);
 
     closeLayoutChooser();
-
-    // Re-render to pick up the new section. renderEntry re-attaches
-    // all listeners and rebuilds the container including the + control.
     renderEntry(currentEntryIndex);
-
     triggerAutoSaveFeedback();
 
     const layoutName = (LAYOUTS.find(l => l.id === layoutId) || {}).name || 'Layout';
@@ -904,6 +1019,14 @@ function onSectionDragEnd(e) {
     const [moved] = entry.sections.splice(index, 1);
     entry.sections.splice(newIndex, 0, moved);
 
+    // Reassign sortOrder for every section in this entry and mark
+    // each one dirty, so the new order is persisted.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
+
     // Re-render the sections. Any pending undo is cleared because
     // reordering counts as "another action."
     lastDeletedSection = null;
@@ -919,15 +1042,105 @@ function onSectionDragEnd(e) {
    --------------------------------------------------------- */
 function triggerAutoSaveFeedback() {
     const indicator = document.getElementById('autoSaveIndicator');
-    if (!indicator) return;
-    indicator.style.opacity = '1';
+    if (indicator) {
+        indicator.classList.remove('save-failed');
+        indicator.style.opacity = '0';   // hide until save actually succeeds
+    }
 
+    // Mark the current entry as dirty. Section-level dirties are set
+    // by the mutation sites themselves.
+    const current = journalDatabase[currentEntryIndex];
+    if (current) markEntryDirty(current);
+
+    _schedulePersistFlush();
+}
+
+function _schedulePersistFlush() {
+    if (_persistTimer) clearTimeout(_persistTimer);
+    _persistTimer = setTimeout(() => {
+        _persistTimer = null;
+        _flushPersist();
+    }, PERSIST_DEBOUNCE_MS);
+}
+
+async function _flushPersist() {
+    if (_persistInFlight) {
+        _persistPendingAgain = true;
+        return;
+    }
+    _persistInFlight = true;
+
+    try {
+        const dirtyEntries = [];
+        const dirtySections = [];
+        const dirtyPhotos = [];
+
+        journalDatabase.forEach(entry => {
+            if (entry._dirty) {
+                // Strip the inline sections array before writing the entry.
+                // Sections live only in the sections store.
+                const { sections, ...entryWithoutSections } = entry;
+                dirtyEntries.push(entryWithoutSections);
+            }
+            (entry.sections || []).forEach(sec => {
+                if (!sec._entryId) sec._entryId = entry._id;
+                if (sec._dirty) dirtySections.push({ ...sec });
+            });
+        });
+
+        if (dirtyEntries.length || dirtySections.length || dirtyPhotos.length) {
+            await persistBatch(dirtyEntries, dirtySections, dirtyPhotos);
+
+            // Clear dirty flags on the real in-memory objects.
+            dirtyEntries.forEach(de => {
+                const entry = journalDatabase.find(e => e._id === de._id);
+                if (entry) entry._dirty = false;
+            });
+            dirtySections.forEach(ds => {
+                const entry = journalDatabase.find(e => e._id === ds._entryId);
+                if (!entry) return;
+                const sec = entry.sections.find(x => x._id === ds._id);
+                if (sec) sec._dirty = false;
+            });
+        }
+
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Persist failed:', err);
+        _showSaveFailedIndicator();
+    } finally {
+        _persistInFlight = false;
+        if (_persistPendingAgain) {
+            _persistPendingAgain = false;
+            _schedulePersistFlush();
+        }
+    }
+}
+function _showSavedIndicator() {
+    const el = document.getElementById('autoSaveIndicator');
+    if (!el) return;
+    el.textContent = 'Saved ✓';
+    el.classList.remove('save-failed');
+    el.style.opacity = '1';
     clearTimeout(autoSaveFeedbackTimeout);
     autoSaveFeedbackTimeout = setTimeout(() => {
-        indicator.style.opacity = '0';
+        el.style.opacity = '0';
     }, 1200);
 }
 
+function _showSaveFailedIndicator() {
+    const el = document.getElementById('autoSaveIndicator');
+    if (!el) return;
+    el.textContent = 'Save failed — retrying';
+    el.classList.add('save-failed');
+    el.style.opacity = '1';
+    // Do not auto-hide; the next success replaces it.
+}
+
+// Flush on tab hide (best effort) and on page hide.
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) _flushPersist();
+});
 /* ---------------------------------------------------------
    EDITABLE FIELDS — WEATHER
    --------------------------------------------------------- */
@@ -1086,7 +1299,8 @@ function createNewEntry() {
         location: "Tallahassee, FL",
         weatherStats: "",
         weatherFeel: "",
-        sections: []
+        sections: [],
+        sortOrder: journalDatabase.length   // <-- append at end
     };
     journalDatabase.push(newBlankPage);
     renderEntry(journalDatabase.length - 1);
@@ -1136,24 +1350,31 @@ function handleMenuAction(action) {
     } else if (action === 'delete') {
         const confirmed = confirm('Confirm Delete?');
         if (!confirmed) return;
-       
-        lastDeletedSection = null;   // NEW
-       
+
+        lastDeletedSection = null;
+
         if (journalDatabase.length > 1) {
-            journalDatabase.splice(currentEntryIndex, 1);
+            const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+            if (removed) {
+                removed.deleted = true;
+                removed.deletedAt = Date.now();
+            }
             const targetIndex = Math.max(0, currentEntryIndex - 1);
             renderEntry(targetIndex);
+            if (removed) persistDeletedEntry(removed);
             showNotification('Entry removed from journal indexes.');
         } else {
-            journalDatabase[0] = {
-                date: new Date().toISOString().split('T')[0],
-                displayTitle: "Single Wiped Sheet",
-                weatherStats: "75°F · Clear",
-                weatherFeel: "",
-                sections: []
-            };
-            renderEntry(0);
-            showNotification('Single entry wiped cleanly.');
+            // Last entry — delete it and return to the landing page.
+            const [removed] = journalDatabase.splice(currentEntryIndex, 1);
+            if (removed) {
+                removed.deleted = true;
+                removed.deletedAt = Date.now();
+                persistDeletedEntry(removed);
+            }
+            currentEntryIndex = 0;
+
+            showLandingPage();
+            showNotification('Last entry removed. Journal is empty.');
         }
     }
 }
@@ -1200,6 +1421,7 @@ function handlePhotoSelect(event, index) {
         const current = journalDatabase[currentEntryIndex];
         if (current && current.sections[index]) {
             current.sections[index].image = e.target.result;
+            markSectionDirty(current.sections[index]);
         }
 
         triggerAutoSaveFeedback();
@@ -1575,6 +1797,7 @@ function backupJournal() {
 
     showNotification('Garden Journal backup downloaded successfully.');
 }
+
 function restoreJournal() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -1582,18 +1805,16 @@ function restoreJournal() {
 
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
-
         if (!file) return;
 
-         const confirmed = confirm(
-          'Restore this backup? Your current journal entries will be replaced.'
-         );
+        const confirmed = confirm(
+            'Restore this backup? Your current journal entries will be replaced.'
+        );
+        if (!confirmed) return;
 
-       if (!confirmed) return;
+        const reader = new FileReader();
 
-       const reader = new FileReader();
-       
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             try {
                 const restoredData = JSON.parse(e.target.result);
 
@@ -1601,11 +1822,33 @@ function restoreJournal() {
                     throw new Error('Invalid backup format.');
                 }
 
-                journalDatabase = restoredData;
+                // Prepare a processed copy first — do not touch the
+                // live journalDatabase until we know it's valid.
+                const prepared = restoredData.map(entry => {
+                    ensureEntryId(entry);
+                    if (typeof entry._seed !== 'boolean') entry._seed = false;
+                    entry._dirty = true;
+                    (entry.sections || []).forEach(sec => {
+                        ensureSectionId(sec);
+                        sec._dirty = true;
+                    });
+                    return entry;
+                });
+
+                // Commit to memory.
+                journalDatabase = prepared;
                 currentEntryIndex = 0;
 
-                renderEntry(currentEntryIndex);
+                // Persist as the source of truth. This replaces the
+                // entries/sections stores and sets the initialized flag.
+                await replaceAll(
+                    journalDatabase,
+                    flattenSections(journalDatabase),
+                    []
+                );
+                await setMeta('initialized', true);
 
+                renderEntry(0);
                 showNotification('Garden Journal restored successfully.');
 
             } catch (error) {
@@ -1797,16 +2040,21 @@ function undoLastDelete() {
         return;
     }
 
-    // If the user navigated away from the entry they deleted from,
-    // still re-insert into the original entry (the index is relative
-    // to that entry's sections array), but do not change the current
-    // view. The user will see the effect when they navigate back.
     const clampedIndex = Math.max(0, Math.min(index, entry.sections.length));
+    section.deleted = false;
+    section.deletedAt = null;
+    section._entryId = entry._id;
     entry.sections.splice(clampedIndex, 0, section);
+
+    // Reassign sortOrder.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
 
     lastDeletedSection = null;
 
-    // Only re-render if we're still looking at the same entry.
     if (currentEntryIndex === entryIndex) {
         renderEntry(currentEntryIndex);
         triggerAutoSaveFeedback();
@@ -1814,7 +2062,6 @@ function undoLastDelete() {
 
     showNotification('Section restored.');
 }
-
 /* ---------------------------------------------------------
    REMOVE SECTION
    Splices the section at `index` out of the current entry,
@@ -1824,29 +2071,145 @@ function removeSection(index) {
     const entry = journalDatabase[currentEntryIndex];
     if (!entry) return;
     if (index < 0 || index >= entry.sections.length) return;
-    if (sectionDrag) {
-    // abort
-       if (sectionDrag.placeholder && sectionDrag.placeholder.parentElement) {
-           sectionDrag.placeholder.parentElement.removeChild(sectionDrag.placeholder);
-       }
-       if (sectionDrag.sectionEl) {
-           sectionDrag.sectionEl.classList.remove('is-dragging');
-       }
-       document.body.classList.remove('is-dragging-section');
-       window.removeEventListener('pointermove', onSectionDragMove);
-       window.removeEventListener('pointerup', onSectionDragEnd);
-       window.removeEventListener('pointercancel', onSectionDragEnd);
-       sectionDrag = null;
-   }
+
     const [removed] = entry.sections.splice(index, 1);
 
-    lastDeletedSection = {
-        section: removed,
-        index: index,
-        entryIndex: currentEntryIndex
-    };
+    // Tombstone the removed section so the delete survives reload.
+    if (removed) {
+        removed.deleted = true;
+        removed.deletedAt = Date.now();
+        persistDeletedSection(removed);
+    }
+
+    // Reassign sortOrder to the remaining sections.
+    entry.sections.forEach((s, i) => {
+        s.sortOrder = i;
+        markSectionDirty(s);
+    });
+    markEntryDirty(entry);
+
+    lastDeletedSection = { section: removed, index, entryIndex: currentEntryIndex };
 
     renderEntry(currentEntryIndex);
     triggerAutoSaveFeedback();
     showUndoBanner();
 }
+/* ---------------------------------------------------------
+   new function for syncing
+   --------------------------------------------------------- */
+
+function _newId() {
+    return (crypto.randomUUID && crypto.randomUUID())
+        || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10));
+}
+
+function ensureEntryId(entry) {
+    if (!entry._id) entry._id = _newId();
+    if (typeof entry._seed !== 'boolean') entry._seed = false;
+    return entry;
+}
+
+function ensureSectionId(section, entryId) {
+    if (!section._id) section._id = _newId();
+    if (typeof section._dirty !== 'boolean') section._dirty = false;
+    if (entryId && !section._entryId) section._entryId = entryId;
+    return section;
+}
+
+function markEntryDirty(entry) {
+    if (!entry) return;
+    ensureEntryId(entry);
+    entry._dirty = true;
+    if (entry._seed) entry._seed = false;   // user touched it — no longer seed
+}
+
+function markSectionDirty(section) {
+    if (!section) return;
+    ensureSectionId(section);
+    section._dirty = true;
+}
+
+/* ---------------------------------------------------------
+   new async function for syncing
+   --------------------------------------------------------- */
+
+async function persistImmediately() {
+    if (_persistTimer) {
+        clearTimeout(_persistTimer);
+        _persistTimer = null;
+    }
+    await _flushPersist();
+}
+/* ---------------------------------------------------------
+   new hydratefrom stored function for syncing
+   --------------------------------------------------------- */
+function hydrateFromStored(stored) {
+    const byEntry = new Map();
+    stored.entries.forEach(e => byEntry.set(e._id, { ...e, sections: [] }));
+
+    // Group sections by entry, then backfill and sort.
+    const sectionsByEntry = new Map();
+    stored.sections.forEach(s => {
+        if (!sectionsByEntry.has(s._entryId)) sectionsByEntry.set(s._entryId, []);
+        sectionsByEntry.get(s._entryId).push(s);
+    });
+    sectionsByEntry.forEach(arr => {
+        arr.forEach((s, i) => {
+            if (typeof s.sortOrder !== 'number') {
+                s.sortOrder = i;
+                s._dirty = true;
+            }
+        });
+        arr.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    });
+
+    byEntry.forEach((entry, id) => {
+        entry.sections = sectionsByEntry.get(id) || [];
+    });
+
+    // Sort entries by date descending (newest first).
+    const entries = stored.entries.map(e => byEntry.get(e._id));
+    entries.sort((a, b) => {
+        const da = a.date || '';
+        const db = b.date || '';
+        if (da === db) return 0;
+        return da < db ? -1 : 1;   // newest first - changed to oldest first
+    });
+    return entries;
+}
+
+/* Write a single tombstone record for an entry that was removed from
+   memory. Because the entry is no longer in journalDatabase,
+   persistImmediately() would not pick it up — it has to be written
+   directly. */
+async function persistDeletedEntry(entry) {
+    if (!entry || !entry._id) return;
+    try {
+        const tx = _db.transaction(['entries'], 'readwrite');
+        tx.objectStore('entries').put(entry);
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Failed to persist entry tombstone:', err);
+        _showSaveFailedIndicator();
+    }
+}
+async function persistDeletedSection(section) {
+    if (!section || !section._id) return;
+    try {
+        const tx = _db.transaction(['sections'], 'readwrite');
+        tx.objectStore('sections').put(section);
+        await new Promise((resolve, reject) => {
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error);
+        });
+        _showSavedIndicator();
+    } catch (err) {
+        console.error('Failed to persist section tombstone:', err);
+        _showSaveFailedIndicator();
+    }
+}
+
