@@ -339,6 +339,7 @@ window.onload = async function () {
    
     setupWeatherListeners();
     lockJournalEditing();
+    initAuth(); 
 
    // Ensure any backfilled sortOrder values get written.
    if (journalDatabase.some(e => e._dirty)) {
