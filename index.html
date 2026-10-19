@@ -52,6 +52,9 @@
                 <button class="btn-search-go" onclick="triggerArchiveSearch()" title="Open Month Archive">Search</button>
             </div>
             
+            <!-- In .app-actions, right before .auth-control -->
+            <button class="btn-auth" id="btnManualSync" onclick="fetchFromCloud()" style="display: none;">Sync ↓</button>
+            
             <div class="auth-control" id="authControl">
                 <button class="btn-auth" id="btnSignIn" onclick="openAuthView()">Sign in</button>
                 <span class="auth-email" id="authEmail"></span>
@@ -152,7 +155,8 @@
             </div>
             <button id="landingBtnSignOut" class="btn-cover-search" onclick="handleSignOut()" style="display: none;">Sign out</button>
         </div>
-        
+        <!-- NEW: Cloud Upload -->
+        <button id="btnUploadCloud" class="btn-cover-search" onclick="pushToCloud()" style="display: none; margin-bottom: 8px;">Backup to Cloud</button>
         <button class="btn-cover-search" onclick="backupJournal()">Backup Journal</button>
         <button class="btn-cover-search" onclick="restoreJournal()">Restore System</button>
     </div>

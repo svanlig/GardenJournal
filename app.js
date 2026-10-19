@@ -39,6 +39,148 @@ try {
 }
 
 /* ---------------------------------------------------------
+   CLOUD SYNC (Stage 5: One-way Upload)
+   --------------------------------------------------------- */
+
+async function pushToCloud() {
+    if (!supabaseClient || !currentSession) {
+        showNotification('Please sign in to upload.');
+        return;
+    }
+
+    const confirmed = confirm("Upload this device's journal to the cloud? This will overwrite any existing cloud data for this account.");
+    if (!confirmed) return;
+
+    const btn = document.getElementById('btnUploadCloud');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Uploading...';
+    showNotification('Starting upload...');
+
+    try {
+        const userId = currentSession.user.id;
+        let uploadedEntries = 0;
+        let uploadedSections = 0;
+        let uploadedPhotos = 0;
+
+        // Iterate over entries to process photos and build the insert payloads
+        for (const entry of journalDatabase) {
+            ensureEntryId(entry);
+
+            // 1. Upload Entry
+            const entryPayload = {
+                user_id: userId,
+                local_id: entry._id,
+                date: entry.date,
+                display_title: entry.displayTitle || '',
+                location: entry.location || '',
+                climate: entry.climate || '',
+                weather_stats: entry.weatherStats || '',
+                weather_feel: entry.weatherFeel || '',
+                sort_order: entry.sortOrder || 0
+            };
+
+            const { error: entryError } = await supabaseClient
+                .from('entries')
+                .upsert(entryPayload, { onConflict: 'user_id, local_id' });
+
+            if (entryError) throw new Error("Entry insert failed: " + entryError.message);
+            uploadedEntries++;
+
+            // 2. Upload Sections
+            for (const sec of (entry.sections || [])) {
+                ensureSectionId(sec, entry._id);
+
+                let photoUrl = sec.image || '';
+
+                // If the image is a local Data URL, upload it to Storage
+                if (photoUrl.startsWith('data:image/')) {
+                    const blob = dataURLtoBlob(photoUrl);
+                    const fileExt = blob.type.split('/')[1] || 'jpeg';
+                    const filePath = `${userId}/${entry._id}/${sec._id}.${fileExt}`;
+
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('photos')
+                        .upload(filePath, blob, { upsert: true });
+
+                    if (uploadError) {
+                        console.error("Photo upload failed for section", sec._id, uploadError);
+                        // We continue anyway, keeping the data URL locally if it fails
+                    } else {
+                        // Get the public URL (or create a signed URL if private)
+                        // Note: Since your bucket is private, we need a signed URL.
+                        // For simplicity in Stage 5, we'll generate a long-lived signed URL (1 year).
+                        const { data: urlData, error: urlError } = await supabaseClient.storage
+                            .from('photos')
+                            .createSignedUrl(filePath, 31536000); // 1 year in seconds
+
+                        if (!urlError && urlData) {
+                            photoUrl = urlData.signedUrl;
+                            uploadedPhotos++;
+                        }
+                    }
+                }
+
+                // Update the local model with the new URL so we don't re-upload next time
+                sec.image = photoUrl;
+                markSectionDirty(sec); // We'll clear this dirty flag after everything finishes
+
+                const sectionPayload = {
+                    user_id: userId,
+                    entry_local_id: entry._id,
+                    local_id: sec._id,
+                    layout: sec.layout,
+                    sort_order: sec.sortOrder || 0,
+                    label: sec.label || '',
+                    text: sec.text || '',
+                    texts: sec.texts || null,
+                    labels: sec.labels || null,
+                    photo_url: photoUrl
+                };
+
+                const { error: secError } = await supabaseClient
+                    .from('sections')
+                    .upsert(sectionPayload, { onConflict: 'user_id, local_id' });
+
+                if (secError) throw new Error("Section insert failed: " + secError.message);
+                uploadedSections++;
+            }
+        }
+
+        // 3. If we made it here, the cloud is up to date.
+        // Clear all dirty flags locally.
+        journalDatabase.forEach(e => {
+            e._dirty = false;
+            (e.sections || []).forEach(s => s._dirty = false);
+        });
+
+        // Save locally to reflect the new photo URLs and cleared dirty flags
+        await persistImmediately();
+
+        showNotification(`Success! Uploaded ${uploadedEntries} entries, ${uploadedSections} sections.`);
+        alert(`Upload complete!\n\n${uploadedEntries} entries\n${uploadedSections} sections\n${uploadedPhotos} photos uploaded.`);
+
+    } catch (err) {
+        console.error('Cloud upload failed:', err);
+        showNotification('Upload failed. Check console.');
+        alert('Upload failed: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+// Helper to convert Data URL to Blob
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
+
+/* ---------------------------------------------------------
    AUTH STATE + UI
    --------------------------------------------------------- */
 let currentSession = null;
@@ -79,6 +221,7 @@ function updateAuthUI() {
     const landBtnSignOut = document.getElementById('landingBtnSignOut');
     const landAuthUser = document.getElementById('landingAuthUser');
     const landAuthEmail = document.getElementById('landingAuthEmail');
+    const btnUploadCloud = document.getElementById('btnUploadCloud');
 
     if (currentSession && currentSession.user) {
         // Logged In State
@@ -90,6 +233,7 @@ function updateAuthUI() {
         if (landAuthUser) landAuthUser.style.display = 'block';
         if (landAuthEmail) landAuthEmail.textContent = currentSession.user.email || '';
         if (landBtnSignOut) landBtnSignOut.style.display = 'block';
+        if (btnUploadCloud) btnUploadCloud.style.display = 'block';
     } else {
         // Logged Out State
         if (btnSignIn) btnSignIn.style.display = 'inline-block';
@@ -99,6 +243,17 @@ function updateAuthUI() {
         if (landBtnSignIn) landBtnSignIn.style.display = 'block';
         if (landAuthUser) landAuthUser.style.display = 'none';
         if (landBtnSignOut) landBtnSignOut.style.display = 'none';
+        if (btnUploadCloud) btnUploadCloud.style.display = 'none';
+    }
+
+   const btnSync = document.getElementById('btnManualSync');
+
+    if (currentSession && currentSession.user) {
+        // ... existing logged in code ...
+        if (btnSync) btnSync.style.display = 'inline-block'; // Show sync button
+    } else {
+        // ... existing logged out code ...
+        if (btnSync) btnSync.style.display = 'none'; // Hide sync button
     }
 }
 
@@ -2395,5 +2550,127 @@ async function persistDeletedSection(section) {
         console.error('Failed to persist section tombstone:', err);
         _showSaveFailedIndicator();
     }
+}
+
+/* ---------------------------------------------------------
+   CLOUD SYNC (Stage 4: Read Only)
+   --------------------------------------------------------- */
+
+async function fetchFromCloud() {
+    if (!supabaseClient || !currentSession) {
+        showNotification('Please sign in to sync.');
+        return;
+    }
+
+    showNotification('Checking cloud...');
+
+    try {
+        // 1. Fetch entries
+        const { data: cloudEntries, error: entriesError } = await supabaseClient
+            .from('entries')
+            .select('*')
+            .is('deleted_at', null); // Ignore tombstoned entries
+
+        if (entriesError) throw entriesError;
+
+        // 2. Fetch sections
+        const { data: cloudSections, error: sectionsError } = await supabaseClient
+            .from('sections')
+            .select('*')
+            .is('deleted_at', null); // Ignore tombstoned sections
+
+        if (sectionsError) throw sectionsError;
+
+        // 3. If cloud is empty, do nothing (keep local data)
+        if (!cloudEntries || cloudEntries.length === 0) {
+            showNotification('Cloud is empty. Local journal is safe.');
+            return;
+        }
+
+        // 4. Cloud has data! Transform it to match our local format.
+        console.log('Cloud data found. Migrating to local format...', cloudEntries.length, 'entries.');
+
+        // Rebuild the nested structure
+        const hydrated = hydrateFromCloud(cloudEntries, cloudSections);
+        // NEW: Sort entries by date immediately so the first render is correct
+        hydrated.sort((a, b) => {
+            const da = a.date || '';
+            const db = b.date || '';
+            if (da === db) return 0;
+            return da < db ? 1 : -1; // Newest first
+        });
+
+        // 5. Overwrite local memory and local IndexedDB
+        journalDatabase = hydrated;
+        
+        // We need to write this to IndexedDB so it persists locally.
+        // We'll use the existing replaceAll function from our storage layer.
+        // Note: we are not uploading photos yet (Stage 5).
+        const flatSections = [];
+        hydrated.forEach(entry => {
+            (entry.sections || []).forEach(sec => {
+                flatSections.push({ ...sec, _entryId: entry._id });
+            });
+        });
+
+        // Write to local database
+        await replaceAll(hydrated, flatSections, []);
+        
+        // Re-render
+        currentEntryIndex = 0;
+        renderEntry(currentEntryIndex);
+        updateAuthUI(); // refresh UI just in case
+        
+        showNotification(`Synced ${hydrated.length} entries from cloud.`);
+
+    } catch (err) {
+        console.error('Cloud fetch failed:', err);
+        showNotification('Sync failed. Check console.');
+    }
+}
+
+function hydrateFromCloud(cloudEntries, cloudSections) {
+    // Group sections by their parent entry's local_id
+    const sectionsByEntry = new Map();
+    cloudSections.forEach(s => {
+        if (!sectionsByEntry.has(s.entry_local_id)) sectionsByEntry.set(s.entry_local_id, []);
+        sectionsByEntry.get(s.entry_local_id).push(s);
+    });
+
+    // Map over entries
+    return cloudEntries.map(ce => {
+        const entrySections = sectionsByEntry.get(ce.local_id) || [];
+        
+        // Sort sections
+        entrySections.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+        // Map sections to local format
+        const mappedSections = entrySections.map(cs => ({
+            _id: cs.local_id,
+            _entryId: cs.entry_local_id,
+            _dirty: false, // It's fresh from the cloud
+            layout: cs.layout,
+            sortOrder: cs.sort_order,
+            label: cs.label || '',
+            text: cs.text || '',
+            texts: cs.texts || ['', '', ''],
+            labels: cs.labels || ['', '', ''],
+            image: cs.photo_url || '',
+        }));
+
+        return {
+            _id: ce.local_id,
+            _seed: false, // Cloud data is never seed data
+            _dirty: false,
+            date: ce.date,
+            displayTitle: ce.display_title || '',
+            location: ce.location || '',
+            climate: ce.climate || '',
+            weatherStats: ce.weather_stats || '',
+            weatherFeel: ce.weather_feel || '',
+            sortOrder: ce.sort_order,
+            sections: mappedSections
+        };
+    });
 }
 
