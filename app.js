@@ -47,13 +47,9 @@ let authMode = 'signin';   // 'signin' or 'signup'
 async function initAuth() {
     if (!supabaseClient) return;
 
-    // 1. Register the listener first (per Supabase docs), and defer
-    // the UI update so it doesn't block the auth client.
+    // 1. Listen for changes (defer the UI update so we don't block the auth client)
     supabaseClient.auth.onAuthStateChange((event, session) => {
-        // set the state immediately
         currentSession = session;
-        
-        // defer the UI update so it doesn't hold up the auth client
         setTimeout(() => {
             updateAuthUI();
             if (event === 'SIGNED_IN') showNotification('Signed in.');
@@ -61,15 +57,13 @@ async function initAuth() {
         }, 0);
     });
 
-    // 2. Then load the current session to catch anything that
-    // already happened before the listener was ready.
+    // 2. Manually check the session on load
     const { data, error } = await supabaseClient.auth.getSession();
     if (error) {
         console.error('Session load failed:', error);
         return;
     }
     
-    // 3. Set the session and update the UI one final time.
     currentSession = data.session;
     updateAuthUI();
 }
