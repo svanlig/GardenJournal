@@ -69,20 +69,36 @@ async function initAuth() {
 }
 
 function updateAuthUI() {
+    // 1. App Bar elements
     const btnSignIn = document.getElementById('btnSignIn');
     const btnSignOut = document.getElementById('btnSignOut');
     const authEmail = document.getElementById('authEmail');
 
-    if (!btnSignIn || !btnSignOut || !authEmail) return;
+    // 2. Landing Page elements
+    const landBtnSignIn = document.getElementById('landingBtnSignIn');
+    const landBtnSignOut = document.getElementById('landingBtnSignOut');
+    const landAuthUser = document.getElementById('landingAuthUser');
+    const landAuthEmail = document.getElementById('landingAuthEmail');
 
     if (currentSession && currentSession.user) {
-        btnSignIn.style.display = 'none';
-        btnSignOut.style.display = 'inline-block';
-        authEmail.textContent = currentSession.user.email || '';
+        // Logged In State
+        if (btnSignIn) btnSignIn.style.display = 'none';
+        if (btnSignOut) btnSignOut.style.display = 'inline-block';
+        if (authEmail) authEmail.textContent = currentSession.user.email || '';
+
+        if (landBtnSignIn) landBtnSignIn.style.display = 'none';
+        if (landAuthUser) landAuthUser.style.display = 'block';
+        if (landAuthEmail) landAuthEmail.textContent = currentSession.user.email || '';
+        if (landBtnSignOut) landBtnSignOut.style.display = 'block';
     } else {
-        btnSignIn.style.display = 'inline-block';
-        btnSignOut.style.display = 'none';
-        authEmail.textContent = '';
+        // Logged Out State
+        if (btnSignIn) btnSignIn.style.display = 'inline-block';
+        if (btnSignOut) btnSignOut.style.display = 'none';
+        if (authEmail) authEmail.textContent = '';
+
+        if (landBtnSignIn) landBtnSignIn.style.display = 'block';
+        if (landAuthUser) landAuthUser.style.display = 'none';
+        if (landBtnSignOut) landBtnSignOut.style.display = 'none';
     }
 }
 
