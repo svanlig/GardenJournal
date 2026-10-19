@@ -221,6 +221,7 @@ function updateAuthUI() {
     const landBtnSignOut = document.getElementById('landingBtnSignOut');
     const landAuthUser = document.getElementById('landingAuthUser');
     const landAuthEmail = document.getElementById('landingAuthEmail');
+    const btnUploadCloud = document.getElementById('btnUploadCloud');
 
     if (currentSession && currentSession.user) {
         // Logged In State
@@ -232,6 +233,7 @@ function updateAuthUI() {
         if (landAuthUser) landAuthUser.style.display = 'block';
         if (landAuthEmail) landAuthEmail.textContent = currentSession.user.email || '';
         if (landBtnSignOut) landBtnSignOut.style.display = 'block';
+        if (btnUploadCloud) btnUploadCloud.style.display = 'block';
     } else {
         // Logged Out State
         if (btnSignIn) btnSignIn.style.display = 'inline-block';
@@ -241,6 +243,7 @@ function updateAuthUI() {
         if (landBtnSignIn) landBtnSignIn.style.display = 'block';
         if (landAuthUser) landAuthUser.style.display = 'none';
         if (landBtnSignOut) landBtnSignOut.style.display = 'none';
+        if (btnUploadCloud) btnUploadCloud.style.display = 'none';
     }
 
    const btnSync = document.getElementById('btnManualSync');
