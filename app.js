@@ -2592,6 +2592,13 @@ async function fetchFromCloud() {
 
         // Rebuild the nested structure
         const hydrated = hydrateFromCloud(cloudEntries, cloudSections);
+        // NEW: Sort entries by date immediately so the first render is correct
+        hydrated.sort((a, b) => {
+            const da = a.date || '';
+            const db = b.date || '';
+            if (da === db) return 0;
+            return da < db ? 1 : -1; // Newest first
+        });
 
         // 5. Overwrite local memory and local IndexedDB
         journalDatabase = hydrated;
