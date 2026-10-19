@@ -39,6 +39,148 @@ try {
 }
 
 /* ---------------------------------------------------------
+   CLOUD SYNC (Stage 5: One-way Upload)
+   --------------------------------------------------------- */
+
+async function pushToCloud() {
+    if (!supabaseClient || !currentSession) {
+        showNotification('Please sign in to upload.');
+        return;
+    }
+
+    const confirmed = confirm("Upload this device's journal to the cloud? This will overwrite any existing cloud data for this account.");
+    if (!confirmed) return;
+
+    const btn = document.getElementById('btnUploadCloud');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Uploading...';
+    showNotification('Starting upload...');
+
+    try {
+        const userId = currentSession.user.id;
+        let uploadedEntries = 0;
+        let uploadedSections = 0;
+        let uploadedPhotos = 0;
+
+        // Iterate over entries to process photos and build the insert payloads
+        for (const entry of journalDatabase) {
+            ensureEntryId(entry);
+
+            // 1. Upload Entry
+            const entryPayload = {
+                user_id: userId,
+                local_id: entry._id,
+                date: entry.date,
+                display_title: entry.displayTitle || '',
+                location: entry.location || '',
+                climate: entry.climate || '',
+                weather_stats: entry.weatherStats || '',
+                weather_feel: entry.weatherFeel || '',
+                sort_order: entry.sortOrder || 0
+            };
+
+            const { error: entryError } = await supabaseClient
+                .from('entries')
+                .upsert(entryPayload, { onConflict: 'user_id, local_id' });
+
+            if (entryError) throw new Error("Entry insert failed: " + entryError.message);
+            uploadedEntries++;
+
+            // 2. Upload Sections
+            for (const sec of (entry.sections || [])) {
+                ensureSectionId(sec, entry._id);
+
+                let photoUrl = sec.image || '';
+
+                // If the image is a local Data URL, upload it to Storage
+                if (photoUrl.startsWith('data:image/')) {
+                    const blob = dataURLtoBlob(photoUrl);
+                    const fileExt = blob.type.split('/')[1] || 'jpeg';
+                    const filePath = `${userId}/${entry._id}/${sec._id}.${fileExt}`;
+
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('photos')
+                        .upload(filePath, blob, { upsert: true });
+
+                    if (uploadError) {
+                        console.error("Photo upload failed for section", sec._id, uploadError);
+                        // We continue anyway, keeping the data URL locally if it fails
+                    } else {
+                        // Get the public URL (or create a signed URL if private)
+                        // Note: Since your bucket is private, we need a signed URL.
+                        // For simplicity in Stage 5, we'll generate a long-lived signed URL (1 year).
+                        const { data: urlData, error: urlError } = await supabaseClient.storage
+                            .from('photos')
+                            .createSignedUrl(filePath, 31536000); // 1 year in seconds
+
+                        if (!urlError && urlData) {
+                            photoUrl = urlData.signedUrl;
+                            uploadedPhotos++;
+                        }
+                    }
+                }
+
+                // Update the local model with the new URL so we don't re-upload next time
+                sec.image = photoUrl;
+                markSectionDirty(sec); // We'll clear this dirty flag after everything finishes
+
+                const sectionPayload = {
+                    user_id: userId,
+                    entry_local_id: entry._id,
+                    local_id: sec._id,
+                    layout: sec.layout,
+                    sort_order: sec.sortOrder || 0,
+                    label: sec.label || '',
+                    text: sec.text || '',
+                    texts: sec.texts || null,
+                    labels: sec.labels || null,
+                    photo_url: photoUrl
+                };
+
+                const { error: secError } = await supabaseClient
+                    .from('sections')
+                    .upsert(sectionPayload, { onConflict: 'user_id, local_id' });
+
+                if (secError) throw new Error("Section insert failed: " + secError.message);
+                uploadedSections++;
+            }
+        }
+
+        // 3. If we made it here, the cloud is up to date.
+        // Clear all dirty flags locally.
+        journalDatabase.forEach(e => {
+            e._dirty = false;
+            (e.sections || []).forEach(s => s._dirty = false);
+        });
+
+        // Save locally to reflect the new photo URLs and cleared dirty flags
+        await persistImmediately();
+
+        showNotification(`Success! Uploaded ${uploadedEntries} entries, ${uploadedSections} sections.`);
+        alert(`Upload complete!\n\n${uploadedEntries} entries\n${uploadedSections} sections\n${uploadedPhotos} photos uploaded.`);
+
+    } catch (err) {
+        console.error('Cloud upload failed:', err);
+        showNotification('Upload failed. Check console.');
+        alert('Upload failed: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+// Helper to convert Data URL to Blob
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
+
+/* ---------------------------------------------------------
    AUTH STATE + UI
    --------------------------------------------------------- */
 let currentSession = null;
