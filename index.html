@@ -51,6 +51,12 @@
                 </select>
                 <button class="btn-search-go" onclick="triggerArchiveSearch()" title="Open Month Archive">Search</button>
             </div>
+            
+            <div class="auth-control" id="authControl">
+                <button class="btn-auth" id="btnSignIn" onclick="openAuthView()">Sign in</button>
+                <span class="auth-email" id="authEmail"></span>
+                <button class="btn-auth" id="btnSignOut" onclick="handleSignOut()" style="display: none;">Sign out</button>
+            </div>
 
             <div class="menu-wrapper">
                 <button class="three-dot-trigger" id="menuTrigger" onclick="toggleDropdown(event)">⋮</button>
