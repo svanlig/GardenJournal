@@ -25,6 +25,156 @@ let lastDeletedSection = null;   // { section: {...}, index: N, entryIndex: M } 
 let sectionDrag = null;   // { index, startY, currentTargetIndex, placeholder, sectionEl } or null
 
 /* ---------------------------------------------------------
+   SUPABASE CLIENT
+   Only used for auth in Stage 3. No data sync yet.
+   --------------------------------------------------------- */
+const SUPABASE_URL = 'https://wvsrhuvjgfwxkmlkfozc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind2c3JodXZqZ2Z3eGttbGtmb3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNjI0NDUsImV4cCI6MjEwNzczODQ0NX0.HUTToc9yfP5gxrpeD1-7LQNv3XKqReamT2vSgPDxgk0';
+
+let supabaseClient = null;
+try {
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+    console.error('Supabase init failed:', e);
+}
+
+/* ---------------------------------------------------------
+   AUTH STATE + UI
+   --------------------------------------------------------- */
+let currentSession = null;
+let authMode = 'signin';   // 'signin' or 'signup'
+
+async function initAuth() {
+    if (!supabaseClient) return;
+
+    // Load any existing session
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+        console.error('Session load failed:', error);
+        return;
+    }
+    currentSession = data.session;
+    updateAuthUI();
+
+    // Listen for auth changes
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        currentSession = session;
+        updateAuthUI();
+        if (event === 'SIGNED_IN') {
+            showNotification('Signed in.');
+        } else if (event === 'SIGNED_OUT') {
+            showNotification('Signed out.');
+        }
+    });
+}
+
+function updateAuthUI() {
+    const btnSignIn = document.getElementById('btnSignIn');
+    const btnSignOut = document.getElementById('btnSignOut');
+    const authEmail = document.getElementById('authEmail');
+
+    if (currentSession && currentSession.user) {
+        if (btnSignIn) btnSignIn.style.display = 'none';
+        if (btnSignOut) btnSignOut.style.display = 'inline-block';
+        if (authEmail) authEmail.textContent = currentSession.user.email || '';
+    } else {
+        if (btnSignIn) btnSignIn.style.display = 'inline-block';
+        if (btnSignOut) btnSignOut.style.display = 'none';
+        if (authEmail) authEmail.textContent = '';
+    }
+}
+
+function openAuthView() {
+    authMode = 'signin';
+    renderAuthMode();
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('authViewContainer').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeAuthView() {
+    document.getElementById('authViewContainer').classList.remove('active');
+    if (journalDatabase.length === 0) {
+        showLandingPage();
+    } else {
+        switchToJournalSheetView();
+    }
+}
+
+function toggleAuthMode() {
+    authMode = authMode === 'signin' ? 'signup' : 'signin';
+    renderAuthMode();
+}
+
+function renderAuthMode() {
+    const title = document.getElementById('authTitle');
+    const subtitle = document.getElementById('authSubtitle');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const switchText = document.getElementById('authSwitchText');
+    const switchBtn = document.getElementById('authSwitchBtn');
+
+    if (authMode === 'signin') {
+        if (title) title.textContent = 'Sign in';
+        if (subtitle) subtitle.textContent = 'Welcome back to your garden journal.';
+        if (submitBtn) submitBtn.textContent = 'Sign in';
+        if (switchText) switchText.textContent = "Don't have an account?";
+        if (switchBtn) switchBtn.textContent = 'Sign up';
+    } else {
+        if (title) title.textContent = 'Create an account';
+        if (subtitle) subtitle.textContent = 'A place for your garden memories.';
+        if (submitBtn) submitBtn.textContent = 'Sign up';
+        if (switchText) switchText.textContent = 'Already have an account?';
+        if (switchBtn) switchBtn.textContent = 'Sign in';
+    }
+}
+
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+    if (!supabaseClient) {
+        showNotification('Sign-in is not available. Check your connection.');
+        return;
+    }
+
+    const email = document.getElementById('authEmailInput').value.trim();
+    const password = document.getElementById('authPasswordInput').value;
+    const submitBtn = document.getElementById('authSubmitBtn');
+
+    if (!email || !password) return;
+
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+
+    try {
+        if (authMode === 'signin') {
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            showNotification('Signed in.');
+        } else {
+            const { error } = await supabaseClient.auth.signUp({ email, password });
+            if (error) throw error;
+            showNotification('Account created. Check your email to confirm if required.');
+        }
+        closeAuthView();
+    } catch (err) {
+        console.error('Auth error:', err);
+        showNotification(err.message || 'Sign-in failed.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }
+}
+
+async function handleSignOut() {
+    if (!supabaseClient) return;
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        console.error('Sign out failed:', error);
+        showNotification('Sign out failed.');
+    }
+}
+
+/* ---------------------------------------------------------
    DATA
    --------------------------------------------------------- */
 let journalDatabase = [
