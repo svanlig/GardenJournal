@@ -149,12 +149,22 @@ async function handleAuthSubmit(event) {
 
     try {
         if (authMode === 'signin') {
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) throw error;
+            // Force update immediately on success
+            currentSession = data.session;
+            updateAuthUI();
             showNotification('Signed in.');
+           
         } else {
-            const { error } = await supabaseClient.auth.signUp({ email, password });
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
             if (error) throw error;
+            // If auto-confirmed, signUp returns a session
+            if (data.session) {
+                currentSession = data.session;
+                updateAuthUI();
+            }
+           
             showNotification('Account created. Check your email to confirm if required.');
         }
         closeAuthView();
@@ -173,6 +183,11 @@ async function handleSignOut() {
     if (error) {
         console.error('Sign out failed:', error);
         showNotification('Sign out failed.');
+    } else {
+        // Force update immediately on success
+        currentSession = null;
+        updateAuthUI();
+        showNotification('Signed out.');
     }
 }
 
