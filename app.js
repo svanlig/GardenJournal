@@ -47,25 +47,31 @@ let authMode = 'signin';   // 'signin' or 'signup'
 async function initAuth() {
     if (!supabaseClient) return;
 
-    // Load any existing session
+    // 1. Register the listener first (per Supabase docs), and defer
+    // the UI update so it doesn't block the auth client.
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+        // set the state immediately
+        currentSession = session;
+        
+        // defer the UI update so it doesn't hold up the auth client
+        setTimeout(() => {
+            updateAuthUI();
+            if (event === 'SIGNED_IN') showNotification('Signed in.');
+            if (event === 'SIGNED_OUT') showNotification('Signed out.');
+        }, 0);
+    });
+
+    // 2. Then load the current session to catch anything that
+    // already happened before the listener was ready.
     const { data, error } = await supabaseClient.auth.getSession();
     if (error) {
         console.error('Session load failed:', error);
         return;
     }
+    
+    // 3. Set the session and update the UI one final time.
     currentSession = data.session;
     updateAuthUI();
-
-    // Listen for auth changes
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-        currentSession = session;
-        updateAuthUI();
-        if (event === 'SIGNED_IN') {
-            showNotification('Signed in.');
-        } else if (event === 'SIGNED_OUT') {
-            showNotification('Signed out.');
-        }
-    });
 }
 
 function updateAuthUI() {
@@ -73,14 +79,16 @@ function updateAuthUI() {
     const btnSignOut = document.getElementById('btnSignOut');
     const authEmail = document.getElementById('authEmail');
 
+    if (!btnSignIn || !btnSignOut || !authEmail) return;
+
     if (currentSession && currentSession.user) {
-        if (btnSignIn) btnSignIn.style.display = 'none';
-        if (btnSignOut) btnSignOut.style.display = 'inline-block';
-        if (authEmail) authEmail.textContent = currentSession.user.email || '';
+        btnSignIn.style.display = 'none';
+        btnSignOut.style.display = 'inline-block';
+        authEmail.textContent = currentSession.user.email || '';
     } else {
-        if (btnSignIn) btnSignIn.style.display = 'inline-block';
-        if (btnSignOut) btnSignOut.style.display = 'none';
-        if (authEmail) authEmail.textContent = '';
+        btnSignIn.style.display = 'inline-block';
+        btnSignOut.style.display = 'none';
+        authEmail.textContent = '';
     }
 }
 
