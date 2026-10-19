@@ -2397,3 +2397,118 @@ async function persistDeletedSection(section) {
     }
 }
 
+/* ---------------------------------------------------------
+   CLOUD SYNC (Stage 4: Read Only)
+   --------------------------------------------------------- */
+
+async function fetchFromCloud() {
+    if (!supabaseClient || !currentSession) {
+        showNotification('Please sign in to sync.');
+        return;
+    }
+
+    showNotification('Checking cloud...');
+
+    try {
+        // 1. Fetch entries
+        const { data: cloudEntries, error: entriesError } = await supabaseClient
+            .from('entries')
+            .select('*')
+            .is('deleted_at', null); // Ignore tombstoned entries
+
+        if (entriesError) throw entriesError;
+
+        // 2. Fetch sections
+        const { data: cloudSections, error: sectionsError } = await supabaseClient
+            .from('sections')
+            .select('*')
+            .is('deleted_at', null); // Ignore tombstoned sections
+
+        if (sectionsError) throw sectionsError;
+
+        // 3. If cloud is empty, do nothing (keep local data)
+        if (!cloudEntries || cloudEntries.length === 0) {
+            showNotification('Cloud is empty. Local journal is safe.');
+            return;
+        }
+
+        // 4. Cloud has data! Transform it to match our local format.
+        console.log('Cloud data found. Migrating to local format...', cloudEntries.length, 'entries.');
+
+        // Rebuild the nested structure
+        const hydrated = hydrateFromCloud(cloudEntries, cloudSections);
+
+        // 5. Overwrite local memory and local IndexedDB
+        journalDatabase = hydrated;
+        
+        // We need to write this to IndexedDB so it persists locally.
+        // We'll use the existing replaceAll function from our storage layer.
+        // Note: we are not uploading photos yet (Stage 5).
+        const flatSections = [];
+        hydrated.forEach(entry => {
+            (entry.sections || []).forEach(sec => {
+                flatSections.push({ ...sec, _entryId: entry._id });
+            });
+        });
+
+        // Write to local database
+        await replaceAll(hydrated, flatSections, []);
+        
+        // Re-render
+        currentEntryIndex = 0;
+        renderEntry(currentEntryIndex);
+        updateAuthUI(); // refresh UI just in case
+        
+        showNotification(`Synced ${hydrated.length} entries from cloud.`);
+
+    } catch (err) {
+        console.error('Cloud fetch failed:', err);
+        showNotification('Sync failed. Check console.');
+    }
+}
+
+function hydrateFromCloud(cloudEntries, cloudSections) {
+    // Group sections by their parent entry's local_id
+    const sectionsByEntry = new Map();
+    cloudSections.forEach(s => {
+        if (!sectionsByEntry.has(s.entry_local_id)) sectionsByEntry.set(s.entry_local_id, []);
+        sectionsByEntry.get(s.entry_local_id).push(s);
+    });
+
+    // Map over entries
+    return cloudEntries.map(ce => {
+        const entrySections = sectionsByEntry.get(ce.local_id) || [];
+        
+        // Sort sections
+        entrySections.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+        // Map sections to local format
+        const mappedSections = entrySections.map(cs => ({
+            _id: cs.local_id,
+            _entryId: cs.entry_local_id,
+            _dirty: false, // It's fresh from the cloud
+            layout: cs.layout,
+            sortOrder: cs.sort_order,
+            label: cs.label || '',
+            text: cs.text || '',
+            texts: cs.texts || ['', '', ''],
+            labels: cs.labels || ['', '', ''],
+            image: cs.photo_url || '',
+        }));
+
+        return {
+            _id: ce.local_id,
+            _seed: false, // Cloud data is never seed data
+            _dirty: false,
+            date: ce.date,
+            displayTitle: ce.display_title || '',
+            location: ce.location || '',
+            climate: ce.climate || '',
+            weatherStats: ce.weather_stats || '',
+            weatherFeel: ce.weather_feel || '',
+            sortOrder: ce.sort_order,
+            sections: mappedSections
+        };
+    });
+}
+
