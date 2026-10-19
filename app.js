@@ -100,6 +100,16 @@ function updateAuthUI() {
         if (landAuthUser) landAuthUser.style.display = 'none';
         if (landBtnSignOut) landBtnSignOut.style.display = 'none';
     }
+
+   const btnSync = document.getElementById('btnManualSync');
+
+    if (currentSession && currentSession.user) {
+        // ... existing logged in code ...
+        if (btnSync) btnSync.style.display = 'inline-block'; // Show sync button
+    } else {
+        // ... existing logged out code ...
+        if (btnSync) btnSync.style.display = 'none'; // Hide sync button
+    }
 }
 
 function openAuthView() {
