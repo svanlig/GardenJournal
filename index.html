@@ -137,19 +137,26 @@
 
                 </div>
 
-                <!-- D: Utilities -->
-                <div class="cover-action-card utility-action">
-                    <div>
-                        <span class="action-card-label">System Tools</span>
-                        <h2 class="action-card-title">Utilities</h2>
-                    </div>
-                    <div class="cover-archive-controls">
-                        <button class="btn-cover-search" onclick="backupJournal()">Backup Journal</button>
-                        <button class="btn-cover-search" onclick="restoreJournal()">Restore System</button>
-                    </div>
-                </div>
-
+               <!-- D: Utilities -->
+<div class="cover-action-card utility-action">
+    <div>
+        <span class="action-card-label">System Tools</span>
+        <h2 class="action-card-title">Utilities</h2>
+    </div>
+    <div class="cover-archive-controls">
+        <!-- Auth block -->
+        <div id="landingAuthBlock" style="margin-bottom: 8px;">
+            <button id="landingBtnSignIn" class="btn-cover-search" onclick="openAuthView()" style="margin-bottom: 6px;">Sign in / Sign up</button>
+            <div id="landingAuthUser" style="display: none; text-align: center; font-family: var(--font-body); font-size: 0.85rem; color: var(--bg-paper); margin-bottom: 6px;">
+                Signed in as <span id="landingAuthEmail" style="font-weight: bold;"></span>
             </div>
+            <button id="landingBtnSignOut" class="btn-cover-search" onclick="handleSignOut()" style="display: none;">Sign out</button>
+        </div>
+        
+        <button class="btn-cover-search" onclick="backupJournal()">Backup Journal</button>
+        <button class="btn-cover-search" onclick="restoreJournal()">Restore System</button>
+    </div>
+</div>
 
             <div class="cover-footer">
                 <span class="cover-footer-meta">VOL. 01 // INDEPENDENT PRINT FORMAT</span>
