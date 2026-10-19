@@ -280,6 +280,39 @@
             <div class="archive-list" id="archiveEntriesList"></div>
         </main>
     </div>
+
+    <!-- =========================================================
+     VIEW: AUTH (Sign in / Sign up)
+     ========================================================= -->
+<div id="authViewContainer" class="view-panel">
+    <main class="auth-page">
+        <div class="auth-panel">
+            <h1 class="auth-title" id="authTitle">Sign in</h1>
+            <p class="auth-subtitle" id="authSubtitle">Welcome back to your garden journal.</p>
+
+            <form id="authForm" onsubmit="handleAuthSubmit(event); return false;">
+                <label class="auth-label">
+                    Email
+                    <input type="email" id="authEmailInput" class="auth-input" required autocomplete="email">
+                </label>
+                <label class="auth-label">
+                    Password
+                    <input type="password" id="authPasswordInput" class="auth-input" required autocomplete="current-password" minlength="6">
+                </label>
+
+                <button type="submit" class="btn-auth-submit" id="authSubmitBtn">Sign in</button>
+            </form>
+
+            <div class="auth-switch">
+                <span id="authSwitchText">Don't have an account?</span>
+                <button type="button" class="auth-switch-btn" onclick="toggleAuthMode()" id="authSwitchBtn">Sign up</button>
+            </div>
+
+            <button type="button" class="auth-cancel" onclick="closeAuthView()">Cancel</button>
+        </div>
+    </main>
+</div>
+    
    <!-- =========================================================
      LAYOUT CHOOSER OVERLAY
      Shown when the + button is clicked. Hidden by default.
