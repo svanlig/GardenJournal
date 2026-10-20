@@ -170,6 +170,13 @@ async function pushToCloud() {
     }
 }
 
+/* Debug helper for Stage 6A */
+window.showQueue = async function() {
+    const q = await getSyncQueue();
+    console.log(`--- SYNC QUEUE (${q.length} items) ---`);
+    q.forEach(item => console.log(item));
+};
+
 // Helper to convert Data URL to Blob
 function dataURLtoBlob(dataurl) {
     var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
