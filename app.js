@@ -742,10 +742,6 @@ window.onload = async function () {
     } catch (err) {
         console.error('Auth setup failed:', err);
     }
-    
-    // THIS WILL NOW ALWAYS RUN
-    window.isAppReady = true;
-    console.log('App is ready. Sync engine active.');
 
     if (journalDatabase.some(e => e._dirty)) {
        persistImmediately();
