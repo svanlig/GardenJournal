@@ -186,8 +186,36 @@ async function replaceAll(entries, sections, photos) {
     await _txDone(tx);
 }
 
+/* ---------------------------------------------------------
+   SYNC QUEUE
+   --------------------------------------------------------- */
+async function enqueueSync(entity, action, id) {
+    const tx = _tx([STORE_QUEUE], 'readwrite');
+    const store = tx.objectStore(STORE_QUEUE);
+    store.add({
+        entity: entity,       // 'entry', 'section', or 'photo'
+        action: action,       // 'upsert' or 'delete'
+        recordId: id,         // the _id of the record
+        _queuedAt: Date.now(),
+        _attemptCount: 0
+    });
+    await _txDone(tx);
+}
+
+async function getSyncQueue() {
+    const tx = _tx([STORE_QUEUE], 'readonly');
+    const req = tx.objectStore(STORE_QUEUE).getAll();
+    return await _reqAsPromise(req);
+}
+
+async function removeFromSyncQueue(queueId) {
+    const tx = _tx([STORE_QUEUE], 'readwrite');
+    tx.objectStore(STORE_QUEUE).delete(queueId);
+    await _txDone(tx);
+}
+
+
 /* ---------- Stage 1 stubs for later stages ---------- */
 
-async function enqueueSync()      { /* no-op in Stage 1 */ }
 async function listConflicts()    { return []; }
 async function resolveConflict()  { /* no-op in Stage 1 */ }
