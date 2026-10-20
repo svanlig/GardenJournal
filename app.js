@@ -1654,9 +1654,14 @@ function createNewEntry() {
         sections: [],
         sortOrder: journalDatabase.length   // <-- append at end
     };
+    // CRITICAL: Make sure it has an ID and is marked dirty BEFORE we push it
+    ensureEntryId(newBlankPage);
+    markEntryDirty(newBlankPage);
+   
     journalDatabase.push(newBlankPage);
     renderEntry(journalDatabase.length - 1);
     updateEntryWeather();
+    triggerAutoSaveFeedback();
     showNotification('New blank journal page composition initialized.');
 }
 
