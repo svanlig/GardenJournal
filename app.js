@@ -1397,7 +1397,8 @@ function triggerAutoSaveFeedback() {
     // Mark the current entry as dirty. Section-level dirties are set
     // by the mutation sites themselves.
     const current = journalDatabase[currentEntryIndex];
-    if (current) markEntryDirty(current);
+    if (current) {markEntryDirty(current);
+    }
 
     _schedulePersistFlush();
 }
