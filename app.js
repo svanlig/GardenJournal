@@ -2534,6 +2534,8 @@ async function persistDeletedEntry(entry) {
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error);
         });
+        // NEW: Queue the delete
+        enqueueSync('entry', 'delete', entry._id);
         _showSavedIndicator();
     } catch (err) {
         console.error('Failed to persist entry tombstone:', err);
@@ -2549,6 +2551,9 @@ async function persistDeletedSection(section) {
             tx.oncomplete = resolve;
             tx.onerror = () => reject(tx.error);
         });
+       
+        // NEW: Queue the delete
+        enqueueSync('section', 'delete', section._id);
         _showSavedIndicator();
     } catch (err) {
         console.error('Failed to persist section tombstone:', err);
