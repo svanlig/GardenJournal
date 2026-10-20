@@ -192,13 +192,33 @@ async function replaceAll(entries, sections, photos) {
 async function enqueueSync(entity, action, id) {
     const tx = _tx([STORE_QUEUE], 'readwrite');
     const store = tx.objectStore(STORE_QUEUE);
+    
+    // Get all current queue items to check for duplicates
+    const allReq = store.getAll();
+    const currentQueue = await _reqAsPromise(allReq);
+    
+    // Check if this exact entity/action/id is already in the queue
+    const existing = currentQueue.find(item => 
+        item.entity === entity && 
+        item.action === action && 
+        item.recordId === id
+    );
+    
+    if (existing) {
+        // It's already queued. We don't need to add it again.
+        // The network loop will just pick up the latest data from IndexedDB when it runs.
+        return;
+    }
+
+    // If not in queue, add it
     store.add({
-        entity: entity,       // 'entry', 'section', or 'photo'
-        action: action,       // 'upsert' or 'delete'
-        recordId: id,         // the _id of the record
+        entity: entity,
+        action: action,
+        recordId: id,
         _queuedAt: Date.now(),
         _attemptCount: 0
     });
+    
     await _txDone(tx);
 }
 
