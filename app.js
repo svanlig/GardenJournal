@@ -1648,7 +1648,7 @@ async function _flushPersist() {
         }
        
     // NEW: Trigger the sync loop after saving locally
-        processSyncQueue(); // <-- ADD THIS LINE
+        if (window.isAppReady) {processSyncQueue();} // <-- ADD THIS LINE
     }
 }
 function _showSavedIndicator() {
