@@ -261,6 +261,96 @@ async function processSyncQueue() {
     }
 }
 
+async function pushEntryToCloud(entry, action) {
+    const userId = currentSession.user.id;
+    
+    if (action === 'delete') {
+        const { error } = await supabaseClient
+            .from('entries')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('user_id', userId)
+            .eq('local_id', entry._id);
+        if (error) throw error;
+        return;
+    }
+
+    const payload = {
+        user_id: userId,
+        local_id: entry._id,
+        date: entry.date,
+        display_title: entry.displayTitle || '',
+        location: entry.location || '',
+        climate: entry.climate || '',
+        weather_stats: entry.weatherStats || '',
+        weather_feel: entry.weatherFeel || '',
+        sort_order: entry.sortOrder || 0,
+        deleted_at: null
+    };
+
+    const { error } = await supabaseClient
+        .from('entries')
+        .upsert(payload, { onConflict: 'user_id, local_id' });
+    
+    if (error) throw error;
+}
+
+async function pushSectionToCloud(section, parentEntry, action) {
+    const userId = currentSession.user.id;
+    
+    if (action === 'delete') {
+        const { error } = await supabaseClient
+            .from('sections')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('user_id', userId)
+            .eq('local_id', section._id);
+        if (error) throw error;
+        return;
+    }
+
+    // Handle Photo Upload if this is a new local Data URL
+    let photoUrl = section.image || '';
+    if (photoUrl.startsWith('data:image/')) {
+        const blob = dataURLtoBlob(photoUrl);
+        const fileExt = blob.type.split('/')[1] || 'jpeg';
+        const filePath = `${userId}/${parentEntry._id}/${section._id}.${fileExt}`;
+
+        const { error: uploadError } = await supabaseClient.storage
+            .from('photos')
+            .upload(filePath, blob, { upsert: true });
+
+        if (!uploadError) {
+            const { data: urlData } = await supabaseClient.storage
+                .from('photos')
+                .createSignedUrl(filePath, 31536000); // 1 year
+            if (urlData) photoUrl = urlData.signedUrl;
+        }
+        
+        // Update memory so we don't upload it again
+        section.image = photoUrl;
+    }
+
+    const payload = {
+        user_id: userId,
+        entry_local_id: parentEntry._id,
+        local_id: section._id,
+        layout: section.layout,
+        sort_order: section.sortOrder || 0,
+        label: section.label || '',
+        text: section.text || '',
+        texts: section.texts || null,
+        labels: section.labels || null,
+        photo_url: photoUrl,
+        deleted_at: null
+    };
+
+    const { error } = await supabaseClient
+        .from('sections')
+        .upsert(payload, { onConflict: 'user_id, local_id' });
+    
+    if (error) throw error;
+}
+
+
 async function updateQueueItemError(queueId, errorMsg) {
     const tx = _db.transaction(['syncQueue'], 'readwrite');
     const store = tx.objectStore('syncQueue');
