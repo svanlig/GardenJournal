@@ -374,27 +374,37 @@ let currentSession = null;
 let authMode = 'signin';   // 'signin' or 'signup'
 
 async function initAuth() {
-    if (!supabaseClient) return;
-
-    // 1. Listen for changes (defer the UI update so we don't block the auth client)
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-        currentSession = session;
-        setTimeout(() => {
-            updateAuthUI();
-            if (event === 'SIGNED_IN') showNotification('Signed in.');
-            if (event === 'SIGNED_OUT') showNotification('Signed out.');
-        }, 0);
-    });
-
-    // 2. Manually check the session on load
-    const { data, error } = await supabaseClient.auth.getSession();
-    if (error) {
-        console.error('Session load failed:', error);
+    if (!supabaseClient) {
+        window.isAppReady = true; // App is ready even if offline
         return;
     }
-    
-    currentSession = data.session;
-    updateAuthUI();
+
+    try {
+        // 1. Listen for changes (defer the UI update so we don't block the auth client)
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            currentSession = session;
+            setTimeout(() => {
+                updateAuthUI();
+                if (event === 'SIGNED_IN') showNotification('Signed in.');
+                if (event === 'SIGNED_OUT') showNotification('Signed out.');
+            }, 0);
+        });
+
+        // 2. Manually check the session on load
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        
+        currentSession = data.session;
+        updateAuthUI();
+        
+        // 3. Mark the app as ready to sync
+        window.isAppReady = true;
+        
+    } catch (err) {
+        console.error('initAuth failed:', err);
+        // Even if auth fails, the app is ready to sync locally
+        window.isAppReady = true; 
+    }
 }
 
 function updateAuthUI() {
