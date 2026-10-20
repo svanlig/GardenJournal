@@ -722,16 +722,34 @@ window.onload = async function () {
        document.querySelector('.app-bar').style.display = 'none';
     }
    
-    setupWeatherListeners();
-    lockJournalEditing();
-    initAuth();
-    window.isAppReady = true;
+// Wrap setup functions so one error doesn't stop the app from syncing
+    try {
+        setupWeatherListeners();
+    } catch (err) {
+        console.error('Weather listener setup failed:', err);
+    }
 
-   // Ensure any backfilled sortOrder values get written.
-   if (journalDatabase.some(e => e._dirty)) {
+    try {
+        lockJournalEditing();
+    } catch (err) {
+        console.error('Lock editing failed:', err);
+    }
+
+    try {
+        if (typeof initAuth === 'function') {
+            initAuth(); // Note: not awaited, so it runs in background
+        }
+    } catch (err) {
+        console.error('Auth setup failed:', err);
+    }
+    
+    // THIS WILL NOW ALWAYS RUN
+    window.isAppReady = true;
+    console.log('App is ready. Sync engine active.');
+
+    if (journalDatabase.some(e => e._dirty)) {
        persistImmediately();
     }
-   
 };
 
 /* ---------------------------------------------------------
