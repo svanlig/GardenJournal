@@ -2360,25 +2360,54 @@ async function updateEntryWeather() {
     }
 }
 function backupJournal() {
-    const backupData = JSON.stringify(journalDatabase, null, 2);
+    try {
+        // We create a clean copy of the journal, stripping out all sync internals
+        // and circular references that might crash JSON.stringify.
+        const cleanBackup = journalDatabase.map(entry => {
+            return {
+                _id: entry._id,
+                date: entry.date,
+                displayTitle: entry.displayTitle || '',
+                location: entry.location || '',
+                climate: entry.climate || '',
+                weatherStats: entry.weatherStats || '',
+                weatherFeel: entry.weatherFeel || '',
+                sortOrder: entry.sortOrder || 0,
+                sections: (entry.sections || []).map(sec => {
+                    return {
+                        _id: sec._id,
+                        _entryId: entry._id,
+                        layout: sec.layout,
+                        sortOrder: sec.sortOrder || 0,
+                        label: sec.label || '',
+                        text: sec.text || '',
+                        texts: sec.texts || null,
+                        labels: sec.labels || null,
+                        image: sec.image || ''
+                    };
+                })
+            };
+        });
 
-    const blob = new Blob([backupData], {
-        type: 'application/json'
-    });
+        const backupData = JSON.stringify(cleanBackup, null, 2);
+        const blob = new Blob([backupData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
 
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `garden-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(url);
-
-    showNotification('Garden Journal backup downloaded successfully.');
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `garden-journal-backup-${new Date().toISOString().split('T')[0]}.json`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(url);
+        showNotification('Garden Journal backup downloaded successfully.');
+        
+    } catch (err) {
+        console.error('Backup failed:', err);
+        showNotification('Backup failed. Check console.');
+    }
 }
 
 function restoreJournal() {
