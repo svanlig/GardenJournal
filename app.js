@@ -1420,10 +1420,14 @@ async function _flushPersist() {
                 // Sections live only in the sections store.
                 const { sections, ...entryWithoutSections } = entry;
                 dirtyEntries.push(entryWithoutSections);
+                // NEW: Queue the entry for cloud sync
+                enqueueSync('entry', 'upsert', entry._id);
             }
             (entry.sections || []).forEach(sec => {
                 if (!sec._entryId) sec._entryId = entry._id;
                 if (sec._dirty) dirtySections.push({ ...sec });
+                // NEW: Queue the section for cloud sync
+                enqueueSync('section', 'upsert', sec._id);
             });
         });
 
