@@ -1,3 +1,4 @@
+/*Stage 6: Automatic local-first sync engine (Queue + Network loop)*/
 /* ---------- Stage 1:: persistence state ---------- */
 let isAppReady = false;
 let _persistTimer = null;
@@ -6,7 +7,7 @@ let _persistPendingAgain = false;
 const PERSIST_DEBOUNCE_MS = 500;
 
 /* =========================================================
-   GARDEN JOURNAL — APPLICATION LOGIC
+   GARDEN JOURNAL — APPLICATION LOGIC - 
    Function names are unchanged so existing inline handlers
    in index.html continue to resolve.
    ========================================================= */
