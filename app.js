@@ -750,7 +750,23 @@ window.onload = async function () {
     if (journalDatabase.some(e => e._dirty)) {
        persistImmediately();
     }
+   
 };
+
+// Independent boot sequence for the sync engine
+window.addEventListener('load', () => {
+    // Give IndexedDB 2 seconds to settle.
+    // If window.onload is stuck, this will still fire.
+    setTimeout(() => {
+        window.isAppReady = true;
+        console.log('Sync engine fired via timeout. isAppReady =', window.isAppReady);
+        
+        // If there's a queue waiting, process it.
+        if (typeof processSyncQueue === 'function') {
+            processSyncQueue();
+        }
+    }, 2000);
+});
 
 /* ---------------------------------------------------------
    BOOTSTRAP
