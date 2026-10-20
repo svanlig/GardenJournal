@@ -1646,6 +1646,9 @@ async function _flushPersist() {
             _persistPendingAgain = false;
             _schedulePersistFlush();
         }
+       
+    // NEW: Trigger the sync loop after saving locally
+        processSyncQueue(); // <-- ADD THIS LINE
     }
 }
 function _showSavedIndicator() {
