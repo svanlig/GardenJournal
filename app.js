@@ -1,5 +1,5 @@
 /* ---------- Stage 1:: persistence state ---------- */
-
+let isAppReady = false;
 let _persistTimer = null;
 let _persistInFlight = false;
 let _persistPendingAgain = false;
