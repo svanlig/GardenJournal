@@ -1606,17 +1606,18 @@ async function _flushPersist() {
         journalDatabase.forEach(entry => {
             if (entry._dirty) {
                 // Strip the inline sections array before writing the entry.
-                // Sections live only in the sections store.
                 const { sections, ...entryWithoutSections } = entry;
                 dirtyEntries.push(entryWithoutSections);
-                // NEW: Queue the entry for cloud sync
+                // Queue the entry for cloud sync
                 enqueueSync('entry', 'upsert', entry._id);
             }
             (entry.sections || []).forEach(sec => {
                 if (!sec._entryId) sec._entryId = entry._id;
-                if (sec._dirty) dirtySections.push({ ...sec });
-                // NEW: Queue the section for cloud sync
-                enqueueSync('section', 'upsert', sec._id);
+                if (sec._dirty) {
+                    dirtySections.push({ ...sec });
+                    // ONLY queue the section if it's actually dirty
+                    enqueueSync('section', 'upsert', sec._id);
+                }
             });
         });
 
@@ -1642,13 +1643,14 @@ async function _flushPersist() {
         _showSaveFailedIndicator();
     } finally {
         _persistInFlight = false;
+        
         if (_persistPendingAgain) {
             _persistPendingAgain = false;
             _schedulePersistFlush();
+        } else if (window.isAppReady) {
+            // Only trigger the sync loop if we aren't queued for another flush
+            processSyncQueue(); 
         }
-       
-    // NEW: Trigger the sync loop after saving locally
-        if (window.isAppReady) {processSyncQueue();} // <-- ADD THIS LINE
     }
 }
 function _showSavedIndicator() {
