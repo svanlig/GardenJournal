@@ -190,9 +190,6 @@ async function replaceAll(entries, sections, photos) {
    SYNC QUEUE
    --------------------------------------------------------- */
 async function enqueueSync(entity, action, id) {
-    // If the app is still booting up, don't queue anything.
-    // The local IndexedDB save will still happen, but we won't sync it to the cloud.
-    if (!window.isAppReady) return;
    
    const tx = _tx([STORE_QUEUE], 'readwrite');
     const store = tx.objectStore(STORE_QUEUE);
