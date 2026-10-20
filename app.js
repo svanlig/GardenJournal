@@ -186,6 +186,96 @@ function dataURLtoBlob(dataurl) {
     }
     return new Blob([u8arr], {type:mime});
 }
+/* ---------------------------------------------------------
+   STAGE 6B: NETWORK LOOP (PUSH)
+   --------------------------------------------------------- */
+
+let isSyncing = false;
+
+async function processSyncQueue() {
+    // 1. Safety checks
+    if (!window.isAppReady || !supabaseClient || !currentSession || isSyncing) return;
+    if (!navigator.onLine) return; // Don't try if offline
+
+    isSyncing = true;
+
+    try {
+        const queue = await getSyncQueue();
+        if (queue.length === 0) {
+            isSyncing = false;
+            return;
+        }
+
+        console.log(`Processing ${queue.length} sync items...`);
+
+        // Process items one by one
+        for (const item of queue) {
+            // Find the actual data in memory
+            const entry = journalDatabase.find(e => e._id === item.recordId);
+            let section = null;
+            let parentEntry = null;
+            
+            if (!entry) {
+                // If it's a section, find its parent entry
+                for (const e of journalDatabase) {
+                    const sec = (e.sections || []).find(s => s._id === item.recordId);
+                    if (sec) {
+                        section = sec;
+                        parentEntry = e;
+                        break;
+                    }
+                }
+            }
+
+            // If we can't find the data, it was deleted from memory. Skip it.
+            if (!entry && !section) {
+                await removeFromSyncQueue(item._queueId);
+                continue;
+            }
+
+            try {
+                if (item.entity === 'entry') {
+                    await pushEntryToCloud(entry, item.action);
+                } else if (item.entity === 'section') {
+                    await pushSectionToCloud(section, parentEntry, item.action);
+                }
+                
+                // If successful, remove from queue
+                await removeFromSyncQueue(item._queueId);
+                
+            } catch (err) {
+                console.error(`Failed to sync ${item.entity} ${item.recordId}:`, err);
+                // Increment attempt count, update in DB, and abort loop to retry later
+                await updateQueueItemError(item._queueId, err.message);
+                throw err; 
+            }
+        }
+        
+        console.log('Queue processed successfully.');
+        showNotification('Cloud sync complete.');
+        
+    } catch (err) {
+        console.warn('Sync paused due to error. Will retry later.');
+    } finally {
+        isSyncing = false;
+    }
+}
+
+async function updateQueueItemError(queueId, errorMsg) {
+    const tx = _db.transaction(['syncQueue'], 'readwrite');
+    const store = tx.objectStore('syncQueue');
+    const req = store.get(queueId);
+    req.onsuccess = () => {
+        const item = req.result;
+        if (item) {
+            item._attemptCount = (item._attemptCount || 0) + 1;
+            item._lastError = errorMsg;
+            store.put(item);
+        }
+    };
+    await _txDone(tx);
+}
+
 
 /* ---------------------------------------------------------
    AUTH STATE + UI
