@@ -2879,4 +2879,7 @@ function hydrateFromCloud(cloudEntries, cloudSections) {
         };
     });
 }
-
+window.addEventListener('online', () => {
+    console.log('Back online. Processing queue...');
+    processSyncQueue();
+});
