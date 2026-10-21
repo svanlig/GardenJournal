@@ -19,6 +19,7 @@
     /* New color coding */
     --bg-outer1: #F4F3E2;
     --bg-paper2: #FBFAE9;
+    --accent1: #C77E62;
    
 
     /* Shared layout constants */
@@ -325,7 +326,7 @@ body {
 .cover-tagline {
     font-family: var(--font-tagline);
     font-size: 1.4rem;
-    color: var(--accent);
+    color: var(--accent1);
     font-weight: 700;
     margin-top: 16px;
     letter-spacing: -0.5px;
