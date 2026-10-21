@@ -29,6 +29,10 @@
     --font-display: 'Betania Patmos', serif;
     --font-body: 'Betania Patmos', serif;
     --font-hand: 'Newsreader', serif;
+
+   /* New Shared font stacks */
+    --font-title: 'Betania Patmos', serif;
+    --font-tagline: 'Betania Patmos', serif;
 }
 
 * {
