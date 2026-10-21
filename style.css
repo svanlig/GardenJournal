@@ -26,13 +26,14 @@
     --sheet-content-x: 55px;
 
     /* Shared font stacks */
-    --font-display: 'Beth Ellen', cursive;
+    --font-display: 'Betania Patmos', serif;
     --font-body: 'Betania Patmos', serif;
     --font-hand: 'Newsreader', serif;
 
    /* New Shared font stacks */
     --font-title: 'Beth Ellen', cursive;
-    --font-tagline: 'Betania Patmos', serif;
+    --font-tagline: 'Zen Kaku Gothic New', san-serif;
+    --landing-box-title: 'Beth Ellen', cursive;
 }
 
 * {
@@ -296,7 +297,7 @@ body {
 .landing-page-cover {
     min-height: 1090px;
     height: auto;
-    padding: 70px 80px 50px 80px;
+    padding: 5px 80px 50px 80px;
     justify-content: space-between;
     overflow: hidden;
     margin: 40px auto;
@@ -312,7 +313,7 @@ body {
 
 .cover-main-title {
     font-family: var(--font-title);
-    font-size: 4.3rem;
+    font-size: 4.2rem;
     font-weight: 800;
     line-height: 0.95;
     color: var(--muted-purple);
@@ -322,11 +323,11 @@ body {
 }
 
 .cover-tagline {
-    font-family: 'Betania Patmos', cursive;
+    font-family: var(--font-tagline);
     font-size: 1.4rem;
     color: var(--coral-red);
     font-weight: 700;
-    margin-top: 14px;
+    margin-top: -25px;
     letter-spacing: -0.5px;
 }
 
@@ -410,7 +411,7 @@ body {
 
 /* --- Card inner typography --- */
 .action-card-label {
-    font-family: var(--font-display);
+    font-family: var(--font-tagline);
     font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
