@@ -24,6 +24,8 @@
     --box-search: #776899;
     --box-surprise: #F2C94C;
     --box-utilities: #578859;
+    --box-border: #1B511F;
+    --box-label: #F2C94C;
    
     /* Shared layout constants */
     --sheet-width: 906px;
@@ -370,28 +372,28 @@ body {
 
 /* --- Card variants --- */
 .cover-action-card.primary-action {
-    background-color: var(--coral-red);
-    border-color: var(--deep-green);
+    background-color: var(--box-entry);
+    border-color: var(--box-border);
     color: var(--bg-paper);
 }
 
-.primary-action .action-card-label { color: var(--citrus-yellow); }
+.primary-action .action-card-label { color: var(--box-label); }
 
 .cover-action-card.archive-action {
-    background-color: var(--muted-purple);
+    background-color: var(--box-search);
     color: var(--bg-paper);
     cursor: default;
 }
 
-.archive-action .action-card-label { color: var(--citrus-yellow); }
+.archive-action .action-card-label { color: var(--box-label); }
 
 .cover-action-card.surprise-action {
-    background-color: var(--citrus-yellow);
+    background-color: var(--box-surprise);
     color: var(--deep-green);
-    border-color: var(--deep-green);
+    border-color: var(--box-border);
 }
 
-.surprise-action .action-card-label { color: var(--coral-red); }
+.surprise-action .action-card-label { color: var(--box-label); }
 
 .surprise-action .action-card-desc {
     border-top: 1px dashed rgba(27, 81, 31, 0.2);
@@ -400,13 +402,13 @@ body {
 }
 
 .cover-action-card.utility-action {
-    background-color: var(--leaf-green);
+    background-color: var(--box-utilities);
     color: var(--bg-paper);
-    border-color: var(--deep-green);
+    border-color: var(--box-border);
     cursor: default;
 }
 
-.utility-action .action-card-label { color: var(--citrus-yellow); }
+.utility-action .action-card-label { color: var(--box-label); }
 
 .utility-action .cover-archive-controls {
     border-top-color: rgba(251, 250, 233, 0.3);
