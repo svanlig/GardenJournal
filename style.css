@@ -315,7 +315,7 @@ body {
     font-size: 4.4rem;
     font-weight: 800;
     line-height: 0.95;
-    color: var(--deep-green);
+    color: var(--muted-purple);
     letter-spacing: -2px;
     text-transform: none;
     white-space: nowrap;
