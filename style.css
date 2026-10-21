@@ -15,6 +15,11 @@
     --citrus-yellow: #F2C94C;
     --shadow-paper: rgba(27, 81, 31, 0.05);
     --header-dark: #1B511F;
+   
+    /* New color coding */
+    --bg-outer1: #F4F3E2;
+    --bg-paper2: #FBFAE9;
+   
 
     /* Shared layout constants */
     --sheet-width: 906px;
