@@ -311,7 +311,7 @@ body {
 }
 
 .cover-main-title {
-    font-family: var(--font-title);
+    font-family: var('Beth Ellen', cursive);
     font-size: 4.4rem;
     font-weight: 800;
     line-height: 0.95;
