@@ -1147,7 +1147,16 @@ body {
         max-width: 340px;
     }
 
-    .cover-main-title { font-size: 3rem !important; }
+    .cover-main-title { 
+          font-size: 2.2rem !important; 
+          letter-spacing: -1px;
+    }
+   
+    .cover-tagline { 
+          font-size: 0.85rem;
+          letter-spacing: 0;
+          margin-top: 10px;
+    }   
 
     .journal-sections-container {
         display: flex;
