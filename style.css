@@ -297,7 +297,7 @@ body {
 .landing-page-cover {
     min-height: 1090px;
     height: auto;
-    padding: 5px 80px 50px 80px;
+    padding: 70px 80px 50px 80px;
     justify-content: space-between;
     overflow: hidden;
     margin: 40px auto;
@@ -327,7 +327,7 @@ body {
     font-size: 1.4rem;
     color: var(--coral-red);
     font-weight: 700;
-    margin-top: -25px;
+    margin-top: 10px;
     letter-spacing: -0.5px;
 }
 
