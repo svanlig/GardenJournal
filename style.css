@@ -20,8 +20,11 @@
     --bg-outer1: #F4F3E2;
     --bg-paper2: #FBFAE9;
     --accent1: #C77E62;
+    --box-entry: #DC4F49;
+    --box-search: #776899;
+    --box-surprise: #F2C94C;
+    --box-utilities: #578859;
    
-
     /* Shared layout constants */
     --sheet-width: 906px;
     --sheet-content-x: 55px;
