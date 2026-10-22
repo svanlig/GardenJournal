@@ -1133,6 +1133,26 @@ body {
        
     }
 
+    /* NEW: Make actions wrap to the next line if needed */
+    .app-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* NEW: Hide the email on mobile to save space, just show the sign out button */
+    .auth-email {
+        display: none !important;
+    }
+
+    /* NEW: Ensure the search control shrinks instead of overflowing */
+    .app-search-control {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+
     body { padding: 0 0 30px 0; }
 
     .journal-page,
