@@ -2289,8 +2289,8 @@ body.is-dragging-section * {
     color: var(--coral-red);
 }
 
-@media (max-width: 940px) {
+/*@media (max-width: 940px) {
     .auth-email {
         display: none;  /* keep the mobile app bar compact */
-    }
+    }*/
 }
