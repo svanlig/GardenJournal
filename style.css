@@ -1141,9 +1141,13 @@ body {
         gap: 10px;
     }
 
-    /* NEW: Hide the email on mobile to save space, just show the sign out button */
+    /* Keep the email visible, but let it truncate with an ellipsis (...) if it's too long */
     .auth-email {
-        display: none !important;
+        display: inline-block;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     /* NEW: Ensure the search control shrinks instead of overflowing */
