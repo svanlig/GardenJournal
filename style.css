@@ -491,6 +491,10 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+   /* ADD THESE LINES */
+    width: 100%;
+    grid-column: 1 / -1; 
+    margin-top: auto;
 }
 
 .cover-footer-meta {
