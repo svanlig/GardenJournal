@@ -1318,14 +1318,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    height: 100%;
 }
 
 .layout-choice-preview .preview-section.arr-2 .preview-photo {
     order: 1;
     width: 100%;
-    flex: 1.5; /* Makes it a wide banner */
+    flex: 1
     height: auto;
-    min-height: 40px;
+    min-height: 30px;
 }
 
 .layout-choice-preview .preview-section.arr-2 .preview-text {
@@ -1333,7 +1334,7 @@ body {
     width: 100%;
     flex: 1;
     height: auto;
-    min-height: 20px;
+    min-height: 30px;
     background-color: var(--leaf-green) !important;
     border: 2px solid var(--leaf-green);
 }
