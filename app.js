@@ -465,11 +465,8 @@ function openAuthView() {
 
 function closeAuthView() {
     document.getElementById('authViewContainer').classList.remove('active');
-    if (journalDatabase.length === 0) {
-        showLandingPage();
-    } else {
-        switchToJournalSheetView();
-    }
+    // Just return to the landing page, regardless of whether there are entries.
+    showLandingPage();
 }
 
 function toggleAuthMode() {
