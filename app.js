@@ -857,6 +857,32 @@ function formatJournalDate(dateStr) {
 /* ---------------------------------------------------------
    LANDING PAGE HANDLERS
    --------------------------------------------------------- */
+function openLatestEntry() {
+    if (journalDatabase.length === 0) {
+        showNotification('No entries yet. Create one!');
+        return;
+    }
+
+    // 1. Sort a copy of the journal by date, newest first
+    const sorted = [...journalDatabase].sort((a, b) => {
+        const da = a.date || '';
+        const db = b.date || '';
+        if (da === db) return 0;
+        return da < db ? 1 : -1;
+    });
+
+    // 2. Find the index of that newest entry in the original database array
+    const latestEntry = sorted[0];
+    const latestIndex = journalDatabase.findIndex(e => e._id === latestEntry._id);
+
+    // 3. Render it and switch views
+    if (latestIndex !== -1) {
+        renderEntry(latestIndex);
+        switchToJournalSheetView();
+    }
+}
+
+
 function createNewEntryFromCover() {
     createNewEntry();
     switchToJournalSheetView();
