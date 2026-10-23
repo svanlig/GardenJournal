@@ -1281,6 +1281,13 @@ function openLayoutChooser() {
                 <div class="preview-section arr-7">
                     <div class="preview-photo">${photoIcon}</div>
                 </div>`;
+         } else if (layout.id === 'arr-2') {
+            // NEW: Wide banner layout
+            preview.innerHTML = `
+                <div class="preview-section arr-2">
+                    <div class="preview-photo">${photoIcon}</div>
+                    <div class="preview-text" style="background: var(--leaf-green);"></div>
+                </div>`;
          } else {
             preview.innerHTML = `
                 <div class="preview-section ${layout.id}">
