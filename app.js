@@ -1255,47 +1255,39 @@ function openLayoutChooser() {
         const preview = document.createElement('div');
         preview.className = 'layout-choice-preview';
 
-    // Mini rendering of the composition using the same class names
-    // as the real section, so the diagram matches what gets added.
-    if (layout.id === 'arr-5') {
-            // Three notes: three colored text blocks, no photo.
+        const photoIcon = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        `;
+
+        // Mini rendering of the composition
+        if (layout.id === 'arr-5') {
             preview.innerHTML = `
                 <div class="preview-section arr-5">
                     <div class="preview-text" style="background: var(--mustard);"></div>
                     <div class="preview-text" style="background: var(--muted-purple);"></div>
                     <div class="preview-text" style="background: var(--coral-red);"></div>
                 </div>`;
-     } else {
+        } else if (layout.id === 'arr-6') {
+            preview.innerHTML = `
+                <div class="preview-section arr-6">
+                    <div class="preview-text" style="background: var(--leaf-green);"></div>
+                </div>`;
+         } else if (layout.id === 'arr-7') {
+            preview.innerHTML = `
+                <div class="preview-section arr-7">
+                    <div class="preview-photo">${photoIcon}</div>
+                </div>`;
+         } else {
             preview.innerHTML = `
                 <div class="preview-section ${layout.id}">
-                    <div class="preview-photo"></div>
+                    <div class="preview-photo">${photoIcon}</div>
                     <div class="preview-text"></div>
                 </div>`;
-     }
-     if (layout.id === 'arr-5') {
-       preview.innerHTML = `
-           <div class="preview-section arr-5">
-               <div class="preview-text" style="background: var(--mustard);"></div>
-               <div class="preview-text" style="background: var(--muted-purple);"></div>
-               <div class="preview-text" style="background: var(--coral-red);"></div>
-           </div>`;
-     } else if (layout.id === 'arr-6') {
-       preview.innerHTML = `
-           <div class="preview-section arr-6">
-              <div class="preview-text" style="background: var(--leaf-green);"></div>
-           </div>`;
-    } else if (layout.id === 'arr-7') {
-       preview.innerHTML = `
-           <div class="preview-section arr-7">
-             <div class="preview-photo" style="background: var(--leaf-green);"></div>
-           </div>`;
-    } else {
-       preview.innerHTML = `
-           <div class="preview-section ${layout.id}">
-               <div class="preview-photo"></div>
-               <div class="preview-text"></div>
-           </div>`;
-    }
+         }
        
         const label = document.createElement('span');
         label.className = 'layout-choice-label';
