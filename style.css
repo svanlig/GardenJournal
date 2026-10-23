@@ -1328,9 +1328,25 @@ body {
     border-radius: 0;
 }
 
+/* The "Photo" block is a white frame with a border and an icon */
 .layout-choice-preview .preview-photo {
-    background: var(--leaf-green);
-    opacity: 0.85;
+    background-color: var(--bg-paper);
+    border: 2px solid var(--leaf-green); /* Green border */
+    border-radius: 2px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--leaf-green); /* The icon uses this color */
+    padding: 4px; /* Keeps the icon from touching the edges */
+}
+/* Style the SVG icon inside the photo box */
+.layout-choice-preview .preview-photo svg {
+    width: 50%;
+    height: 50%;
+    max-width: 24px;
+    max-height: 24px;
+    opacity: 0.8;
 }
 
 .layout-choice-preview .preview-text {
