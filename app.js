@@ -2150,6 +2150,11 @@ function toggleEditMode() {
     if (button) {
         button.textContent = isEditMode ? 'Done' : 'Edit';
     }
+    // NEW: Keep the bottom button in sync
+    const buttonBottom = document.getElementById('editModeButtonBottom');
+    if (buttonBottom) {
+        buttonBottom.textContent = isEditMode ? 'Done' : 'Edit';
+    }
 
     if (isEditMode) {
         showNotification('Edit mode on — you can now change this entry.');
@@ -2205,6 +2210,12 @@ function lockJournalEditing() {
     const button = document.getElementById('editModeButton');
     if (button) {
         button.textContent = 'Edit';
+    }
+   
+     // NEW: Keep the bottom button in sync
+    const buttonBottom = document.getElementById('editModeButtonBottom');
+    if (buttonBottom) {
+        buttonBottom.textContent = 'Edit';
     }
 
     // NEW: hide Edit-mode-only controls (e.g. the + button) by
