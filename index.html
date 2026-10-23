@@ -23,7 +23,7 @@
     <nav class="app-bar is-hidden" id="appBar">
         <div class="app-branding" onclick="showLandingPage()" title="Return to Journal Front Cover">
             <span class="app-main-title">My Garden Journal</span>
-            <span class="app-subtitle">little things worth remembering</span>
+            <span class="app-subtitle">keeping track of my growing garden</span>
         </div>
 
         <div class="app-actions">
@@ -83,7 +83,7 @@
         <main class="landing-page-cover paper-sheet">
             <div class="cover-header">
                 <h1 class="cover-main-title">My Garden Journal</h1>
-                <p class="cover-tagline">little things worth remembering</p>
+                <p class="cover-tagline">keeping track of my growing garden</p>
             </div>
 
             <div class="cover-content-grid">
@@ -106,6 +106,7 @@
                             <h2 class="action-card-title">The Index</h2>
                         </div>
                         <div class="cover-archive-controls">
+                            <button class="btn-cover-search" onclick="openLatestEntry()" style="margin-bottom: 12px;">Open Latest Entry →</button>
                             <select id="coverMonthSelect" class="cover-select">
                                 <option value="01">January</option>
                                 <option value="02">February</option>
@@ -177,7 +178,7 @@
     <footer class="bottom-nav">
         <button class="btn-nav" id="btnPrev" onclick="navigatePage(-1)">← Previous</button>
         <span class="nav-page-indicator" id="pageIndicator">Page 1 of 1</span>
-        <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button> 
+        <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button
     </footer>
 
     <main class="journal-page paper-sheet" id="journalPage">
