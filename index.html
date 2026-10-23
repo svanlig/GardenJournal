@@ -6,7 +6,7 @@
     <title>My Garden Journal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Beth+Ellen&family=Betania+Patmos&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Kalam:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Nunito+Sans:wght@400;500;600;700&family=Zen+Kurenaido&family=Zen+Kaku+Gothic+New:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Betania+Patmos&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Kalam:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
     <div class="conflict-indicator" id="conflictIndicator" hidden>
@@ -23,7 +23,7 @@
     <nav class="app-bar is-hidden" id="appBar">
         <div class="app-branding" onclick="showLandingPage()" title="Return to Journal Front Cover">
             <span class="app-main-title">My Garden Journal</span>
-            <span class="app-subtitle">keeping track of my growing garden</span>
+            <span class="app-subtitle">little things worth remembering</span>
         </div>
 
         <div class="app-actions">
@@ -83,7 +83,7 @@
         <main class="landing-page-cover paper-sheet">
             <div class="cover-header">
                 <h1 class="cover-main-title">My Garden Journal</h1>
-                <p class="cover-tagline">keeping track of my growing garden</p>
+                <p class="cover-tagline">little things worth remembering</p>
             </div>
 
             <div class="cover-content-grid">
@@ -178,6 +178,9 @@
         <button class="btn-nav" id="btnPrev" onclick="navigatePage(-1)">← Previous</button>
         <span class="nav-page-indicator" id="pageIndicator">Page 1 of 1</span>
         <button class="btn-nav" id="btnNext" onclick="navigatePage(1)">Next →</button>
+        <!-- NEW: The bottom Edit/Done button -->
+        <button class="btn-nav" id="editModeButtonBottom" onclick="toggleEditMode()" style="margin-left: 10px;">Edit</button>
+        
     </footer>
 
     <main class="journal-page paper-sheet" id="journalPage">
