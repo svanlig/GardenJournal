@@ -2061,7 +2061,7 @@ body.is-dragging-section * {
     aspect-ratio: auto;
     height: auto;
     overflow: visible;
-    background: transparent;
+    background: #FFFFFF;
     display: block;
     padding: 0;
     border: none;
