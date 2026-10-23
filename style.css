@@ -2008,14 +2008,25 @@ body.is-dragging-section * {
     min-height: 60px;
 }
 
+/* --- Arr-7: Image Only --- */
 .layout-choice-preview .preview-section.arr-7 {
-    display: block;
-}
-.layout-choice-preview .preview-section.arr-7 .preview-photo {
+    display: block; /* It fills the whole tile */
     width: 100%;
     height: 100%;
-    min-height: 60px;
 }
+
+.layout-choice-preview .preview-section.arr-7 .preview-text {
+    display: none; /* No text in this layout */
+}
+
+/* Force the white background and green border just like the other photo boxes */
+.layout-choice-preview .preview-section.arr-7 .preview-photo {
+    background-color: var(--bg-paper) !important;
+    border: 2px solid var(--leaf-green) !important;
+    width: 100%;
+    height: 100%;
+}
+
 
 /* =========================================================
    COMPOSITION 7: IMAGE ONLY
