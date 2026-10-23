@@ -562,67 +562,66 @@ async function handleSignOut() {
    --------------------------------------------------------- */
 let journalDatabase = [
     {
-        date: "2026-09-17",
-        displayTitle: "The Orange Tree",
-        weatherStats: "82°F · Sunny",
-        weatherFeel: "Hot and humid, but there was a lovely breeze this morning.",
-        sections: [
-            {
-                text: "The Meyer Lemon saplings are completely bathing in the early sunlight today. Noticeable soft new growth clusters along the southern branch tips. The soil texture feels perfect after Tuesday's light rain framework.",
-                image: "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                text: "Tasted the first tiny orange yield of the season. The skins are highly fragrant, crisp oils bursting immediately upon handling. Need to adjust the organic mulch perimeter before the temperature shifts upward next week.",
-                image: "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                text: "Spent an hour carefully tending to the low-hanging interior olive branches. Clear pathways created inside the structure to maximize airflow and catch the beautiful, golden afternoon warm sunlight perfectly.",
-                image: "https://images.unsplash.com/photo-1543157145-f78c636d023d?auto=format&fit=crop&w=600&q=80"
-            },
-            {
-                text: "The warm dusk scent profile carries sweet, intense undertones of mock orange blossoms and dry rosemary spikes. A single pale gold butterfly stayed near the upper leaf tiers for almost twenty quiet minutes tonight.",
-                image: "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80"
-            }
-        ]
+  "date": "2026-10-23",
+  "displayTitle": "Welcome to Your Garden Journal!",
+  "location": "Your Garden",
+  "climate": "Your Zone",
+  "weatherStats": "Sunny",
+  "weatherFeel": "Describe how the weather feels today!",
+  "sortOrder": 0,
+  "sections": [
+    {
+      "layout": "arr-6",
+      "text": "This is a place that you can use to keep track of your garden successes and fails, and anything in between. The aim is to make garden journaling easier, so you can look back and remember the beautiful memories you made in your garden!",
+      "image": "",
+      "sortOrder": 0,
+      "label": "A JOURNAL FOR YOUR GARDEN"
     },
     {
-        date: "2026-09-14",
-        displayTitle: "Tomatoes",
-        weatherStats: "79°F · Overcast",
-        weatherFeel: "Heavy gray air keeping things cool, with a small hint of afternoon rain drops.",
-        sections: [
-            { text: "Heirloom tomato variants showing brilliant deep red shading across the grid blocks.", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80" },
-            { text: "Sturdy stakes supporting heavy branches seamlessly.", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" }
-        ]
+      "layout": "arr-2",
+      "sortOrder": 1,
+      "label": "ORGANIZE AND CUSTOMIZE",
+      "text": "Click EDIT to start journaling. +ADD LAYOUT to add a section the page. Add a photo and scribble some notes. In EDIT mode, you can drag the handles on the top left side to move the section up or down. You can also delete a section by clicking the (-) button at the top right.",
+      "image": "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=1200&q=80"
     },
     {
-        date: "2026-09-08",
-        displayTitle: "First Dahlia",
-        weatherStats: "74°F · Crisp morning",
-        weatherFeel: "A beautiful shift in breeze profile. Perfect dew points for tracking early color scales.",
-        sections: [
-            { text: "The very first magnificent dahlia bloom opened fully this morning layout.", image: "https://images.unsplash.com/photo-1508747705-3df2073ff37d?auto=format&fit=crop&w=600&q=80" },
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" }
-        ]
+      "layout": "arr-1",
+      "sortOrder": 2,
+      "label": "CHOOSE FROM DIFFERENT LAYOUTS",
+      "text": "There are a few layouts for you to choose from, notice how this one has a picture on the right?",
+      "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&w=600&q=80"
     },
     {
-        date: "2026-09-02",
-        displayTitle: "Morning in the Garden",
-        weatherStats: "85°F · High Sun",
-        weatherFeel: "Intense heat early. Had to water the delicate greens twice to counter quick drying cycles.",
-        sections: [
-            { text: "Quiet layers of autumn dew hovering low above the crisp herb fields.", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" },
-            { text: "", image: "" }
-        ]
+      "layout": "arr-3",
+      "sortOrder": 3,
+      "label": "SYNC",
+      "text": "Everything you write is saved to your private account and synced across your device automatically. You can also choose to backup to your own local device.",
+      "image": "https://images.unsplash.com/photo-1543157145-f78c636d023d?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      "layout": "arr-5",
+      "sortOrder": 4,
+      "texts": [
+        "This 3 note section can be used to organize your garden observations. This one can be a reminder \"Water the greens 3X a week.\"",
+        "Give each section its own title. For this one: \"I did not even notice the hornworms until they ate up half the tomato plants. They disguise so well!\"",
+        "\"I added a high K fertilizer to the roses, will have to see the results in the following weeks.\"\nThere are so many creative ways to use this space!"
+      ],
+      "labels": [
+        "REMINDERS",
+        "MY OBSERVATION",
+        "FOLLOW UP"
+      ]
+    },
+    {
+      "layout": "arr-4",
+      "sortOrder": 5,
+      "label": "READY TO GROW?",
+      "text": "When you are ready, delete this tutorial entry and create your first real entry. \nYou can also use your own photo editing apps to combine and edit photos, combine them - and then add it here for a more beautiful presentation.\nHappy Journaling and Happy Gardening!",
+      "image": "https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&w=600&q=80"
     }
-];
-
+  ]
+}
+]
 /* ---------------------------------------------------------
    STATE
    --------------------------------------------------------- */
