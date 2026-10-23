@@ -1313,13 +1313,30 @@ body {
 .layout-choice-preview .preview-section.arr-4 .preview-photo { order: 2; }
 .layout-choice-preview .preview-section.arr-4 .preview-text  { order: 1; }
 
+/* --- Arr-2: Wide Photo on Top / Text Below --- */
 .layout-choice-preview .preview-section.arr-2 {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
-.layout-choice-preview .preview-section.arr-2 .preview-photo { order: 1; }
-.layout-choice-preview .preview-section.arr-2 .preview-text  { order: 2; }
+
+.layout-choice-preview .preview-section.arr-2 .preview-photo {
+    order: 1;
+    width: 100%;
+    flex: 1.5; /* Makes it a wide banner */
+    height: auto;
+    min-height: 40px;
+}
+
+.layout-choice-preview .preview-section.arr-2 .preview-text {
+    order: 2;
+    width: 100%;
+    flex: 1;
+    height: auto;
+    min-height: 20px;
+    background-color: var(--leaf-green) !important;
+    border: 2px solid var(--leaf-green);
+}
 
 .layout-choice-preview .preview-photo,
 .layout-choice-preview .preview-text {
