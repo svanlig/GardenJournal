@@ -2297,8 +2297,10 @@ body.is-dragging-section * {
 .text-link {
   cursor: pointer;
   color: var(--primary-color);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-underline-offset: 4px;
 }
 
 .text-link:hover {
